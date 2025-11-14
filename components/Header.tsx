@@ -14,17 +14,16 @@ const SystemStatusIndicator: React.FC = () => {
     const [isActive, setIsActive] = useState(false);
 
     useEffect(() => {
-        const checkKey = () => {
-            const key = localStorage.getItem('gemini_api_key');
-            setIsActive(!!key);
+        // This global flag is set in geminiService.ts based on the presence of process.env.API_KEY
+        // It's a simple way to check for build-time environment variable presence on the client.
+        const checkApiStatus = () => {
+            setIsActive((window as any).GEMINI_API_ACTIVE || false);
         };
         
-        checkKey();
-        window.addEventListener('storage', checkKey);
-        const intervalId = setInterval(checkKey, 2000); // Periodically check
+        checkApiStatus();
+        const intervalId = setInterval(checkApiStatus, 5000); // Periodically check for safety
         
         return () => {
-            window.removeEventListener('storage', checkKey);
             clearInterval(intervalId);
         };
     }, []);

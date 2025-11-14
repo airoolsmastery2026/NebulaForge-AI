@@ -27,7 +27,7 @@ interface Platform {
 }
 
 const platforms: Record<string, Platform> = {
-    gemini: { id: "gemini", nameKey: "connections.gemini", icon: <PlatformLogo platformId="gemini" />, fields: [{name: 'API_KEY', type: 'password'}], docsUrl: 'https://ai.google.dev/gemini-api/docs/api-key' },
+    gemini: { id: "gemini", nameKey: "connections.gemini", icon: <PlatformLogo platformId="gemini" />, fields: [], docsUrl: 'https://ai.google.dev/gemini-api/docs/api-key' },
     youtube: { id: "youtube", nameKey: "connections.youtube", icon: <PlatformLogo platformId="youtube" />, fields: [{name: 'CLIENT_ID', type: 'text'}, {name: 'CLIENT_SECRET', type: 'password'}], docsUrl: 'https://console.cloud.google.com/apis/credentials' },
     tiktok: { id: "tiktok", nameKey: "connections.tiktok", icon: <PlatformLogo platformId="tiktok" />, fields: [{name: 'CLIENT_KEY', type: 'text'}, {name: 'CLIENT_SECRET', type: 'password'}], docsUrl: 'https://developers.tiktok.com/documents/get-started' },
     instagram: { id: "instagram", nameKey: "connections.instagram", icon: <PlatformLogo platformId="instagram" />, fields: [{name: 'ACCESS_TOKEN', type: 'password'}], docsUrl: 'https://developers.facebook.com/docs/instagram-basic-display-api/getting-started' },
@@ -94,7 +94,6 @@ const platformCategories = [
 ];
 
 const STORAGE_KEY = 'universal-connections';
-const GEMINI_API_KEY = 'gemini_api_key';
 
 
 const StatusIndicator: React.FC<{status: ConnectionStatus}> = ({ status }) => {
@@ -144,19 +143,11 @@ const ConnectionModal: React.FC<{
             autoMode: true,
             credentials,
         };
-        if (platform.id === 'gemini') {
-            localStorage.setItem(GEMINI_API_KEY, credentials.API_KEY || '');
-            window.dispatchEvent(new Event('storage')); // Notify other components
-        }
         onSave(newConnection);
         onClose();
     };
     
     const handleDisconnectClick = () => {
-        if (platform.id === 'gemini') {
-            localStorage.removeItem(GEMINI_API_KEY);
-            window.dispatchEvent(new Event('storage')); // Notify other components
-        }
         onDisconnect(platform.id);
     };
 
@@ -262,23 +253,25 @@ export const Connections: React.FC = () => {
     const [activePlatformId, setActivePlatformId] = useState<string | null>(null);
     const [isFbTokenManagerOpen, setIsFbTokenManagerOpen] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const [isCoreAiActive, setIsCoreAiActive] = useState(false);
 
     useEffect(() => {
+        setIsCoreAiActive((window as any).GEMINI_API_ACTIVE || false);
+
         try {
             const stored = localStorage.getItem(STORAGE_KEY);
             if (stored) {
                 const parsed = JSON.parse(stored);
-                // Sync gemini_api_key into the main connections object on load
-                const geminiKey = localStorage.getItem(GEMINI_API_KEY);
-                if (geminiKey && (!parsed.gemini || parsed.gemini.credentials.API_KEY !== geminiKey)) {
-                    parsed.gemini = {
-                        id: 'gemini', status: 'connected', credentials: { API_KEY: geminiKey }
-                    };
+                // On load, if core AI is active but not in connections, add it.
+                if (isCoreAiActive && !parsed.gemini) {
+                    parsed.gemini = { id: 'gemini', status: 'connected', credentials: {} };
                 }
                 setConnections(parsed);
+            } else if (isCoreAiActive) {
+                setConnections({ 'gemini': { id: 'gemini', status: 'connected', credentials: {} } as Connection});
             }
         } catch (e) { console.error("Failed to load connections:", e); }
-    }, []);
+    }, [isCoreAiActive]);
     
     const saveConnections = (newConnections: Record<string, Connection>) => {
         setConnections(newConnections);
@@ -316,11 +309,6 @@ export const Connections: React.FC = () => {
             try {
                 if (typeof e.target?.result === 'string') {
                     const restoredConns = JSON.parse(e.target.result);
-                    // Handle core gemini key from restored file
-                    if (restoredConns.gemini?.credentials?.API_KEY) {
-                        localStorage.setItem(GEMINI_API_KEY, restoredConns.gemini.credentials.API_KEY);
-                        window.dispatchEvent(new Event('storage'));
-                    }
                     saveConnections(restoredConns);
                 }
             } catch (err) { console.error("Failed to restore connections:", err); }
@@ -329,8 +317,6 @@ export const Connections: React.FC = () => {
     };
     
     const activePlatform = activePlatformId ? platforms[activePlatformId] : null;
-    const corePlatform = platforms['gemini'];
-    const coreConnection = connections['gemini'];
     const otherCategories = platformCategories.filter(cat => cat.nameKey !== 'connections.category_ai');
 
     return (
@@ -349,7 +335,7 @@ export const Connections: React.FC = () => {
                 </Card>
 
                 {/* Core AI Engine Section */}
-                <Card className={`border-2 ${coreConnection ? 'border-green-500/30' : 'border-red-500/30 animate-pulse'}`}>
+                <Card className={`border-2 ${isCoreAiActive ? 'border-green-500/30' : 'border-red-500/30'}`}>
                     <div className="p-4 flex flex-col sm:flex-row items-center justify-between">
                         <div className="flex items-center space-x-4">
                             <PlatformLogo platformId="gemini" className="w-12 h-12" />
@@ -358,9 +344,12 @@ export const Connections: React.FC = () => {
                                 <p className="text-sm text-gray-400 max-w-md">{t('connections.geminiCoreDescription')}</p>
                             </div>
                         </div>
-                         <Button onClick={() => setActivePlatformId('gemini')} className="mt-4 sm:mt-0" icon={<Zap className="h-4 w-4" />}>
-                            {coreConnection ? t('connections.edit') : t('connections.activateButton')}
-                        </Button>
+                        <div className="mt-4 sm:mt-0">
+                            <div className={`flex items-center space-x-2 px-3 py-1.5 rounded-full ${isCoreAiActive ? 'bg-green-500/20 text-green-300' : 'bg-red-500/20 text-red-300'}`}>
+                                <div className={`w-3 h-3 rounded-full ${isCoreAiActive ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                                <span className="font-semibold text-sm">{isCoreAiActive ? t('header.statusActive') : t('header.statusInactive')}</span>
+                            </div>
+                        </div>
                     </div>
                 </Card>
 

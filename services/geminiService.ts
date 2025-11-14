@@ -2,24 +2,14 @@
 import { GoogleGenAI, Type, Modality } from "@google/genai";
 import type { Product, Trend } from '../types';
 
-function getApiKey(): string {
-    // Check localStorage first
-    try {
-        const storedKey = localStorage.getItem('gemini_api_key');
-        if (storedKey) {
-            return storedKey;
-        }
-    } catch (error) {
-        console.error("Error reading Gemini API key from localStorage:", error);
-    }
-    // Fallback to environment variable
-    return process.env.API_KEY || "";
-}
+// Set a global flag based on the presence of the API key at build time.
+// This allows other components to reactively check if the core AI is active.
+(window as any).GEMINI_API_ACTIVE = !!process.env.API_KEY;
 
 const createAiClient = () => {
-    const apiKey = getApiKey();
+    const apiKey = process.env.API_KEY;
     if (!apiKey) {
-        console.warn("Gemini API key not found. AI features will be mocked.");
+        console.warn("Gemini API key not found in process.env.API_KEY. AI features will be mocked.");
         return null;
     }
     return new GoogleGenAI({ apiKey });
@@ -351,6 +341,98 @@ export const generateSpeech = async (script: string): Promise<string> => {
     }
 };
 
+export const generateMusic = async (prompt: string): Promise<string> => {
+    const ai = createAiClient();
+    if (!ai) {
+       await new Promise(resolve => setTimeout(resolve, 2000));
+       // This is a base64 encoded silent WAV file.
+       return "UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABgAAABkYXRhAAAAAA==";
+    }
+    // In a real scenario, you'd call a music generation model like Suno.
+    // For now, we reuse the TTS model as a placeholder for API interaction.
+    try {
+        const response = await ai.models.generateContent({
+            model: "gemini-2.5-flash-preview-tts",
+            contents: [{ parts: [{ text: `Generate music for this prompt, treating it as a script: ${prompt}` }] }],
+            config: {
+                responseModalities: [Modality.AUDIO],
+                speechConfig: {
+                    voiceConfig: {
+                        prebuiltVoiceConfig: { voiceName: 'Kore' },
+                    },
+                },
+            },
+        });
+        const base64Audio = response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+        if (!base64Audio) {
+            throw new Error("No audio data returned from API.");
+        }
+        return base64Audio;
+    } catch (error) {
+        console.error("Error generating music with Gemini API:", error);
+        return "";
+    }
+};
+
+export const generateSfx = async (prompt: string): Promise<string> => {
+    const ai = createAiClient();
+    if (!ai) {
+       await new Promise(resolve => setTimeout(resolve, 1000));
+       // Silent WAV file
+       return "UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABgAAABkYXRhAAAAAA==";
+    }
+    try {
+        const response = await ai.models.generateContent({
+            model: "gemini-2.5-flash-preview-tts",
+            contents: [{ parts: [{ text: `Generate a sound effect for this description: ${prompt}` }] }],
+            config: {
+                responseModalities: [Modality.AUDIO],
+                speechConfig: {
+                    voiceConfig: {
+                        prebuiltVoiceConfig: { voiceName: 'Puck' }, // Different voice for variety
+                    },
+                },
+            },
+        });
+        const base64Audio = response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+        if (!base64Audio) {
+            throw new Error("No audio data returned from API.");
+        }
+        return base64Audio;
+    } catch (error) {
+        console.error("Error generating SFX with Gemini API:", error);
+        return "";
+    }
+};
+
+
+export const generateImageForScene = async (prompt: string): Promise<string> => {
+    const ai = createAiClient();
+    if (!ai) {
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        // This is a base64 encoded placeholder image to avoid errors when mocking.
+        return "iVBORw0KGgoAAAANSUhEUgAAAMgAAABkCAIAAABeC2PWAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAHCSURBVHhe7dFBDQAgEMCw7V/5C1+g4RARBAYs2R4aDw8QIQLGgAgQASNABIwAEbAIEAEjQASMACNgESACRoAIGAEjQASMACNgESACRoAIGAEjQASMACNgESACRoAIGAEjQASMACNgESACRoAIGAEjQASMACNgESACRoAIGAEjQASMACNgESACRoAIGAEjQASMACNgESACRoAIGAEjQASMACNgESACRoAIGAEjQASMACNgESACRoAIGAEjQASMACNgESACRoAIGAEjQASMACNgESACRoAIGAEjQASMACNgESACRoAIGAEjQASMACNgESACRoAIGAEjQASMACNgESACRoAIGAEjQASMACNgESACRoAIGAEjQASMACNgESACRoAIGAEjQASMACNgESACRoAIGAEjQASMACNgESACRoAIGAEjQASMACNgESACRoAIGAEjQASMACNgESACRoAIGAEjQASMACNgESACRoAIGAEjQASMACNgESACRoAIGAEjQASMACNgESACRoAIGAEjQASMACNgESACRoAIGAEjQASMACNgESACRoAIGAEjQASMACNgESACRoAIGAEjQASMACNgESACRoAIGAEjQASMACNgESACRoAIGAEjQASNgEDOB/212GKF4uWAAAAAASUVORK5CYII=";
+    }
+    try {
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash-image',
+            contents: { parts: [{ text: prompt }] },
+            config: {
+                responseModalities: [Modality.IMAGE],
+            },
+        });
+        for (const part of response.candidates[0].content.parts) {
+            if (part.inlineData) {
+                return part.inlineData.data;
+            }
+        }
+        throw new Error("No image data returned from API.");
+    } catch (error) {
+        console.error("Error generating image with Gemini API:", error);
+        return "";
+    }
+};
+
 const ensureVeoApiKey = async () => {
     if ((window as any).aistudio && !(await (window as any).aistudio.hasSelectedApiKey())) {
         await (window as any).aistudio.openSelectKey();
@@ -416,7 +498,7 @@ export const checkVideoGenerationStatus = async (operation: any): Promise<any> =
 };
 
 export const getVideoResult = async (uri: string): Promise<Blob | null> => {
-    const apiKey = getApiKey();
+    const apiKey = process.env.API_KEY;
     if (!apiKey) {
         console.warn("API key not found, cannot download video.");
         return null;

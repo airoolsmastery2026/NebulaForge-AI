@@ -63,7 +63,22 @@ export interface PlatformPerformance {
 }
 
 export type RenderStatus = 'Queued' | 'Rendering' | 'Completed' | 'Failed';
-export type AIModel = 'Sora 2' | 'VEO 3.1' | 'Suno' | 'Dreamina' | 'KlingAI' | 'ElevenLabs Voice AI' | 'gemini-2.5-flash-preview-tts';
+export type AIModel = 'Sora 2' | 'VEO 3.1' | 'Suno' | 'Dreamina' | 'KlingAI' | 'ElevenLabs Voice AI' | 'gemini-2.5-flash-preview-tts' | 'Gemini SFX Generator';
+
+export interface Scene {
+    id: number;
+    text: string;
+    prompt: string;
+    model: AIModel;
+    isGenerating: boolean;
+    thumbnailUrl?: string; // This will be a base64 data URL
+}
+
+export interface SoundEffect {
+    id: number;
+    name: string;
+    audioData: string; // base64 encoded
+}
 
 export interface RenderJob {
   id: number;
