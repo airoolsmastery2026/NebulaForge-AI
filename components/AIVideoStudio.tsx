@@ -1,18 +1,18 @@
-import React, { useState, useMemo, useEffect, useCallback } from 'react';
+
+import React, { useState, useMemo, useCallback } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription } from './common/Card';
 import { Button } from './common/Button';
 import { Spinner } from './common/Spinner';
 import { useI18n } from '../hooks/useI18n';
 import type { ProductWithContent, RenderJob, AIModel, Scene, SoundEffect } from '../types';
 import { generateSpeech, generateImageForScene, generateMusic, generateSfx } from '../services/geminiService';
-import { Mic2, Film, Music, Bot, Volume2 } from './LucideIcons';
+import { Mic2, Film, Music, Bot, Volume2, Play } from './LucideIcons';
 
 interface AIVideoStudioProps {
     productsWithContent: ProductWithContent[];
     onAddRenderJob: (job: Omit<RenderJob, 'id'>) => void;
 }
 
-// Model definitions
 const voiceModels: AIModel[] = ['gemini-2.5-flash-preview-tts', 'ElevenLabs Voice AI'];
 const videoModels: AIModel[] = ['VEO 3.1', 'KlingAI', 'Sora 2', 'Dreamina'];
 const musicModels: AIModel[] = ['Suno'];
@@ -20,19 +20,26 @@ const sfxModels: AIModel[] = ['Gemini SFX Generator'];
 
 type ActiveTab = 'visuals' | 'voice' | 'music' | 'sfx';
 
+const Waveform: React.FC = () => (
+    <div className="flex items-center h-full w-full px-2 overflow-hidden">
+        {Array.from({ length: 60 }).map((_, i) => (
+            <div
+                key={i}
+                className="w-full bg-cyan-400 rounded-sm"
+                style={{ height: `${20 + Math.sin(i / 2) * 15 + Math.random() * 10}%`, minWidth: '2px', marginRight: '2px' }}
+            />
+        ))}
+    </div>
+);
 
-const TimelineTrack: React.FC<{ title: string; icon: React.ReactNode; hasContent: boolean }> = ({ title, icon, hasContent }) => (
-    <div className="flex items-center space-x-3 p-2">
-        <div className="flex flex-col items-center w-16 text-center">
+const TimelineTrack: React.FC<{ title: string; icon: React.ReactNode; children: React.ReactNode; }> = ({ title, icon, children }) => (
+    <div className="flex items-center space-x-3 p-1">
+        <div className="flex flex-col items-center w-20 text-center flex-shrink-0">
             {icon}
             <span className="text-xs text-gray-400 mt-1">{title}</span>
         </div>
-        <div className="flex-grow h-12 bg-gray-800/50 rounded-md flex items-center justify-center border-2 border-dashed border-gray-700">
-            {hasContent ? (
-                <div className="w-full h-full bg-primary-500/30 rounded-md" />
-            ) : (
-                <span className="text-xs text-gray-500">Empty Track</span>
-            )}
+        <div className="flex-grow h-20 bg-gray-800/50 rounded-md flex items-center border-2 border-dashed border-gray-700 overflow-hidden">
+            {children}
         </div>
     </div>
 );
@@ -44,17 +51,14 @@ export const AIVideoStudio: React.FC<AIVideoStudioProps> = ({ productsWithConten
     const [scenes, setScenes] = useState<Scene[]>([]);
     const [activeTab, setActiveTab] = useState<ActiveTab>('visuals');
 
-    // AI Assets State
     const [voiceoverData, setVoiceoverData] = useState<string | null>(null);
     const [musicData, setMusicData] = useState<string | null>(null);
     const [sfxLibrary, setSfxLibrary] = useState<SoundEffect[]>([]);
     
-    // Generation State
     const [isGeneratingVoice, setIsGeneratingVoice] = useState(false);
     const [isGeneratingMusic, setIsGeneratingMusic] = useState(false);
     const [isGeneratingSfx, setIsGeneratingSfx] = useState(false);
     
-    // UI Models State
     const [voiceModel, setVoiceModel] = useState<AIModel>(voiceModels[0]);
     const [musicModel, setMusicModel] = useState<AIModel>(musicModels[0]);
     const [sfxModel, setSfxModel] = useState<AIModel>(sfxModels[0]);
@@ -77,7 +81,6 @@ export const AIVideoStudio: React.FC<AIVideoStudioProps> = ({ productsWithConten
         } else {
             setScenes([]);
         }
-        // Reset all assets
         setVoiceoverData(null);
         setMusicData(null);
         setSfxLibrary([]);
@@ -116,7 +119,9 @@ export const AIVideoStudio: React.FC<AIVideoStudioProps> = ({ productsWithConten
         if (!sfxPrompt) return;
         setIsGeneratingSfx(true);
         const audioB64 = await generateSfx(sfxPrompt);
-        setSfxLibrary(prev => [...prev, { id: Date.now(), name: sfxPrompt, audioData: audioB64 }]);
+        if (audioB64) {
+            setSfxLibrary(prev => [...prev, { id: Date.now(), name: sfxPrompt, audioData: audioB64 }]);
+        }
         setSfxPrompt('');
         setIsGeneratingSfx(false);
     }, [sfxPrompt]);
@@ -169,7 +174,7 @@ export const AIVideoStudio: React.FC<AIVideoStudioProps> = ({ productsWithConten
             {selectedProduct && (
                 <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 items-start">
                     {/* Left Panel: Controls */}
-                    <div className="lg:col-span-2 space-y-4">
+                    <div className="lg:col-span-2">
                         <Card>
                              <CardHeader>
                                 <CardTitle>{t('aiVideoStudio.controls')}</CardTitle>
@@ -181,22 +186,29 @@ export const AIVideoStudio: React.FC<AIVideoStudioProps> = ({ productsWithConten
                                     <button onClick={() => setActiveTab('music')} className={tabButtonClasses('music')}><Music className="h-4 w-4" /><span>{t('aiVideoStudio.music')}</span></button>
                                     <button onClick={() => setActiveTab('sfx')} className={tabButtonClasses('sfx')}><Volume2 className="h-4 w-4" /><span>{t('aiVideoStudio.sfx')}</span></button>
                                 </div>
-                                <div className="p-2">
+                                <div className="p-2 max-h-[70vh] overflow-y-auto">
                                     {activeTab === 'visuals' && (
-                                         <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-2">
+                                         <div className="space-y-3">
                                             {scenes.map(scene => (
-                                                <div key={scene.id} className="p-3 bg-gray-800/50 rounded-md">
-                                                    <p className="text-sm text-gray-300 italic mb-2">"{scene.text}"</p>
-                                                    <div className="space-y-2">
-                                                        <textarea value={scene.prompt} onChange={e => setScenes(prev => prev.map(s => s.id === scene.id ? {...s, prompt: e.target.value} : s))} rows={2} className={`${inputClasses} w-full text-xs`}/>
-                                                        <div className="flex gap-2">
-                                                            <select value={scene.model} onChange={e => setScenes(prev => prev.map(s => s.id === scene.id ? {...s, model: e.target.value as AIModel} : s))} className={`${selectClasses} text-xs`}>
+                                                <Card key={scene.id} className="bg-gray-800/50">
+                                                    <div className="p-3">
+                                                        <div className="flex gap-3">
+                                                            <div className="w-24 h-14 bg-gray-900/50 rounded-md flex-shrink-0 flex items-center justify-center">
+                                                                {scene.isGenerating ? <Spinner/> : scene.thumbnailUrl ? <img src={scene.thumbnailUrl} className="w-full h-full object-cover rounded-md" alt={`Scene ${scene.id}`}/> : <Film className="w-6 h-6 text-gray-600"/>}
+                                                            </div>
+                                                            <div className="flex-grow space-y-1">
+                                                                <p className="text-xs text-gray-400 italic line-clamp-2">"{scene.text}"</p>
+                                                                <textarea value={scene.prompt} onChange={e => setScenes(prev => prev.map(s => s.id === scene.id ? {...s, prompt: e.target.value} : s))} rows={2} className={`${inputClasses} w-full text-xs`}/>
+                                                            </div>
+                                                        </div>
+                                                        <div className="flex gap-2 mt-2">
+                                                            <select value={scene.model} onChange={e => setScenes(prev => prev.map(s => s.id === scene.id ? {...s, model: e.target.value as AIModel} : s))} className={`${selectClasses} text-xs flex-grow`}>
                                                                 {videoModels.map(m => <option key={m} value={m}>{m}</option>)}
                                                             </select>
                                                             <Button size="sm" onClick={() => handleGenerateClip(scene.id)} isLoading={scene.isGenerating}>{t('aiVideoStudio.generateVisuals')}</Button>
                                                         </div>
                                                     </div>
-                                                </div>
+                                                </Card>
                                             ))}
                                         </div>
                                     )}
@@ -239,32 +251,45 @@ export const AIVideoStudio: React.FC<AIVideoStudioProps> = ({ productsWithConten
                     {/* Right Panel: Preview & Timeline */}
                     <div className="lg:col-span-3 space-y-6">
                         <Card>
-                            <CardHeader>
-                                <CardTitle>{t('aiVideoStudio.preview')}</CardTitle>
-                            </CardHeader>
+                            <CardHeader><CardTitle>{t('aiVideoStudio.preview')}</CardTitle></CardHeader>
                             <div className="p-4">
-                                <div className="aspect-video bg-gray-900 rounded-md flex items-center justify-center overflow-hidden">
+                                <div className="relative aspect-video bg-gray-900 rounded-md flex items-center justify-center overflow-hidden">
                                     {scenes.find(s => s.thumbnailUrl) ? 
                                         <img src={scenes.find(s => s.thumbnailUrl)?.thumbnailUrl} className="w-full h-full object-contain" alt="Preview"/> :
                                         <Film className="w-16 h-16 text-gray-700"/>
                                     }
+                                    <div className="absolute inset-0 bg-black/20 flex items-center justify-center group">
+                                        <Play className="w-16 h-16 text-white/50 group-hover:text-white/80 transition-colors cursor-pointer group-hover:scale-110"/>
+                                    </div>
                                 </div>
                             </div>
                         </Card>
                          <Card>
                             <CardHeader>
                                 <CardTitle>{t('aiVideoStudio.timeline')}</CardTitle>
+                                <CardDescription>{t('aiVideoStudio.timelineDescription')}</CardDescription>
                             </CardHeader>
-                             <div className="p-4 space-y-2">
-                                 <div className="flex items-center space-x-3 p-2">
-                                    <div className="flex flex-col items-center w-16 text-center"><Film className="h-5 w-5 text-gray-300" /><span className="text-xs text-gray-400 mt-1">{t('aiVideoStudio.videoTrack')}</span></div>
-                                    <div className="flex-grow h-16 bg-gray-800/50 rounded-md flex items-center p-1 space-x-1 overflow-x-auto">
-                                        {scenes.map(s => <div key={s.id} className={`w-14 h-full rounded flex-shrink-0 bg-gray-700 flex items-center justify-center ${s.isGenerating ? 'animate-pulse' : ''}`}>{s.thumbnailUrl ? <img src={s.thumbnailUrl} className="w-full h-full object-cover rounded"/> : <span className="text-2xl text-gray-500">{s.id+1}</span>}</div>)}
+                             <div className="p-4 space-y-1">
+                                <TimelineTrack title={t('aiVideoStudio.videoTrack')} icon={<Film className="h-5 w-5 text-gray-300" />}>
+                                    {scenes.some(s => s.thumbnailUrl) ? 
+                                    <div className="flex items-center h-full p-1 space-x-1 overflow-x-auto">
+                                        {scenes.map(s => (
+                                            <div key={s.id} className="h-full aspect-video rounded flex-shrink-0 bg-gray-700">
+                                                {s.thumbnailUrl ? <img src={s.thumbnailUrl} className="w-full h-full object-cover rounded" alt={`Scene ${s.id} thumbnail`}/> : null}
+                                            </div>
+                                        ))}
                                     </div>
-                                </div>
-                                <TimelineTrack title={t('aiVideoStudio.voiceTrack')} icon={<Mic2 className="h-5 w-5 text-gray-300" />} hasContent={!!voiceoverData} />
-                                <TimelineTrack title={t('aiVideoStudio.musicTrack')} icon={<Music className="h-5 w-5 text-gray-300" />} hasContent={!!musicData} />
-                                <TimelineTrack title={t('aiVideoStudio.sfxTrack')} icon={<Volume2 className="h-5 w-5 text-gray-300" />} hasContent={sfxLibrary.length > 0} />
+                                    : <span className="text-xs text-gray-500 w-full text-center">Empty Track</span>}
+                                </TimelineTrack>
+                                <TimelineTrack title={t('aiVideoStudio.voiceTrack')} icon={<Mic2 className="h-5 w-5 text-gray-300" />}>
+                                    {voiceoverData ? <Waveform /> : <span className="text-xs text-gray-500 w-full text-center">Empty Track</span>}
+                                </TimelineTrack>
+                                <TimelineTrack title={t('aiVideoStudio.musicTrack')} icon={<Music className="h-5 w-5 text-gray-300" />}>
+                                    {musicData ? <Waveform /> : <span className="text-xs text-gray-500 w-full text-center">Empty Track</span>}
+                                </TimelineTrack>
+                                <TimelineTrack title={t('aiVideoStudio.sfxTrack')} icon={<Volume2 className="h-5 w-5 text-gray-300" />}>
+                                    {sfxLibrary.length > 0 ? <div className="flex items-center h-full px-2">{sfxLibrary.map(sfx => <div key={sfx.id} className="h-3/5 w-10 bg-purple-500/50 rounded-sm mr-2 flex-shrink-0" title={sfx.name} />)}</div> : <span className="text-xs text-gray-500 w-full text-center">Empty Track</span>}
+                                </TimelineTrack>
                             </div>
                         </Card>
                         <Button onClick={handleSendToRender} disabled={!canRender} size="lg" className="w-full" icon={<Bot className="h-5 w-5"/>}>
