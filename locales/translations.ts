@@ -139,6 +139,7 @@ export const translations = {
       voiceover: "Voiceover",
       music: "Music",
       sfx: "Sound Effects",
+      effects: "Effects",
       scene: "Scene",
       selectVoiceModel: "Select Voice Model",
       generateVoiceover: "Generate Voiceover",
@@ -160,6 +161,12 @@ export const translations = {
       sendToRender: "Send to Render Queue",
       assetsNeeded: "Generate a voiceover and at least one visual clip to enable rendering.",
       generating: "Generating..."
+    },
+    
+    effects: {
+      glitch: "Glitch",
+      vintage: "Vintage",
+      neon: "Neon Glow"
     },
 
     // Render Queue
@@ -653,6 +660,7 @@ export const translations = {
       voiceover: "Lồng tiếng",
       music: "Âm nhạc",
       sfx: "Hiệu ứng âm thanh",
+      effects: "Hiệu ứng",
       scene: "Cảnh",
       selectVoiceModel: "Chọn mô hình giọng nói",
       generateVoiceover: "Tạo lồng tiếng",
@@ -674,6 +682,12 @@ export const translations = {
       sendToRender: "Gửi đến hàng đợi kết xuất",
       assetsNeeded: "Tạo lồng tiếng và ít nhất một clip hình ảnh để bật tính năng kết xuất.",
       generating: "Đang tạo..."
+    },
+    
+    effects: {
+        glitch: "Nhiễu Sóng",
+        vintage: "Cổ Điển",
+        neon: "Phát Sáng Neon"
     },
 
     // Render Queue

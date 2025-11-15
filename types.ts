@@ -65,6 +65,8 @@ export interface PlatformPerformance {
 export type RenderStatus = 'Queued' | 'Rendering' | 'Completed' | 'Failed';
 export type AIModel = 'Sora 2' | 'VEO 3.1' | 'Suno' | 'Dreamina' | 'KlingAI' | 'ElevenLabs Voice AI' | 'gemini-2.5-flash-preview-tts' | 'Gemini SFX Generator';
 
+export type VideoEffect = 'glitch' | 'vintage' | 'neon';
+
 export interface Scene {
     id: number;
     text: string;
@@ -73,6 +75,7 @@ export interface Scene {
     generationStatus: 'idle' | 'generating' | 'completed' | 'failed';
     videoOperation?: any;
     videoUrl?: string; // This will be a local blob URL
+    effects?: VideoEffect[];
 }
 
 export interface SoundEffect {

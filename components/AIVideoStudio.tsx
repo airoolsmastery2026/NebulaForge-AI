@@ -3,9 +3,9 @@ import { Card, CardHeader, CardTitle, CardDescription } from './common/Card';
 import { Button } from './common/Button';
 import { Spinner } from './common/Spinner';
 import { useI18n } from '../hooks/useI18n';
-import type { ProductWithContent, RenderJob, AIModel, Scene, SoundEffect } from '../types';
+import type { ProductWithContent, RenderJob, AIModel, Scene, SoundEffect, VideoEffect } from '../types';
 import { startSceneVideoGeneration, checkVideoGenerationStatus, getVideoResult, generateSpeech, generateMusic, generateSfx } from '../services/geminiService';
-import { Mic2, Film, Music, Bot, Volume2, Play } from './LucideIcons';
+import { Mic2, Film, Music, Bot, Volume2, Play, Wand2 } from './LucideIcons';
 
 interface AIVideoStudioProps {
     productsWithContent: ProductWithContent[];
@@ -16,8 +16,9 @@ const voiceModels: AIModel[] = ['gemini-2.5-flash-preview-tts', 'ElevenLabs Voic
 const videoModels: AIModel[] = ['VEO 3.1', 'KlingAI', 'Sora 2', 'Dreamina'];
 const musicModels: AIModel[] = ['Suno'];
 const sfxModels: AIModel[] = ['Gemini SFX Generator'];
+const videoEffects: VideoEffect[] = ['glitch', 'vintage', 'neon'];
 
-type ActiveTab = 'visuals' | 'voice' | 'music' | 'sfx';
+type ActiveTab = 'visuals' | 'voice' | 'music' | 'sfx' | 'effects';
 
 const Waveform: React.FC = () => (
     <div className="flex items-center h-full w-full px-2 overflow-hidden">
@@ -42,6 +43,20 @@ const TimelineTrack: React.FC<{ title: string; icon: React.ReactNode; children: 
         </div>
     </div>
 );
+
+const EffectBadge: React.FC<{ effect: VideoEffect }> = ({ effect }) => {
+    const { t } = useI18n();
+    const effectStyles: Record<VideoEffect, string> = {
+        glitch: 'bg-purple-500/80 text-white',
+        vintage: 'bg-amber-600/80 text-white',
+        neon: 'bg-cyan-400/80 text-black',
+    };
+    return (
+        <span className={`px-1.5 py-0.5 text-[10px] font-bold rounded-full ${effectStyles[effect]}`} title={t(`effects.${effect}`)}>
+            {t(`effects.${effect}`)[0]}
+        </span>
+    );
+};
 
 
 export const AIVideoStudio: React.FC<AIVideoStudioProps> = ({ productsWithContent, onAddRenderJob }) => {
@@ -75,7 +90,7 @@ export const AIVideoStudio: React.FC<AIVideoStudioProps> = ({ productsWithConten
         if (product?.content.script) {
             const scriptSentences = product.content.script.split(/[.\n]+/).filter(s => s.trim() !== '');
             setScenes(scriptSentences.map((s, i) => ({
-                id: i, text: s.trim(), prompt: s.trim(), model: videoModels[0], generationStatus: 'idle'
+                id: i, text: s.trim(), prompt: s.trim(), model: videoModels[0], generationStatus: 'idle', effects: []
             })));
         } else {
             setScenes([]);
@@ -159,6 +174,22 @@ export const AIVideoStudio: React.FC<AIVideoStudioProps> = ({ productsWithConten
         setSfxPrompt('');
         setIsGeneratingSfx(false);
     }, [sfxPrompt]);
+
+    const handleToggleEffect = useCallback((sceneId: number, effect: VideoEffect) => {
+        setScenes(prevScenes => {
+            return prevScenes.map(scene => {
+                if (scene.id === sceneId) {
+                    const currentEffects = scene.effects || [];
+                    const hasEffect = currentEffects.includes(effect);
+                    const newEffects = hasEffect 
+                        ? currentEffects.filter(e => e !== effect) 
+                        : [...currentEffects, effect];
+                    return { ...scene, effects: newEffects };
+                }
+                return scene;
+            });
+        });
+    }, []);
     
     const handleSendToRender = () => {
         const product = productsWithContent.find(p => p.id === selectedProductId);
@@ -190,6 +221,8 @@ export const AIVideoStudio: React.FC<AIVideoStudioProps> = ({ productsWithConten
         activeTab === tabName ? 'bg-primary-600 text-white' : 'text-gray-300 hover:bg-gray-700/50'
       }`;
 
+    const firstSceneWithVideo = scenes.find(s => s.videoUrl);
+
     return (
         <div className="space-y-6">
              <Card>
@@ -217,6 +250,7 @@ export const AIVideoStudio: React.FC<AIVideoStudioProps> = ({ productsWithConten
                             <div className="p-2 space-y-4">
                                 <div className="flex space-x-1 p-1 bg-gray-800/50 rounded-lg">
                                     <button onClick={() => setActiveTab('visuals')} className={tabButtonClasses('visuals')}><Film className="h-4 w-4" /><span>{t('aiVideoStudio.scriptAndVisuals')}</span></button>
+                                    <button onClick={() => setActiveTab('effects')} className={tabButtonClasses('effects')}><Wand2 className="h-4 w-4" /><span>{t('aiVideoStudio.effects')}</span></button>
                                     <button onClick={() => setActiveTab('voice')} className={tabButtonClasses('voice')}><Mic2 className="h-4 w-4" /><span>{t('aiVideoStudio.voiceover')}</span></button>
                                     <button onClick={() => setActiveTab('music')} className={tabButtonClasses('music')}><Music className="h-4 w-4" /><span>{t('aiVideoStudio.music')}</span></button>
                                     <button onClick={() => setActiveTab('sfx')} className={tabButtonClasses('sfx')}><Volume2 className="h-4 w-4" /><span>{t('aiVideoStudio.sfx')}</span></button>
@@ -247,6 +281,37 @@ export const AIVideoStudio: React.FC<AIVideoStudioProps> = ({ productsWithConten
                                                     </div>
                                                 </Card>
                                             ))}
+                                        </div>
+                                    )}
+                                    {activeTab === 'effects' && (
+                                        <div className="space-y-3">
+                                            {scenes.map(scene => {
+                                                const sceneEffects = scene.effects || [];
+                                                return (
+                                                    <Card key={scene.id} className="bg-gray-800/50">
+                                                        <div className="p-3">
+                                                            <div className="flex gap-3 items-center">
+                                                                <div className="relative w-16 h-9 bg-gray-900/50 rounded-md flex-shrink-0">
+                                                                    {scene.videoUrl && <video src={scene.videoUrl} className="w-full h-full object-cover rounded-md" muted loop playsInline />}
+                                                                </div>
+                                                                <p className="text-xs text-gray-400 italic flex-grow line-clamp-2">"{scene.text}"</p>
+                                                            </div>
+                                                            <div className="mt-2 flex flex-wrap gap-2">
+                                                                {videoEffects.map(effect => (
+                                                                    <Button
+                                                                        key={effect}
+                                                                        size="sm"
+                                                                        variant={sceneEffects.includes(effect) ? 'primary' : 'secondary'}
+                                                                        onClick={() => handleToggleEffect(scene.id, effect)}
+                                                                    >
+                                                                        {t(`effects.${effect}`)}
+                                                                    </Button>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                    </Card>
+                                                );
+                                            })}
                                         </div>
                                     )}
                                      {activeTab === 'voice' && (
@@ -291,10 +356,15 @@ export const AIVideoStudio: React.FC<AIVideoStudioProps> = ({ productsWithConten
                             <CardHeader><CardTitle>{t('aiVideoStudio.preview')}</CardTitle></CardHeader>
                             <div className="p-4">
                                 <div className="relative aspect-video bg-gray-900 rounded-md flex items-center justify-center overflow-hidden">
-                                    {scenes.find(s => s.videoUrl) ? 
-                                        <video src={scenes.find(s => s.videoUrl)?.videoUrl} className="w-full h-full object-contain" autoPlay muted loop playsInline/> :
+                                    {firstSceneWithVideo ? 
+                                        <video src={firstSceneWithVideo.videoUrl} className="w-full h-full object-contain" autoPlay muted loop playsInline/> :
                                         <Film className="w-16 h-16 text-gray-700"/>
                                     }
+                                    {firstSceneWithVideo?.effects && firstSceneWithVideo.effects.length > 0 && (
+                                        <div className="absolute top-2 left-2 flex flex-col space-y-1 z-10">
+                                            {firstSceneWithVideo.effects.map(effect => <EffectBadge key={effect} effect={effect} />)}
+                                        </div>
+                                    )}
                                     <div className="absolute inset-0 bg-black/20 flex items-center justify-center group">
                                         <Play className="w-16 h-16 text-white/50 group-hover:text-white/80 transition-colors cursor-pointer group-hover:scale-110"/>
                                     </div>
@@ -311,8 +381,13 @@ export const AIVideoStudio: React.FC<AIVideoStudioProps> = ({ productsWithConten
                                     {scenes.some(s => s.videoUrl) ? 
                                     <div className="flex items-center h-full p-1 space-x-1 overflow-x-auto">
                                         {scenes.map(s => (
-                                            <div key={s.id} className="h-full aspect-video rounded flex-shrink-0 bg-gray-700">
+                                            <div key={s.id} className="relative h-full aspect-video rounded flex-shrink-0 bg-gray-700">
                                                 {s.videoUrl ? <video src={s.videoUrl} className="w-full h-full object-cover rounded" muted loop playsInline/> : null}
+                                                {s.effects && s.effects.length > 0 && (
+                                                    <div className="absolute top-1 right-1 flex space-x-0.5">
+                                                        {s.effects.map(effect => <EffectBadge key={effect} effect={effect} />)}
+                                                    </div>
+                                                )}
                                             </div>
                                         ))}
                                     </div>
