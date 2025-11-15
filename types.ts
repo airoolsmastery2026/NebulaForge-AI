@@ -70,8 +70,9 @@ export interface Scene {
     text: string;
     prompt: string;
     model: AIModel;
-    isGenerating: boolean;
-    thumbnailUrl?: string; // This will be a base64 data URL
+    generationStatus: 'idle' | 'generating' | 'completed' | 'failed';
+    videoOperation?: any;
+    videoUrl?: string; // This will be a local blob URL
 }
 
 export interface SoundEffect {

@@ -1,5 +1,6 @@
 
 
+
 import React from 'react';
 import { Page } from '../types';
 import { AnalyticsIcon, DashboardIcon, EditIcon, PublishIcon, SearchIcon, CloseIcon, SparklesIcon, ConnectIcon, TemplateIcon } from './Icons';

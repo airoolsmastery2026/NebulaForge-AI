@@ -1,11 +1,10 @@
-
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription } from './common/Card';
 import { Button } from './common/Button';
 import { Spinner } from './common/Spinner';
 import { useI18n } from '../hooks/useI18n';
 import type { ProductWithContent, RenderJob, AIModel, Scene, SoundEffect } from '../types';
-import { generateSpeech, generateImageForScene, generateMusic, generateSfx } from '../services/geminiService';
+import { startSceneVideoGeneration, checkVideoGenerationStatus, getVideoResult, generateSpeech, generateMusic, generateSfx } from '../services/geminiService';
 import { Mic2, Film, Music, Bot, Volume2, Play } from './LucideIcons';
 
 interface AIVideoStudioProps {
@@ -76,7 +75,7 @@ export const AIVideoStudio: React.FC<AIVideoStudioProps> = ({ productsWithConten
         if (product?.content.script) {
             const scriptSentences = product.content.script.split(/[.\n]+/).filter(s => s.trim() !== '');
             setScenes(scriptSentences.map((s, i) => ({
-                id: i, text: s.trim(), prompt: s.trim(), model: videoModels[0], isGenerating: false
+                id: i, text: s.trim(), prompt: s.trim(), model: videoModels[0], generationStatus: 'idle'
             })));
         } else {
             setScenes([]);
@@ -98,14 +97,49 @@ export const AIVideoStudio: React.FC<AIVideoStudioProps> = ({ productsWithConten
     const handleGenerateClip = useCallback(async (sceneId: number) => {
         const scene = scenes.find(s => s.id === sceneId);
         if (!scene) return;
-        setScenes(prev => prev.map(s => s.id === sceneId ? { ...s, isGenerating: true } : s));
-        const imageData = await generateImageForScene(scene.prompt);
-        if (imageData) {
-            setScenes(prev => prev.map(s => s.id === sceneId ? { ...s, isGenerating: false, thumbnailUrl: `data:image/png;base64,${imageData}` } : s));
+        setScenes(prev => prev.map(s => s.id === sceneId ? { ...s, generationStatus: 'generating' } : s));
+        const operation = await startSceneVideoGeneration(scene.prompt);
+        if (operation) {
+            setScenes(prev => prev.map(s => s.id === sceneId ? { ...s, videoOperation: operation } : s));
         } else {
-            setScenes(prev => prev.map(s => s.id === sceneId ? { ...s, isGenerating: false } : s));
+            setScenes(prev => prev.map(s => s.id === sceneId ? { ...s, generationStatus: 'failed' } : s));
         }
     }, [scenes]);
+    
+    useEffect(() => {
+        const pollInterval = setInterval(async () => {
+            const scenesToPoll = scenes.filter(s => s.generationStatus === 'generating' && s.videoOperation && !s.videoOperation.done);
+            if (scenesToPoll.length === 0) return;
+
+            for (const scene of scenesToPoll) {
+                const updatedOperation = await checkVideoGenerationStatus(scene.videoOperation);
+                if (updatedOperation.done) {
+                    if (updatedOperation.error) {
+                        console.error(`Video generation failed for scene ${scene.id}:`, updatedOperation.error);
+                        setScenes(prev => prev.map(s => s.id === scene.id ? { ...s, generationStatus: 'failed' } : s));
+                    } else {
+                        const videoUri = updatedOperation.response?.generatedVideos?.[0]?.video?.uri;
+                        if (videoUri) {
+                            const videoBlob = await getVideoResult(videoUri);
+                            if (videoBlob) {
+                                const blobUrl = URL.createObjectURL(videoBlob);
+                                setScenes(prev => prev.map(s => s.id === scene.id ? { ...s, generationStatus: 'completed', videoUrl: blobUrl, videoOperation: updatedOperation } : s));
+                            } else {
+                                setScenes(prev => prev.map(s => s.id === scene.id ? { ...s, generationStatus: 'failed' } : s));
+                            }
+                        } else {
+                            setScenes(prev => prev.map(s => s.id === scene.id ? { ...s, generationStatus: 'failed' } : s));
+                        }
+                    }
+                } else {
+                    setScenes(prev => prev.map(s => s.id === scene.id ? { ...s, videoOperation: updatedOperation } : s));
+                }
+            }
+        }, 10000); // Poll every 10 seconds
+
+        return () => clearInterval(pollInterval);
+    }, [scenes]);
+
 
     const handleGenerateMusic = useCallback(async () => {
         if (!musicPrompt) return;
@@ -133,7 +167,7 @@ export const AIVideoStudio: React.FC<AIVideoStudioProps> = ({ productsWithConten
         if(voiceoverData) modelsUsed.add(voiceModel);
         if(musicData) modelsUsed.add(musicModel);
         if(sfxLibrary.length > 0) modelsUsed.add(sfxModel);
-        scenes.forEach(s => s.thumbnailUrl && modelsUsed.add(s.model));
+        scenes.forEach(s => s.videoUrl && modelsUsed.add(s.model));
         
         onAddRenderJob({
             productName: `${product.name} (Studio Pro)`,
@@ -146,7 +180,7 @@ export const AIVideoStudio: React.FC<AIVideoStudioProps> = ({ productsWithConten
     };
 
     const selectedProduct = productsWithContent.find(p => p.id === selectedProductId);
-    const canRender = voiceoverData && scenes.some(s => s.thumbnailUrl);
+    const canRender = voiceoverData && scenes.some(s => s.videoUrl);
     const selectClasses = "w-full bg-gray-700 border border-gray-600 rounded-md shadow-sm pl-3 pr-10 py-2 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-primary-500 sm:text-sm text-gray-100";
     const inputClasses = "flex-grow bg-gray-700/50 border border-gray-600 rounded-md px-3 py-2 text-gray-100";
     
@@ -194,7 +228,9 @@ export const AIVideoStudio: React.FC<AIVideoStudioProps> = ({ productsWithConten
                                                     <div className="p-3">
                                                         <div className="flex gap-3">
                                                             <div className="w-24 h-14 bg-gray-900/50 rounded-md flex-shrink-0 flex items-center justify-center">
-                                                                {scene.isGenerating ? <Spinner/> : scene.thumbnailUrl ? <img src={scene.thumbnailUrl} className="w-full h-full object-cover rounded-md" alt={`Scene ${scene.id}`}/> : <Film className="w-6 h-6 text-gray-600"/>}
+                                                                {scene.generationStatus === 'generating' ? <Spinner/> : 
+                                                                 scene.videoUrl ? <video src={scene.videoUrl} className="w-full h-full object-cover rounded-md" controls muted loop playsInline /> : 
+                                                                 <Film className="w-6 h-6 text-gray-600"/>}
                                                             </div>
                                                             <div className="flex-grow space-y-1">
                                                                 <p className="text-xs text-gray-400 italic line-clamp-2">"{scene.text}"</p>
@@ -205,7 +241,7 @@ export const AIVideoStudio: React.FC<AIVideoStudioProps> = ({ productsWithConten
                                                             <select value={scene.model} onChange={e => setScenes(prev => prev.map(s => s.id === scene.id ? {...s, model: e.target.value as AIModel} : s))} className={`${selectClasses} text-xs flex-grow`}>
                                                                 {videoModels.map(m => <option key={m} value={m}>{m}</option>)}
                                                             </select>
-                                                            <Button size="sm" onClick={() => handleGenerateClip(scene.id)} isLoading={scene.isGenerating}>{t('aiVideoStudio.generateVisuals')}</Button>
+                                                            <Button size="sm" onClick={() => handleGenerateClip(scene.id)} isLoading={scene.generationStatus === 'generating'}>{scene.videoUrl ? t('contentGenerator.regenerate') : t('aiVideoStudio.generateVisuals')}</Button>
                                                         </div>
                                                     </div>
                                                 </Card>
@@ -254,8 +290,8 @@ export const AIVideoStudio: React.FC<AIVideoStudioProps> = ({ productsWithConten
                             <CardHeader><CardTitle>{t('aiVideoStudio.preview')}</CardTitle></CardHeader>
                             <div className="p-4">
                                 <div className="relative aspect-video bg-gray-900 rounded-md flex items-center justify-center overflow-hidden">
-                                    {scenes.find(s => s.thumbnailUrl) ? 
-                                        <img src={scenes.find(s => s.thumbnailUrl)?.thumbnailUrl} className="w-full h-full object-contain" alt="Preview"/> :
+                                    {scenes.find(s => s.videoUrl) ? 
+                                        <video src={scenes.find(s => s.videoUrl)?.videoUrl} className="w-full h-full object-contain" autoPlay muted loop playsInline/> :
                                         <Film className="w-16 h-16 text-gray-700"/>
                                     }
                                     <div className="absolute inset-0 bg-black/20 flex items-center justify-center group">
@@ -271,11 +307,11 @@ export const AIVideoStudio: React.FC<AIVideoStudioProps> = ({ productsWithConten
                             </CardHeader>
                              <div className="p-4 space-y-1">
                                 <TimelineTrack title={t('aiVideoStudio.videoTrack')} icon={<Film className="h-5 w-5 text-gray-300" />}>
-                                    {scenes.some(s => s.thumbnailUrl) ? 
+                                    {scenes.some(s => s.videoUrl) ? 
                                     <div className="flex items-center h-full p-1 space-x-1 overflow-x-auto">
                                         {scenes.map(s => (
                                             <div key={s.id} className="h-full aspect-video rounded flex-shrink-0 bg-gray-700">
-                                                {s.thumbnailUrl ? <img src={s.thumbnailUrl} className="w-full h-full object-cover rounded" alt={`Scene ${s.id} thumbnail`}/> : null}
+                                                {s.videoUrl ? <video src={s.videoUrl} className="w-full h-full object-cover rounded" muted loop playsInline/> : null}
                                             </div>
                                         ))}
                                     </div>

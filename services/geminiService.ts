@@ -1,4 +1,7 @@
 
+
+
+
 import { GoogleGenAI, Type, Modality } from "@google/genai";
 import type { Product, Trend } from '../types';
 
@@ -219,9 +222,14 @@ Avoid over-promotional language.
 
 export const generateVideoTitles = async (productName: string): Promise<string[]> => {
     const prompt = `
-Generate 5 catchy and viral-worthy video titles for a YouTube Shorts review of the product: "${productName}".
+Generate 10 catchy and viral-worthy video titles for a YouTube Shorts review of the product: "${productName}".
 Each title must be under 50 characters.
-Include curiosity or emotional hooks, e.g., "This AI Blew My Mind!" or "The Future of [Topic] Is Here!".
+Focus on creating strong, curiosity-driven hooks. Use tactics like:
+- Posing a controversial question (e.g., "Is [Product] a Scam?")
+- Highlighting a shocking result (e.g., "This AI Wrote My Code in 5s")
+- Creating a sense of urgency or FOMO (e.g., "Don't Buy It Until You See This")
+- Using strong, emotional words (e.g., "The AI Tool That Changed Everything")
+- Making a bold claim (e.g., "The Only [Product Category] Tool You Need")
 `;
     const schema = {
         type: Type.OBJECT,
@@ -245,7 +253,12 @@ Include curiosity or emotional hooks, e.g., "This AI Blew My Mind!" or "The Futu
             `${productName} Review 2024`,
             `The TRUTH about ${productName}`,
             `I tried ${productName} for 7 days...`,
-            `MOCK: ${productName} Secret Feature!`
+            `MOCK: ${productName} Secret Feature!`,
+            `This AI Changed My Workflow`,
+            `Don't Buy ${productName} Without Watching`,
+            `${productName}: Scam or Genius?`,
+            `My Brutally Honest ${productName} Review`,
+            `The Future is ${productName}, Here's Why.`,
         ];
     }
 
@@ -265,7 +278,7 @@ Include curiosity or emotional hooks, e.g., "This AI Blew My Mind!" or "The Futu
     } catch (error) {
         console.error("Error generating video titles with Gemini API:", error);
         // Fallback to simpler text generation if JSON fails
-        const fallbackResponse = await generateContent(`Generate 5 catchy video titles (under 50 characters) for a product review of "${productName}". Output as a numbered list.`);
+        const fallbackResponse = await generateContent(`Generate 10 catchy video titles (under 50 characters) for a product review of "${productName}". Output as a numbered list.`);
         return fallbackResponse.split('\n').filter(line => line.trim().match(/^\d+\./)).map(line => line.replace(/^\d+\.\s*/, '').trim());
     }
 };
@@ -465,6 +478,38 @@ export const startVideoGeneration = async (product: Product): Promise<any> => {
         return operation;
     } catch (error: any) {
         console.error("Error starting video generation with Veo API:", error);
+        if (error.message?.includes("Requested entity was not found.")) {
+            if ((window as any).aistudio) {
+                await (window as any).aistudio.openSelectKey();
+            }
+        }
+        return null;
+    }
+};
+
+export const startSceneVideoGeneration = async (prompt: string): Promise<any> => {
+    await ensureVeoApiKey();
+    const ai = createAiClient();
+    if (!ai) {
+        await new Promise(resolve => setTimeout(resolve, 500));
+        return { name: `mock-op-${Date.now()}`, done: false };
+    }
+    
+    const fullPrompt = `Create a short, 5-second video clip for a vertical video (9:16 aspect ratio) that visually represents the following text: "${prompt}". Style: cinematic, engaging, high-quality.`;
+
+    try {
+        const operation = await ai.models.generateVideos({
+            model: 'veo-3.1-fast-generate-preview',
+            prompt: fullPrompt,
+            config: {
+                numberOfVideos: 1,
+                resolution: '720p',
+                aspectRatio: '9:16'
+            }
+        });
+        return operation;
+    } catch (error: any) {
+        console.error("Error starting scene video generation with Veo API:", error);
         if (error.message?.includes("Requested entity was not found.")) {
             if ((window as any).aistudio) {
                 await (window as any).aistudio.openSelectKey();
