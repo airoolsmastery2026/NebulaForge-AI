@@ -1,7 +1,3 @@
-
-
-
-
 import { GoogleGenAI, Type, Modality } from "@google/genai";
 import type { Product, Trend } from '../types';
 

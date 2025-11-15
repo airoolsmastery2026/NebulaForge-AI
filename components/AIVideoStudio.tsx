@@ -175,7 +175,8 @@ export const AIVideoStudio: React.FC<AIVideoStudioProps> = ({ productsWithConten
             progress: 0,
             createdAt: new Date().toISOString(),
             models: Array.from(modelsUsed),
-            audioData: voiceoverData || undefined
+            audioData: voiceoverData || undefined,
+            scenes: scenes.filter(s => s.videoUrl)
         });
     };
 

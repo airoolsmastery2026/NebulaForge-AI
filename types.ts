@@ -91,6 +91,7 @@ export interface RenderJob {
   videoOperation?: any;
   audioData?: string; // base64 encoded
   videoUrl?: string;
+  scenes?: Scene[];
 }
 
 export type ScoutStatus = 'pending' | 'approved' | 'declined' | 'skipped' | 'auto-producing';
