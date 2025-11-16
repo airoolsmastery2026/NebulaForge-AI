@@ -71,6 +71,8 @@ export const translations = {
       systemStatus: "System Status",
       statusActive: "Core AI Active",
       statusInactive: "Core AI Inactive - API Key Required",
+      startDemo: "Start Demo",
+      demoActive: "Demo Active",
     },
 
     // Dashboard
@@ -284,6 +286,7 @@ export const translations = {
     connections: {
         hubTitle: "AI Universal Connections Hub",
         hubDescription: "Connect your accounts to enable the 24/7 automation engine.",
+        setupGuide: "View Setup Guide",
         geminiCoreTitle: "Gemini Core AI Engine",
         geminiCoreDescription: "The central AI powering content generation. An API key is required for the app to function.",
         activateButton: "Activate System",
@@ -329,6 +332,39 @@ export const translations = {
         category_developer: "Developer Platforms",
         category_affiliate: "Affiliate Marketing",
         category_crypto_financial: "Crypto & Financial",
+
+        // Help Texts
+        help: {
+            clickForDocs: 'Click for documentation.',
+            MERCHANT_ID: "Your unique merchant identifier provided by ShareASale.",
+            API_TOKEN: "The API Token for authentication, found in your ShareASale account settings.",
+            API_SECRET: "The API Secret for authentication, found in your ShareASale account settings.",
+            CLIENT_ID: "The Client ID from your app in the developer console.",
+            CLIENT_SECRET: "The Client Secret from your app in the developer console.",
+            ACCESS_TOKEN: "The Access Token for API authentication.",
+            CLIENT_KEY: "The Client Key from your app in the developer console.",
+            API_KEY: "The API Key for authentication.",
+            ACCESS_TOKEN_SECRET: "The Access Token Secret for authentication.",
+            APP_ID: "The App ID from your application settings.",
+            APP_SECRET: "The App Secret from your application settings.",
+            DEVELOPER_KEY: "The Developer Key from your account.",
+            ASSOCIATE_TAG: "Your unique Amazon Associates tracking ID.",
+            ACCESS_KEY: "The Access Key for API authentication.",
+            SECRET_KEY: "The Secret Key for API authentication.",
+            AFFILIATE_ID: "Your unique affiliate identifier.",
+            EMAIL: "The email address associated with your API account.",
+            PERSONAL_ACCESS_TOKEN: "Your Personal Access Token (PAT) for API access.",
+            PARTNER_ID: "Your Partner ID for the platform's API.",
+            BOT_TOKEN: "The token for your Telegram Bot from BotFather.",
+            APP_KEY: "The App Key from your app in the developer console.",
+            PARTNER_CODE: "Your Partner Code for the API.",
+            TMN_CODE: "The TMN Code provided by the payment gateway.",
+            HASH_SECRET: "The Hash Secret for signing requests.",
+            REFERRAL_CODE: "Your affiliate referral code.",
+            REDIRECT_URI: "The Redirect URI configured in your OAuth application.",
+            AZURE_CLIENT_ID: "The Application (client) ID from your Azure App Registration.",
+            AZURE_CLIENT_SECRET: "The Client Secret from your Azure App Registration.",
+        },
 
         // Platforms
         gemini: "Gemini",
@@ -660,6 +696,8 @@ export const translations = {
       systemStatus: "Trạng thái Hệ thống",
       statusActive: "Lõi AI Hoạt động",
       statusInactive: "Lõi AI Tắt - Yêu cầu API Key",
+      startDemo: "Bắt đầu Demo",
+      demoActive: "Demo đang chạy",
     },
     
     // Dashboard
@@ -872,6 +910,7 @@ export const translations = {
     connections: {
         hubTitle: "Trung tâm Kết nối AI Toàn cầu",
         hubDescription: "Kết nối các tài khoản của bạn để kích hoạt công cụ tự động 24/7.",
+        setupGuide: "Xem Hướng dẫn Cài đặt",
         geminiCoreTitle: "Lõi AI Gemini",
         geminiCoreDescription: "AI trung tâm cung cấp sức mạnh cho việc tạo nội dung. Cần có API key để ứng dụng hoạt động.",
         activateButton: "Kích hoạt Hệ thống",
@@ -918,6 +957,39 @@ export const translations = {
         category_affiliate: "Tiếp thị liên kết",
         category_crypto_financial: "Crypto & Tài chính",
         
+        // Help Texts
+        help: {
+            clickForDocs: 'Nhấp để xem tài liệu.',
+            MERCHANT_ID: "Mã định danh nhà cung cấp duy nhất của bạn do ShareASale cấp.",
+            API_TOKEN: "Token API để xác thực, tìm thấy trong cài đặt tài khoản ShareASale của bạn.",
+            API_SECRET: "Secret API để xác thực, tìm thấy trong cài đặt tài khoản ShareASale của bạn.",
+            CLIENT_ID: "Client ID từ ứng dụng của bạn trong bảng điều khiển nhà phát triển.",
+            CLIENT_SECRET: "Client Secret từ ứng dụng của bạn trong bảng điều khiển nhà phát triển.",
+            ACCESS_TOKEN: "Access Token để xác thực API.",
+            CLIENT_KEY: "Client Key từ ứng dụng của bạn trong bảng điều khiển nhà phát triển.",
+            API_KEY: "Khóa API để xác thực.",
+            ACCESS_TOKEN_SECRET: "Access Token Secret để xác thực.",
+            APP_ID: "App ID từ cài đặt ứng dụng của bạn.",
+            APP_SECRET: "App Secret từ cài đặt ứng dụng của bạn.",
+            DEVELOPER_KEY: "Developer Key từ tài khoản của bạn.",
+            ASSOCIATE_TAG: "ID theo dõi Amazon Associates duy nhất của bạn.",
+            ACCESS_KEY: "Access Key để xác thực API.",
+            SECRET_KEY: "Secret Key để xác thực API.",
+            AFFILIATE_ID: "Mã định danh liên kết duy nhất của bạn.",
+            EMAIL: "Địa chỉ email được liên kết với tài khoản API của bạn.",
+            PERSONAL_ACCESS_TOKEN: "Personal Access Token (PAT) của bạn để truy cập API.",
+            PARTNER_ID: "Partner ID của bạn cho API của nền tảng.",
+            BOT_TOKEN: "Token cho Bot Telegram của bạn từ BotFather.",
+            APP_KEY: "App Key từ ứng dụng của bạn trong bảng điều khiển nhà phát triển.",
+            PARTNER_CODE: "Mã Đối tác của bạn cho API.",
+            TMN_CODE: "Mã TMN được cung cấp bởi cổng thanh toán.",
+            HASH_SECRET: "Hash Secret để ký yêu cầu.",
+            REFERRAL_CODE: "Mã giới thiệu liên kết của bạn.",
+            REDIRECT_URI: "URI chuyển hướng được cấu hình trong ứng dụng OAuth của bạn.",
+            AZURE_CLIENT_ID: "Application (client) ID từ Azure App Registration của bạn.",
+            AZURE_CLIENT_SECRET: "Client Secret từ Azure App Registration của bạn.",
+        },
+
         // Platforms
         gemini: "Gemini",
         youtube: "YouTube",

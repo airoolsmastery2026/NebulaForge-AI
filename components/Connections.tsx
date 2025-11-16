@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription } from './common/Card';
 import { Button } from './common/Button';
@@ -9,65 +10,76 @@ import {
     HardDriveDownload,
     HardDriveUpload,
     X as XIcon,
-    Zap
+    Zap,
+    HelpCircle,
+    BookOpen
 } from './LucideIcons';
 import { useI18n } from '../hooks/useI18n';
 import { PlatformLogo } from './PlatformLogo';
 import { FacebookTokenManager } from './FacebookTokenManager';
+// Fix: Import `Page` as a value, not just a type, because it is used in an `onClick` handler.
 import type { Connection, ConnectionStatus } from '../types';
+import { Page } from '../types';
 import { checkPlatformStatus } from '../services/platformStatusService';
 
+
+interface ConnectionField {
+    name: string;
+    type: 'text' | 'password';
+    helpTextKey: string;
+    helpUrl?: string;
+}
 
 interface Platform {
     id: string;
     nameKey: string;
     icon: React.ReactNode;
-    fields: { name: string, type: 'text' | 'password' }[];
+    fields: ConnectionField[];
     docsUrl: string;
 }
 
 const platforms: Record<string, Platform> = {
     gemini: { id: "gemini", nameKey: "connections.gemini", icon: <PlatformLogo platformId="gemini" />, fields: [], docsUrl: 'https://ai.google.dev/gemini-api/docs/api-key' },
-    youtube: { id: "youtube", nameKey: "connections.youtube", icon: <PlatformLogo platformId="youtube" />, fields: [{name: 'CLIENT_ID', type: 'text'}, {name: 'CLIENT_SECRET', type: 'password'}], docsUrl: 'https://console.cloud.google.com/apis/credentials' },
-    tiktok: { id: "tiktok", nameKey: "connections.tiktok", icon: <PlatformLogo platformId="tiktok" />, fields: [{name: 'CLIENT_KEY', type: 'text'}, {name: 'CLIENT_SECRET', type: 'password'}], docsUrl: 'https://developers.tiktok.com/documents/get-started' },
-    instagram: { id: "instagram", nameKey: "connections.instagram", icon: <PlatformLogo platformId="instagram" />, fields: [{name: 'ACCESS_TOKEN', type: 'password'}], docsUrl: 'https://developers.facebook.com/docs/instagram-basic-display-api/getting-started' },
-    x_twitter: { id: "x_twitter", nameKey: "connections.x_twitter", icon: <PlatformLogo platformId="x_twitter" />, fields: [{name: 'API_KEY', type: 'text'}, {name: 'API_SECRET', type: 'password'}, {name: 'ACCESS_TOKEN', type: 'password'}, {name: 'ACCESS_TOKEN_SECRET', type: 'password'}], docsUrl: 'https://developer.twitter.com/en/portal/projects-and-apps' },
-    pinterest: { id: "pinterest", nameKey: "connections.pinterest", icon: <PlatformLogo platformId="pinterest" />, fields: [{name: 'APP_ID', type: 'text'}, {name: 'APP_SECRET', type: 'password'}], docsUrl: 'https://developers.pinterest.com/docs/getting-started/' },
-    clickbank: { id: "clickbank", nameKey: "connections.clickbank", icon: <PlatformLogo platformId="clickbank" />, fields: [{name: 'API_KEY', type: 'password'}, {name: 'DEVELOPER_KEY', type: 'password'}], docsUrl: 'https://support.clickbank.com/hc/en-us/articles/360004522031-How-do-I-create-an-API-Key-' },
-    amazon: { id: "amazon", nameKey: "connections.amazon", icon: <PlatformLogo platformId="amazon" />, fields: [{name: 'ASSOCIATE_TAG', type: 'text'}, {name: 'ACCESS_KEY', type: 'text'}, {name: 'SECRET_KEY', type: 'password'}], docsUrl: 'https://webservices.amazon.com/paapi5/documentation/getting-started/register.html' },
-    shareasale: { id: "shareasale", nameKey: "connections.shareasale", icon: <PlatformLogo platformId="shareasale" />, fields: [{name: 'MERCHANT_ID', type: 'text'}, {name: 'API_TOKEN', type: 'password'}, {name: 'API_SECRET', type: 'password'}], docsUrl: 'https://help.shareasale.com/hc/en-us/articles/360044230132-API-Documentation-for-Affiliates' },
-    accesstrade: { id: "accesstrade", nameKey: "connections.accesstrade", icon: <PlatformLogo platformId="accesstrade" />, fields: [{name: 'ACCESS_KEY', type: 'text'}, {name: 'SECRET_KEY', type: 'password'}], docsUrl: 'https://pub.accesstrade.vn/tools/api_key' },
-    digistore24: { id: "digistore24", nameKey: "connections.digistore24", icon: <PlatformLogo platformId="digistore24" />, fields: [{name: 'API_KEY', type: 'password'}], docsUrl: 'https://dev.digistore24.com/documentation/api-keys/' },
-    jvzoo: { id: "jvzoo", nameKey: "connections.jvzoo", icon: <PlatformLogo platformId="jvzoo" />, fields: [{name: 'API_KEY', type: 'password'}], docsUrl: 'https://www.jvzoo.com/developers/api' },
-    warriorplus: { id: "warriorplus", nameKey: "connections.warriorplus", icon: <PlatformLogo platformId="warriorplus" />, fields: [{name: 'API_KEY', type: 'password'}], docsUrl: 'https://warriorplus.com/account/api' },
-    rakuten: { id: "rakuten", nameKey: "connections.rakuten", icon: <PlatformLogo platformId="rakuten" />, fields: [{name: 'ACCESS_TOKEN', type: 'password'}, {name: 'SECRET_KEY', type: 'password'}], docsUrl: 'https://rakutenadvertising.com/developers/' },
-    semrush: { id: "semrush", nameKey: "connections.semrush", icon: <PlatformLogo platformId="semrush" />, fields: [{name: 'API_KEY', type: 'password'}, {name: 'AFFILIATE_ID', type: 'text'}], docsUrl: 'https://www.semrush.com/affiliates/' },
-    hubspot: { id: "hubspot", nameKey: "connections.hubspot", icon: <PlatformLogo platformId="hubspot" />, fields: [{name: 'API_KEY', type: 'password'}], docsUrl: 'https://developers.hubspot.com/docs/api/overview' },
-    cloudways: { id: "cloudways", nameKey: "connections.cloudways", icon: <PlatformLogo platformId="cloudways" />, fields: [{name: 'EMAIL', type: 'text'}, {name: 'API_KEY', type: 'password'}], docsUrl: 'https://developers.cloudways.com/docs/api-playground' },
-    cj: { id: "cj", nameKey: "connections.cj", icon: <PlatformLogo platformId="cj" />, fields: [{name: 'PERSONAL_ACCESS_TOKEN', type: 'password'}], docsUrl: 'https://developers.cj.com/authentication' },
-    shopee: { id: "shopee", nameKey: "connections.shopee", icon: <PlatformLogo platformId="shopee" />, fields: [{name: 'PARTNER_ID', type: 'text'}, {name: 'API_KEY', type: 'password'}], docsUrl: 'https://open.shopee.com/documents' },
-    telegram: { id: "telegram", nameKey: "connections.telegram", icon: <PlatformLogo platformId="telegram" />, fields: [{name: 'BOT_TOKEN', type: 'password'}], docsUrl: 'https://core.telegram.org/bots#6-botfather' },
-    lazada: { id: "lazada", nameKey: "connections.lazada", icon: <PlatformLogo platformId="lazada" />, fields: [{name: 'APP_KEY', type: 'text'}, {name: 'APP_SECRET', type: 'password'}], docsUrl: 'https://open.lazada.com/doc/doc.htm' },
-    tiki: { id: "tiki", nameKey: "connections.tiki", icon: <PlatformLogo platformId="tiki" />, fields: [{name: 'CLIENT_ID', type: 'text'}, {name: 'CLIENT_SECRET', type: 'password'}], docsUrl: 'https://open.tiki.vn/docs/' },
-    zalo: { id: "zalo", nameKey: "connections.zalo", icon: <PlatformLogo platformId="zalo" />, fields: [{name: 'APP_ID', type: 'text'}, {name: 'APP_SECRET', type: 'password'}], docsUrl: 'https://developers.zalo.me/docs/api/official-account-api' },
-    momo: { id: "momo", nameKey: "connections.momo", icon: <PlatformLogo platformId="momo" />, fields: [{name: 'PARTNER_CODE', type: 'text'}, {name: 'ACCESS_KEY', type: 'text'}, {name: 'SECRET_KEY', type: 'password'}], docsUrl: 'https://developers.momo.vn' },
-    vnpay: { id: "vnpay", nameKey: "connections.vnpay", icon: <PlatformLogo platformId="vnpay" />, fields: [{name: 'TMN_CODE', type: 'text'}, {name: 'HASH_SECRET', type: 'password'}], docsUrl: 'https://sandbox.vnpayment.vn/apis/docs/huong-dan-tich-hop/' },
-    crypto_com: { id: "crypto_com", nameKey: "connections.crypto_com", icon: <PlatformLogo platformId="crypto_com" />, fields: [{name: 'REFERRAL_CODE', type: 'text'}], docsUrl: 'https://crypto.com/vi/product-news/exchange-affiliate-2-0' },
-    binance: { id: "binance", nameKey: "connections.binance", icon: <PlatformLogo platformId="binance" />, fields: [{name: 'API_KEY', type: 'text'}, {name: 'API_SECRET', type: 'password'}], docsUrl: 'https://accounts.binance.com/affiliate' },
-    bybit: { id: "bybit", nameKey: "connections.bybit", icon: <PlatformLogo platformId="bybit" />, fields: [{name: 'API_KEY', type: 'text'}, {name: 'API_SECRET', type: 'password'}], docsUrl: 'https://www.bybit.com/en/affiliates/' },
-    host123: { id: "host123", nameKey: "connections.host123", icon: <PlatformLogo platformId="host123" />, fields: [{name: 'AFFILIATE_ID', type: 'text'}], docsUrl: 'https://123host.vn/en/affiliates.html' },
-    facebook_ads: { id: "facebook_ads", nameKey: "connections.facebook_ads", icon: <PlatformLogo platformId="facebook" />, fields: [{name: 'APP_ID', type: 'text'}, {name: 'APP_SECRET', type: 'password'}, {name: 'REDIRECT_URI', type: 'text'}], docsUrl: 'https://www.facebook.com/business/partner-programs/affiliate' },
-    tiktok_ads: { id: "tiktok_ads", nameKey: "connections.tiktok_ads", icon: <PlatformLogo platformId="tiktok" />, fields: [{name: 'CLIENT_ID', type: 'text'}, {name: 'CLIENT_SECRET', type: 'password'}, {name: 'REDIRECT_URI', type: 'text'}], docsUrl: 'https://www.tiktok.com/business/affiliate' },
-    youtube_partner: { id: "youtube_partner", nameKey: "connections.youtube_partner", icon: <PlatformLogo platformId="youtube" />, fields: [{name: 'CLIENT_ID', type: 'text'}, {name: 'CLIENT_SECRET', type: 'password'}, {name: 'REDIRECT_URI', type: 'text'}], docsUrl: 'https://www.youtube.com/yt/creators/monetization/affiliate/' },
-    instagram_affiliate: { id: "instagram_affiliate", nameKey: "connections.instagram_affiliate", icon: <PlatformLogo platformId="instagram" />, fields: [{name: 'CLIENT_ID', type: 'text'}, {name: 'CLIENT_SECRET', type: 'password'}, {name: 'REDIRECT_URI', type: 'text'}], docsUrl: 'https://www.facebook.com/business/instagram/affiliate' },
-    twitter_affiliate: { id: "twitter_affiliate", nameKey: "connections.twitter_affiliate", icon: <PlatformLogo platformId="x_twitter" />, fields: [{name: 'CLIENT_ID', type: 'text'}, {name: 'CLIENT_SECRET', type: 'password'}, {name: 'REDIRECT_URI', type: 'text'}], docsUrl: 'https://ads.twitter.com/affiliate' },
+    youtube: { id: "youtube", nameKey: "connections.youtube", icon: <PlatformLogo platformId="youtube" />, fields: [{name: 'CLIENT_ID', type: 'text', helpTextKey: 'connections.help.CLIENT_ID'}, {name: 'CLIENT_SECRET', type: 'password', helpTextKey: 'connections.help.CLIENT_SECRET'}], docsUrl: 'https://console.cloud.google.com/apis/credentials' },
+    tiktok: { id: "tiktok", nameKey: "connections.tiktok", icon: <PlatformLogo platformId="tiktok" />, fields: [{name: 'CLIENT_KEY', type: 'text', helpTextKey: 'connections.help.CLIENT_KEY'}, {name: 'CLIENT_SECRET', type: 'password', helpTextKey: 'connections.help.CLIENT_SECRET'}], docsUrl: 'https://developers.tiktok.com/documents/get-started' },
+    instagram: { id: "instagram", nameKey: "connections.instagram", icon: <PlatformLogo platformId="instagram" />, fields: [{name: 'ACCESS_TOKEN', type: 'password', helpTextKey: 'connections.help.ACCESS_TOKEN'}], docsUrl: 'https://developers.facebook.com/docs/instagram-basic-display-api/getting-started' },
+    x_twitter: { id: "x_twitter", nameKey: "connections.x_twitter", icon: <PlatformLogo platformId="x_twitter" />, fields: [{name: 'API_KEY', type: 'text', helpTextKey: 'connections.help.API_KEY'}, {name: 'API_SECRET', type: 'password', helpTextKey: 'connections.help.API_SECRET'}, {name: 'ACCESS_TOKEN', type: 'password', helpTextKey: 'connections.help.ACCESS_TOKEN'}, {name: 'ACCESS_TOKEN_SECRET', type: 'password', helpTextKey: 'connections.help.ACCESS_TOKEN_SECRET'}], docsUrl: 'https://developer.twitter.com/en/portal/projects-and-apps' },
+    pinterest: { id: "pinterest", nameKey: "connections.pinterest", icon: <PlatformLogo platformId="pinterest" />, fields: [{name: 'APP_ID', type: 'text', helpTextKey: 'connections.help.APP_ID'}, {name: 'APP_SECRET', type: 'password', helpTextKey: 'connections.help.APP_SECRET'}], docsUrl: 'https://developers.pinterest.com/docs/getting-started/' },
+    clickbank: { id: "clickbank", nameKey: "connections.clickbank", icon: <PlatformLogo platformId="clickbank" />, fields: [{name: 'API_KEY', type: 'password', helpTextKey: 'connections.help.API_KEY'}, {name: 'DEVELOPER_KEY', type: 'password', helpTextKey: 'connections.help.DEVELOPER_KEY'}], docsUrl: 'https://support.clickbank.com/hc/en-us/articles/360004522031-How-do-I-create-an-API-Key-' },
+    amazon: { id: "amazon", nameKey: "connections.amazon", icon: <PlatformLogo platformId="amazon" />, fields: [{name: 'ASSOCIATE_TAG', type: 'text', helpTextKey: 'connections.help.ASSOCIATE_TAG'}, {name: 'ACCESS_KEY', type: 'text', helpTextKey: 'connections.help.ACCESS_KEY'}, {name: 'SECRET_KEY', type: 'password', helpTextKey: 'connections.help.SECRET_KEY'}], docsUrl: 'https://webservices.amazon.com/paapi5/documentation/getting-started/register.html' },
+    shareasale: { id: "shareasale", nameKey: "connections.shareasale", icon: <PlatformLogo platformId="shareasale" />, fields: [{name: 'MERCHANT_ID', type: 'text', helpTextKey: 'connections.help.MERCHANT_ID'}, {name: 'API_TOKEN', type: 'password', helpTextKey: 'connections.help.API_TOKEN'}, {name: 'API_SECRET', type: 'password', helpTextKey: 'connections.help.API_SECRET'}], docsUrl: 'https://help.shareasale.com/hc/en-us/articles/360044230132-API-Documentation-for-Affiliates' },
+    accesstrade: { id: "accesstrade", nameKey: "connections.accesstrade", icon: <PlatformLogo platformId="accesstrade" />, fields: [{name: 'ACCESS_KEY', type: 'text', helpTextKey: 'connections.help.ACCESS_KEY'}, {name: 'SECRET_KEY', type: 'password', helpTextKey: 'connections.help.SECRET_KEY'}], docsUrl: 'https://pub.accesstrade.vn/tools/api_key' },
+    digistore24: { id: "digistore24", nameKey: "connections.digistore24", icon: <PlatformLogo platformId="digistore24" />, fields: [{name: 'API_KEY', type: 'password', helpTextKey: 'connections.help.API_KEY'}], docsUrl: 'https://dev.digistore24.com/documentation/api-keys/' },
+    jvzoo: { id: "jvzoo", nameKey: "connections.jvzoo", icon: <PlatformLogo platformId="jvzoo" />, fields: [{name: 'API_KEY', type: 'password', helpTextKey: 'connections.help.API_KEY'}], docsUrl: 'https://www.jvzoo.com/developers/api' },
+    warriorplus: { id: "warriorplus", nameKey: "connections.warriorplus", icon: <PlatformLogo platformId="warriorplus" />, fields: [{name: 'API_KEY', type: 'password', helpTextKey: 'connections.help.API_KEY'}], docsUrl: 'https://warriorplus.com/account/api' },
+    rakuten: { id: "rakuten", nameKey: "connections.rakuten", icon: <PlatformLogo platformId="rakuten" />, fields: [{name: 'ACCESS_TOKEN', type: 'password', helpTextKey: 'connections.help.ACCESS_TOKEN'}, {name: 'SECRET_KEY', type: 'password', helpTextKey: 'connections.help.SECRET_KEY'}], docsUrl: 'https://rakutenadvertising.com/developers/' },
+    semrush: { id: "semrush", nameKey: "connections.semrush", icon: <PlatformLogo platformId="semrush" />, fields: [{name: 'API_KEY', type: 'password', helpTextKey: 'connections.help.API_KEY'}, {name: 'AFFILIATE_ID', type: 'text', helpTextKey: 'connections.help.AFFILIATE_ID'}], docsUrl: 'https://www.semrush.com/affiliates/' },
+    hubspot: { id: "hubspot", nameKey: "connections.hubspot", icon: <PlatformLogo platformId="hubspot" />, fields: [{name: 'API_KEY', type: 'password', helpTextKey: 'connections.help.API_KEY'}], docsUrl: 'https://developers.hubspot.com/docs/api/overview' },
+    cloudways: { id: "cloudways", nameKey: "connections.cloudways", icon: <PlatformLogo platformId="cloudways" />, fields: [{name: 'EMAIL', type: 'text', helpTextKey: 'connections.help.EMAIL'}, {name: 'API_KEY', type: 'password', helpTextKey: 'connections.help.API_KEY'}], docsUrl: 'https://developers.cloudways.com/docs/api-playground' },
+    cj: { id: "cj", nameKey: "connections.cj", icon: <PlatformLogo platformId="cj" />, fields: [{name: 'PERSONAL_ACCESS_TOKEN', type: 'password', helpTextKey: 'connections.help.PERSONAL_ACCESS_TOKEN'}], docsUrl: 'https://developers.cj.com/authentication' },
+    shopee: { id: "shopee", nameKey: "connections.shopee", icon: <PlatformLogo platformId="shopee" />, fields: [{name: 'PARTNER_ID', type: 'text', helpTextKey: 'connections.help.PARTNER_ID'}, {name: 'API_KEY', type: 'password', helpTextKey: 'connections.help.API_KEY'}], docsUrl: 'https://open.shopee.com/documents' },
+    telegram: { id: "telegram", nameKey: "connections.telegram", icon: <PlatformLogo platformId="telegram" />, fields: [{name: 'BOT_TOKEN', type: 'password', helpTextKey: 'connections.help.BOT_TOKEN'}], docsUrl: 'https://core.telegram.org/bots#6-botfather' },
+    lazada: { id: "lazada", nameKey: "connections.lazada", icon: <PlatformLogo platformId="lazada" />, fields: [{name: 'APP_KEY', type: 'text', helpTextKey: 'connections.help.APP_KEY'}, {name: 'APP_SECRET', type: 'password', helpTextKey: 'connections.help.APP_SECRET'}], docsUrl: 'https://open.lazada.com/doc/doc.htm' },
+    tiki: { id: "tiki", nameKey: "connections.tiki", icon: <PlatformLogo platformId="tiki" />, fields: [{name: 'CLIENT_ID', type: 'text', helpTextKey: 'connections.help.CLIENT_ID'}, {name: 'CLIENT_SECRET', type: 'password', helpTextKey: 'connections.help.CLIENT_SECRET'}], docsUrl: 'https://open.tiki.vn/docs/' },
+    zalo: { id: "zalo", nameKey: "connections.zalo", icon: <PlatformLogo platformId="zalo" />, fields: [{name: 'APP_ID', type: 'text', helpTextKey: 'connections.help.APP_ID'}, {name: 'APP_SECRET', type: 'password', helpTextKey: 'connections.help.APP_SECRET'}], docsUrl: 'https://developers.zalo.me/docs/api/official-account-api' },
+    momo: { id: "momo", nameKey: "connections.momo", icon: <PlatformLogo platformId="momo" />, fields: [{name: 'PARTNER_CODE', type: 'text', helpTextKey: 'connections.help.PARTNER_CODE'}, {name: 'ACCESS_KEY', type: 'text', helpTextKey: 'connections.help.ACCESS_KEY'}, {name: 'SECRET_KEY', type: 'password', helpTextKey: 'connections.help.SECRET_KEY'}], docsUrl: 'https://developers.momo.vn' },
+    vnpay: { id: "vnpay", nameKey: "connections.vnpay", icon: <PlatformLogo platformId="vnpay" />, fields: [{name: 'TMN_CODE', type: 'text', helpTextKey: 'connections.help.TMN_CODE'}, {name: 'HASH_SECRET', type: 'password', helpTextKey: 'connections.help.HASH_SECRET'}], docsUrl: 'https://sandbox.vnpayment.vn/apis/docs/huong-dan-tich-hop/' },
+    crypto_com: { id: "crypto_com", nameKey: "connections.crypto_com", icon: <PlatformLogo platformId="crypto_com" />, fields: [{name: 'REFERRAL_CODE', type: 'text', helpTextKey: 'connections.help.REFERRAL_CODE'}], docsUrl: 'https://crypto.com/vi/product-news/exchange-affiliate-2-0' },
+    binance: { id: "binance", nameKey: "connections.binance", icon: <PlatformLogo platformId="binance" />, fields: [{name: 'API_KEY', type: 'text', helpTextKey: 'connections.help.API_KEY'}, {name: 'API_SECRET', type: 'password', helpTextKey: 'connections.help.API_SECRET'}], docsUrl: 'https://accounts.binance.com/affiliate' },
+    bybit: { id: "bybit", nameKey: "connections.bybit", icon: <PlatformLogo platformId="bybit" />, fields: [{name: 'API_KEY', type: 'text', helpTextKey: 'connections.help.API_KEY'}, {name: 'API_SECRET', type: 'password', helpTextKey: 'connections.help.API_SECRET'}], docsUrl: 'https://www.bybit.com/en/affiliates/' },
+    host123: { id: "host123", nameKey: "connections.host123", icon: <PlatformLogo platformId="host123" />, fields: [{name: 'AFFILIATE_ID', type: 'text', helpTextKey: 'connections.help.AFFILIATE_ID'}], docsUrl: 'https://123host.vn/en/affiliates.html' },
+    facebook_ads: { id: "facebook_ads", nameKey: "connections.facebook_ads", icon: <PlatformLogo platformId="facebook" />, fields: [{name: 'APP_ID', type: 'text', helpTextKey: 'connections.help.APP_ID'}, {name: 'APP_SECRET', type: 'password', helpTextKey: 'connections.help.APP_SECRET'}, {name: 'REDIRECT_URI', type: 'text', helpTextKey: 'connections.help.REDIRECT_URI'}], docsUrl: 'https://www.facebook.com/business/partner-programs/affiliate' },
+    tiktok_ads: { id: "tiktok_ads", nameKey: "connections.tiktok_ads", icon: <PlatformLogo platformId="tiktok" />, fields: [{name: 'CLIENT_ID', type: 'text', helpTextKey: 'connections.help.CLIENT_ID'}, {name: 'CLIENT_SECRET', type: 'password', helpTextKey: 'connections.help.CLIENT_SECRET'}, {name: 'REDIRECT_URI', type: 'text', helpTextKey: 'connections.help.REDIRECT_URI'}], docsUrl: 'https://www.tiktok.com/business/affiliate' },
+    youtube_partner: { id: "youtube_partner", nameKey: "connections.youtube_partner", icon: <PlatformLogo platformId="youtube" />, fields: [{name: 'CLIENT_ID', type: 'text', helpTextKey: 'connections.help.CLIENT_ID'}, {name: 'CLIENT_SECRET', type: 'password', helpTextKey: 'connections.help.CLIENT_SECRET'}, {name: 'REDIRECT_URI', type: 'text', helpTextKey: 'connections.help.REDIRECT_URI'}], docsUrl: 'https://www.youtube.com/yt/creators/monetization/affiliate/' },
+    instagram_affiliate: { id: "instagram_affiliate", nameKey: "connections.instagram_affiliate", icon: <PlatformLogo platformId="instagram" />, fields: [{name: 'CLIENT_ID', type: 'text', helpTextKey: 'connections.help.CLIENT_ID'}, {name: 'CLIENT_SECRET', type: 'password', helpTextKey: 'connections.help.CLIENT_SECRET'}, {name: 'REDIRECT_URI', type: 'text', helpTextKey: 'connections.help.REDIRECT_URI'}], docsUrl: 'https://www.facebook.com/business/instagram/affiliate' },
+    twitter_affiliate: { id: "twitter_affiliate", nameKey: "connections.twitter_affiliate", icon: <PlatformLogo platformId="x_twitter" />, fields: [{name: 'CLIENT_ID', type: 'text', helpTextKey: 'connections.help.CLIENT_ID'}, {name: 'CLIENT_SECRET', type: 'password', helpTextKey: 'connections.help.CLIENT_SECRET'}, {name: 'REDIRECT_URI', type: 'text', helpTextKey: 'connections.help.REDIRECT_URI'}], docsUrl: 'https://ads.twitter.com/affiliate' },
     facebook_token_engine: { id: "facebook_token_engine", nameKey: "connections.facebook_token_engine", icon: <PlatformLogo platformId="facebook_token_engine" />, fields: [], docsUrl: 'https://developers.facebook.com/docs/facebook-login/access-tokens' },
-    microsoft: { id: "microsoft", nameKey: "connections.microsoft", icon: <PlatformLogo platformId="microsoft" />, fields: [{name: 'AZURE_CLIENT_ID', type: 'text'}, {name: 'AZURE_CLIENT_SECRET', type: 'password'}], docsUrl: 'https://portal.azure.com/#view/Microsoft_AAD_RegisteredApps/ApplicationsListBlade' },
-    github: { id: "github", nameKey: "connections.github", icon: <PlatformLogo platformId="github" />, fields: [{name: 'CLIENT_ID', type: 'text'}, {name: 'CLIENT_SECRET', type: 'password'}], docsUrl: 'https://github.com/settings/developers' },
-    discord: { id: "discord", nameKey: "connections.discord", icon: <PlatformLogo platformId="discord" />, fields: [{name: 'CLIENT_ID', type: 'text'}, {name: 'CLIENT_SECRET', type: 'password'}], docsUrl: 'https://discord.com/developers/applications' },
-    spotify: { id: "spotify", nameKey: "connections.spotify", icon: <PlatformLogo platformId="spotify" />, fields: [{name: 'CLIENT_ID', type: 'text'}, {name: 'CLIENT_SECRET', type: 'password'}], docsUrl: 'https://developer.spotify.com/dashboard' },
-    linkedin: { id: "linkedin", nameKey: "connections.linkedin", icon: <PlatformLogo platformId="linkedin" />, fields: [{name: 'CLIENT_ID', type: 'text'}, {name: 'CLIENT_SECRET', type: 'password'}], docsUrl: 'https://www.linkedin.com/developers/apps' },
-    googledrive: { id: "googledrive", nameKey: "connections.googledrive", icon: <PlatformLogo platformId="googledrive" />, fields: [{name: 'CLIENT_ID', type: 'text'}, {name: 'CLIENT_SECRET', type: 'password'}], docsUrl: 'https://console.cloud.google.com/apis/credentials' },
+    microsoft: { id: "microsoft", nameKey: "connections.microsoft", icon: <PlatformLogo platformId="microsoft" />, fields: [{name: 'AZURE_CLIENT_ID', type: 'text', helpTextKey: 'connections.help.AZURE_CLIENT_ID'}, {name: 'AZURE_CLIENT_SECRET', type: 'password', helpTextKey: 'connections.help.AZURE_CLIENT_SECRET'}], docsUrl: 'https://portal.azure.com/#view/Microsoft_AAD_RegisteredApps/ApplicationsListBlade' },
+    github: { id: "github", nameKey: "connections.github", icon: <PlatformLogo platformId="github" />, fields: [{name: 'CLIENT_ID', type: 'text', helpTextKey: 'connections.help.CLIENT_ID'}, {name: 'CLIENT_SECRET', type: 'password', helpTextKey: 'connections.help.CLIENT_SECRET'}], docsUrl: 'https://github.com/settings/developers' },
+    discord: { id: "discord", nameKey: "connections.discord", icon: <PlatformLogo platformId="discord" />, fields: [{name: 'CLIENT_ID', type: 'text', helpTextKey: 'connections.help.CLIENT_ID'}, {name: 'CLIENT_SECRET', type: 'password', helpTextKey: 'connections.help.CLIENT_SECRET'}], docsUrl: 'https://discord.com/developers/applications' },
+    spotify: { id: "spotify", nameKey: "connections.spotify", icon: <PlatformLogo platformId="spotify" />, fields: [{name: 'CLIENT_ID', type: 'text', helpTextKey: 'connections.help.CLIENT_ID'}, {name: 'CLIENT_SECRET', type: 'password', helpTextKey: 'connections.help.CLIENT_SECRET'}], docsUrl: 'https://developer.spotify.com/dashboard' },
+    linkedin: { id: "linkedin", nameKey: "connections.linkedin", icon: <PlatformLogo platformId="linkedin" />, fields: [{name: 'CLIENT_ID', type: 'text', helpTextKey: 'connections.help.CLIENT_ID'}, {name: 'CLIENT_SECRET', type: 'password', helpTextKey: 'connections.help.CLIENT_SECRET'}], docsUrl: 'https://www.linkedin.com/developers/apps' },
+    googledrive: { id: "googledrive", nameKey: "connections.googledrive", icon: <PlatformLogo platformId="googledrive" />, fields: [{name: 'CLIENT_ID', type: 'text', helpTextKey: 'connections.help.CLIENT_ID'}, {name: 'CLIENT_SECRET', type: 'password', helpTextKey: 'connections.help.CLIENT_SECRET'}], docsUrl: 'https://console.cloud.google.com/apis/credentials' },
 };
 
 const platformCategories = [
@@ -181,8 +193,16 @@ const ConnectionModal: React.FC<{
             
             {!isConnected && platform.fields.map(field => (
                 <div key={field.name}>
-                    <label className="text-xs text-gray-400 block font-mono mb-1">{field.name}</label>
+                    <div className="flex items-center space-x-2 mb-1">
+                        <label htmlFor={`${platform.id}-${field.name}`} className="text-xs text-gray-400 block font-mono">{field.name}</label>
+                        <div data-tooltip={t(field.helpTextKey) + (field.helpUrl ? `\n\n${t('connections.help.clickForDocs')}` : '')}>
+                           <a href={field.helpUrl || '#'} target="_blank" rel="noopener noreferrer" onClick={e => {if (!field.helpUrl) e.preventDefault()}} aria-label={`Help for ${field.name}`}>
+                                <HelpCircle className="h-4 w-4 text-gray-500 hover:text-cyan-400"/>
+                           </a>
+                        </div>
+                    </div>
                     <input 
+                        id={`${platform.id}-${field.name}`}
                         type={field.type}
                         className="w-full bg-gray-800/50 border border-gray-600 rounded-md px-2 py-1.5 text-gray-50 focus:outline-none focus:ring-1 focus:ring-primary-500 text-sm"
                         value={credentials[field.name] || ''}
@@ -247,7 +267,11 @@ const PlatformCard: React.FC<{
     );
 };
 
-export const Connections: React.FC = () => {
+interface ConnectionsProps {
+    setCurrentPage: (page: Page) => void;
+}
+
+export const Connections: React.FC<ConnectionsProps> = ({ setCurrentPage }) => {
     const { t } = useI18n();
     const [connections, setConnections] = useState<Record<string, Connection>>({});
     const [activePlatformId, setActivePlatformId] = useState<string | null>(null);
@@ -323,10 +347,13 @@ export const Connections: React.FC = () => {
         <>
             <div className="space-y-8">
                 <Card>
-                    <CardHeader className="text-center !p-6">
-                        <CardTitle className="text-2xl">{t('connections.hubTitle')}</CardTitle>
-                        <CardDescription>{t('connections.hubDescription')}</CardDescription>
-                        <div className="flex justify-center space-x-2 mt-4">
+                    <CardHeader className="text-center !p-6 flex flex-col sm:flex-row justify-between items-center">
+                        <div>
+                            <CardTitle className="text-2xl">{t('connections.hubTitle')}</CardTitle>
+                            <CardDescription>{t('connections.hubDescription')}</CardDescription>
+                        </div>
+                        <div className="flex justify-center space-x-2 mt-4 sm:mt-0">
+                            <Button variant="secondary" onClick={() => setCurrentPage(Page.API_DOCS)} icon={<BookOpen className="h-4 w-4"/>}>{t('connections.setupGuide')}</Button>
                             <Button variant="secondary" onClick={handleBackup} icon={<HardDriveDownload className="h-4 w-4"/>} title={t('connections.backupTooltip')}>{t('connections.backup')}</Button>
                             <Button variant="secondary" onClick={handleRestoreClick} icon={<HardDriveUpload className="h-4 w-4"/>} title={t('connections.restoreTooltip')}>{t('connections.restore')}</Button>
                             <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" accept=".json" />
