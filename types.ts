@@ -1,4 +1,3 @@
-
 export enum Page {
     // Group 1: Main Navigation
     DASHBOARD = 'Dashboard', // Trang chủ
@@ -185,4 +184,22 @@ export interface AppNotification {
     id: number;
     message: string;
     type: 'info' | 'success' | 'warning' | 'error';
+}
+
+// --- Supabase Auth Types ---
+export interface User {
+  id: string;
+  email?: string;
+  user_metadata: {
+    [key: string]: any;
+    avatar_url?: string;
+    full_name?: string;
+    name?: string;
+  };
+}
+
+export interface Session {
+  access_token: string;
+  refresh_token: string;
+  user: User;
 }

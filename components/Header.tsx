@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { MenuIcon } from './Icons';
 import { useI18n } from '../hooks/useI18n';
@@ -6,7 +5,9 @@ import { LanguageSwitcher } from './common/LanguageSwitcher';
 import { HeaderClock } from './common/HeaderClock';
 import { isGeminiApiActive } from '../services/geminiService';
 import { useAppContext } from '../contexts/AppContext';
-import { Users } from './LucideIcons';
+import { getSupabaseClient } from '../services/supabaseClient';
+import { Users, Github } from './LucideIcons';
+import { Button } from './common/Button';
 
 interface HeaderProps {
     toggleSidebar: () => void;
@@ -48,17 +49,35 @@ const SystemStatusIndicator: React.FC = () => {
 };
 
 const UserProfile: React.FC = () => {
-    const { isAuthenticated, login, logout } = useAppContext();
+    const { session, login, logout, addNotification } = useAppContext();
+    const { t } = useI18n();
 
-    if (!isAuthenticated) {
-        return <button onClick={login} className="text-sm font-semibold text-gray-300 hover:text-white">Login</button>;
+    const handleLogin = () => {
+        const supabase = getSupabaseClient();
+        if (supabase) {
+            login();
+        } else {
+            addNotification({ type: 'warning', message: 'Please configure Supabase in Connections to log in.' });
+        }
+    };
+    
+    if (!session) {
+        return <Button onClick={handleLogin} size="sm" variant="secondary" icon={<Github className="h-4 w-4"/>}>Login</Button>;
     }
 
+    const { user } = session;
+    const userName = user.user_metadata?.full_name || user.user_metadata?.name || user.email || 'User';
+    const avatarUrl = user.user_metadata?.avatar_url;
+
     return (
-        <div className="flex items-center space-x-2">
-            <Users className="w-6 h-6 p-1 bg-gray-700 rounded-full" />
+        <div className="flex items-center space-x-3">
+            {avatarUrl ? (
+                <img src={avatarUrl} alt={userName} className="w-8 h-8 rounded-full" />
+            ) : (
+                <Users className="w-8 h-8 p-1 bg-gray-700 rounded-full" />
+            )}
             <div className="hidden md:block">
-                <p className="text-sm font-semibold">Demo User</p>
+                <p className="text-sm font-semibold truncate max-w-[150px]">{userName}</p>
                 <button onClick={logout} className="text-xs text-gray-400 hover:text-red-400">Logout</button>
             </div>
         </div>

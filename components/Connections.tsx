@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription } from './common/Card';
 import { Button } from './common/Button';
@@ -39,6 +38,7 @@ interface Platform {
 
 const platforms: Record<string, Platform> = {
     gemini: { id: "gemini", nameKey: "connections.gemini", icon: <PlatformLogo platformId="gemini" />, fields: [{name: 'API_KEY', type: 'password', helpTextKey: 'connections.help.API_KEY'}], docsUrl: 'https://ai.google.dev/gemini-api/docs/api-key' },
+    supabase: { id: "supabase", nameKey: "connections.supabase", icon: <PlatformLogo platformId="supabase" />, fields: [{name: 'SUPABASE_URL', type: 'text', helpTextKey: 'connections.help.SUPABASE_URL'}, {name: 'SUPABASE_ANON_KEY', type: 'password', helpTextKey: 'connections.help.SUPABASE_ANON_KEY'}], docsUrl: 'https://supabase.com/dashboard/project/_/settings/api' },
     youtube: { id: "youtube", nameKey: "connections.youtube", icon: <PlatformLogo platformId="youtube" />, fields: [{name: 'CLIENT_ID', type: 'text', helpTextKey: 'connections.help.CLIENT_ID'}, {name: 'CLIENT_SECRET', type: 'password', helpTextKey: 'connections.help.CLIENT_SECRET'}, {name: 'REDIRECT_URI', type: 'text', helpTextKey: 'connections.help.REDIRECT_URI'}], docsUrl: 'https://console.cloud.google.com/apis/credentials' },
     tiktok: { id: "tiktok", nameKey: "connections.tiktok", icon: <PlatformLogo platformId="tiktok" />, fields: [{name: 'CLIENT_KEY', type: 'text', helpTextKey: 'connections.help.CLIENT_KEY'}, {name: 'CLIENT_SECRET', type: 'password', helpTextKey: 'connections.help.CLIENT_SECRET'}], docsUrl: 'https://developers.tiktok.com/documents/get-started' },
     instagram: { id: "instagram", nameKey: "connections.instagram", icon: <PlatformLogo platformId="instagram" />, fields: [{name: 'ACCESS_TOKEN', type: 'password', helpTextKey: 'connections.help.ACCESS_TOKEN'}], docsUrl: 'https://developers.facebook.com/docs/instagram-basic-display-api/getting-started' },
@@ -92,7 +92,7 @@ const platformCategories = [
     },
     {
         nameKey: 'connections.category_developer',
-        platforms: ['microsoft', 'github', 'discord', 'spotify', 'linkedin', 'googledrive']
+        platforms: ['supabase', 'microsoft', 'github', 'discord', 'spotify', 'linkedin', 'googledrive']
     },
     {
         nameKey: 'connections.category_affiliate',

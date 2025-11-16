@@ -1,4 +1,3 @@
-
 export const translations = {
   en: {
     // General
@@ -366,10 +365,13 @@ export const translations = {
             REDIRECT_URI: "The Redirect URI configured in your OAuth application.",
             AZURE_CLIENT_ID: "The Application (client) ID from your Azure App Registration.",
             AZURE_CLIENT_SECRET: "The Client Secret from your Azure App Registration.",
+            SUPABASE_URL: "The unique URL for your Supabase project's API. Found in Project Settings > API.",
+            SUPABASE_ANON_KEY: "The public anonymous key for your Supabase project. Safe for client-side use. Found in Project Settings > API.",
         },
 
         // Platforms
         gemini: "Gemini",
+        supabase: "Supabase",
         youtube: "YouTube",
         clickbank: "ClickBank",
         amazon: "Amazon Associates",
@@ -991,10 +993,13 @@ export const translations = {
             REDIRECT_URI: "URI chuyển hướng được cấu hình trong ứng dụng OAuth của bạn.",
             AZURE_CLIENT_ID: "Application (client) ID từ Azure App Registration của bạn.",
             AZURE_CLIENT_SECRET: "Client Secret từ Azure App Registration của bạn.",
+            SUPABASE_URL: "URL duy nhất cho API của dự án Supabase. Tìm thấy trong Cài đặt Dự án > API.",
+            SUPABASE_ANON_KEY: "Khóa công khai (anon) cho dự án Supabase. An toàn để sử dụng phía client. Tìm thấy trong Cài đặt Dự án > API.",
         },
 
         // Platforms
         gemini: "Gemini",
+        supabase: "Supabase",
         youtube: "YouTube",
         clickbank: "ClickBank",
         amazon: "Amazon Associates",

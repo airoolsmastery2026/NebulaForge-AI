@@ -286,6 +286,16 @@ const GoogleDriveLogo = (props: React.SVGProps<SVGSVGElement>) => (
     </svg>
 );
 
+const SupabaseLogo = (props: React.SVGProps<SVGSVGElement>) => (
+    <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+        <title>Supabase Logo</title>
+        <path d="M32.001 0C32.001 0 54.401 1.6 64.001 16L32.001 64C32.001 64 0 49.6 0 32C0 14.3269 14.3279 0 32.001 0Z" fill="#3ECF8E"/>
+        <path d="M32.0006 10.6667C32.0006 10.6667 46.934 11.7333 53.334 22.4L32.0006 53.3333C32.0006 53.3333 10.6673 42.1333 10.6673 32C10.6673 21.3113 21.312 10.6667 32.0006 10.6667Z" fill="#3ECF8E"/>
+        <path d="M32.0006 10.6667C32.0006 10.6667 46.934 11.7333 53.334 22.4L32.0006 53.3333V10.6667Z" fill="#36B27A"/>
+    </svg>
+);
+
+
 export const PlatformLogo: React.FC<{ platformId: string; className?: string }> = ({ platformId, className }) => {
     const props = { className: className || defaultProps.className };
 
@@ -328,6 +338,7 @@ export const PlatformLogo: React.FC<{ platformId: string; className?: string }> 
         case 'bybit': return <BybitLogo {...props} />;
         case 'host123': return <Host123Logo {...props} />;
         case 'googledrive': return <GoogleDriveLogo {...props} />;
+        case 'supabase': return <SupabaseLogo {...props} />;
         default: return null;
     }
 };

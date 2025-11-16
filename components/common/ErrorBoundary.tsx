@@ -23,7 +23,6 @@ export class ErrorBoundary extends React.Component<Props, State> {
   }
 
   public render() {
-    // FIX: Use direct property access to avoid potential issues with 'this' context during destructuring.
     if (this.state.hasError) {
       return (
         <div className="flex items-center justify-center h-screen bg-gray-900 text-gray-100">
@@ -43,6 +42,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
       );
     }
 
+    // FIX: The previous destructuring was causing a tooling-related error. Switched to a direct return of `this.props.children`, which is a standard and robust pattern.
     return this.props.children;
   }
 }
