@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription } from './common/Card';
 import { Button } from './common/Button';
@@ -13,7 +14,7 @@ interface AIVideoStudioProps {
 }
 
 const voiceModels: AIModel[] = ['gemini-2.5-flash-preview-tts', 'ElevenLabs Voice AI'];
-const videoModels: AIModel[] = ['VEO 3.1', 'KlingAI', 'Sora 2', 'Dreamina'];
+const videoModels: AIModel[] = ['VEO 3.1 (Fast)', 'VEO 3.1 (HQ)', 'KlingAI', 'Sora 2', 'Dreamina'];
 const musicModels: AIModel[] = ['Suno'];
 const sfxModels: AIModel[] = ['Gemini SFX Generator'];
 const videoEffects: VideoEffect[] = ['glitch', 'vintage', 'neon'];
@@ -51,9 +52,10 @@ const EffectBadge: React.FC<{ effect: VideoEffect }> = ({ effect }) => {
         vintage: 'bg-amber-600/80 text-white',
         neon: 'bg-cyan-400/80 text-black',
     };
+    const effectName = t(`effectNames.${effect}`);
     return (
-        <span className={`px-1.5 py-0.5 text-[10px] font-bold rounded-full ${effectStyles[effect]}`} title={t(`effects.${effect}`)}>
-            {t(`effects.${effect}`)[0]}
+        <span className={`px-1.5 py-0.5 text-[10px] font-bold rounded-full ${effectStyles[effect]}`} title={effectName}>
+            {effectName[0]}
         </span>
     );
 };
@@ -113,7 +115,7 @@ export const AIVideoStudio: React.FC<AIVideoStudioProps> = ({ productsWithConten
         const scene = scenes.find(s => s.id === sceneId);
         if (!scene) return;
         setScenes(prev => prev.map(s => s.id === sceneId ? { ...s, generationStatus: 'generating' } : s));
-        const operation = await startSceneVideoGeneration(scene.prompt);
+        const operation = await startSceneVideoGeneration(scene.prompt, scene.model);
         if (operation) {
             setScenes(prev => prev.map(s => s.id === sceneId ? { ...s, videoOperation: operation } : s));
         } else {
@@ -304,7 +306,7 @@ export const AIVideoStudio: React.FC<AIVideoStudioProps> = ({ productsWithConten
                                                                         variant={sceneEffects.includes(effect) ? 'primary' : 'secondary'}
                                                                         onClick={() => handleToggleEffect(scene.id, effect)}
                                                                     >
-                                                                        {t(`effects.${effect}`)}
+                                                                        {t(`effectNames.${effect}`)}
                                                                     </Button>
                                                                 ))}
                                                             </div>

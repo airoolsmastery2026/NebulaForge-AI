@@ -1,5 +1,5 @@
 import { GoogleGenAI, Type, Modality } from "@google/genai";
-import type { Product, Trend } from '../types';
+import type { Product, Trend, AIModel } from '../types';
 
 // Set a global flag based on the presence of the API key at build time.
 // This allows other components to reactively check if the core AI is active.
@@ -448,7 +448,12 @@ const ensureVeoApiKey = async () => {
     }
 };
 
-export const startVideoGeneration = async (product: Product): Promise<any> => {
+const veoModelMapping: Record<string, string> = {
+    'VEO 3.1 (Fast)': 'veo-3.1-fast-generate-preview',
+    'VEO 3.1 (HQ)': 'veo-3.1-generate-preview',
+};
+
+export const startVideoGeneration = async (product: Product, model: AIModel = 'VEO 3.1 (Fast)'): Promise<any> => {
     await ensureVeoApiKey();
     const ai = createAiClient();
     if (!ai) {
@@ -461,9 +466,11 @@ export const startVideoGeneration = async (product: Product): Promise<any> => {
     - Key Features to highlight: ${product.features}.
     - Style: Modern, fast-paced, engaging, suitable for platforms like TikTok and YouTube Shorts.`;
 
+    const modelId = veoModelMapping[model] || 'veo-3.1-fast-generate-preview';
+
     try {
         const operation = await ai.models.generateVideos({
-            model: 'veo-3.1-fast-generate-preview',
+            model: modelId,
             prompt,
             config: {
                 numberOfVideos: 1,
@@ -483,7 +490,7 @@ export const startVideoGeneration = async (product: Product): Promise<any> => {
     }
 };
 
-export const startSceneVideoGeneration = async (prompt: string): Promise<any> => {
+export const startSceneVideoGeneration = async (prompt: string, model: AIModel = 'VEO 3.1 (Fast)'): Promise<any> => {
     await ensureVeoApiKey();
     const ai = createAiClient();
     if (!ai) {
@@ -493,9 +500,11 @@ export const startSceneVideoGeneration = async (prompt: string): Promise<any> =>
     
     const fullPrompt = `Create a short, 5-second video clip for a vertical video (9:16 aspect ratio) that visually represents the following text: "${prompt}". Style: cinematic, engaging, high-quality.`;
 
+    const modelId = veoModelMapping[model] || 'veo-3.1-fast-generate-preview';
+
     try {
         const operation = await ai.models.generateVideos({
-            model: 'veo-3.1-fast-generate-preview',
+            model: modelId,
             prompt: fullPrompt,
             config: {
                 numberOfVideos: 1,

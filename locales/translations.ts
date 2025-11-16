@@ -1,5 +1,4 @@
 
-
 export const translations = {
   en: {
     // General
@@ -193,10 +192,8 @@ export const translations = {
       generating: "Generating..."
     },
     
-    // Fix: This key was duplicated. One was inside 'aiVideoStudio' and one at the root level.
-    // To resolve, I've consolidated effect-related translations under the 'effects' key.
-    // The key 'effects' inside 'aiVideoStudio' was for a label and is kept as is.
-    effects: {
+    // Renamed from 'effects' to 'effectNames' to avoid key collision with aiVideoStudio.effects label.
+    effectNames: {
       glitch: "Glitch",
       vintage: "Vintage",
       neon: "Neon Glow"
@@ -307,8 +304,6 @@ export const translations = {
         backupTooltip: "Save all your connection settings to a JSON file.",
         restoreTooltip: "Load connection settings from a JSON file.",
         export: "Export JSON",
-        // Fix: Removed duplicate 'status' key that was causing a JSON parsing error.
-        actions: "Actions",
         edit: "Edit",
         delete: "Delete",
         platform: "Platform",
@@ -386,7 +381,8 @@ export const translations = {
         templates: "Templates",
         editTitle: "Edit Template",
         createTitle: "Create New Template",
-        description: "Define the structure for your AI-generated content.",
+        // Fix: Renamed 'description' to 'pageDescription' to avoid duplicate key error.
+        pageDescription: "Define the structure for your AI-generated content.",
         nameLabel: "Template Name",
         typeLabel: "Template Type",
         contentLabel: "Prompt Content",
@@ -586,6 +582,11 @@ export const translations = {
     },
     placeholder: {
         underConstruction: "This page is under construction. Full functionality will be available soon."
+    },
+    qualitySelector: {
+      quality: "Quality",
+      fast: "Fast",
+      hq: "High Quality"
     }
   },
   vi: {
@@ -780,7 +781,7 @@ export const translations = {
       generating: "Đang tạo..."
     },
     
-    effects: {
+    effectNames: {
         glitch: "Nhiễu Sóng",
         vintage: "Cổ Điển",
         neon: "Phát Sáng Neon"
@@ -891,8 +892,6 @@ export const translations = {
         backupTooltip: "Lưu tất cả cài đặt kết nối của bạn vào một tệp JSON.",
         restoreTooltip: "Tải cài đặt kết nối từ một tệp JSON.",
         export: "Xuất JSON",
-        // Fix: Removed duplicate 'status' key that was causing a JSON parsing error.
-        actions: "Hành động",
         edit: "Sửa",
         delete: "Xóa",
         platform: "Nền tảng",
@@ -970,7 +969,8 @@ export const translations = {
         templates: "Các mẫu",
         editTitle: "Chỉnh sửa Mẫu",
         createTitle: "Tạo Mẫu mới",
-        description: "Xác định cấu trúc cho nội dung do AI tạo ra của bạn.",
+        // Fix: Renamed 'description' to 'pageDescription' to avoid duplicate key error.
+        pageDescription: "Xác định cấu trúc cho nội dung do AI tạo ra của bạn.",
         nameLabel: "Tên Mẫu",
         typeLabel: "Loại Mẫu",
         contentLabel: "Nội dung Prompt",
@@ -1170,6 +1170,11 @@ export const translations = {
     },
     placeholder: {
         underConstruction: "Trang này đang được xây dựng. Chức năng đầy đủ sẽ sớm có sẵn."
+    },
+    qualitySelector: {
+      quality: "Chất lượng",
+      fast: "Nhanh",
+      hq: "Chất lượng cao"
     }
   }
 };

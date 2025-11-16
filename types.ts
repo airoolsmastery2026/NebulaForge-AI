@@ -90,7 +90,7 @@ export interface PlatformPerformance {
 }
 
 export type RenderStatus = 'Queued' | 'Rendering' | 'Completed' | 'Failed';
-export type AIModel = 'Sora 2' | 'VEO 3.1' | 'Suno' | 'Dreamina' | 'KlingAI' | 'ElevenLabs Voice AI' | 'gemini-2.5-flash-preview-tts' | 'Gemini SFX Generator';
+export type AIModel = 'Sora 2' | 'VEO 3.1 (Fast)' | 'VEO 3.1 (HQ)' | 'Suno' | 'Dreamina' | 'KlingAI' | 'ElevenLabs Voice AI' | 'gemini-2.5-flash-preview-tts' | 'Gemini SFX Generator';
 
 export type VideoEffect = 'glitch' | 'vintage' | 'neon';
 

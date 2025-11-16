@@ -21,7 +21,8 @@ const statusColors: Record<RenderJob['status'], string> = {
 
 const modelColors: Record<string, string> = {
     'Sora 2': 'border-purple-500',
-    'VEO 3.1': 'border-blue-500',
+    'VEO 3.1 (Fast)': 'border-blue-500',
+    'VEO 3.1 (HQ)': 'border-teal-400',
     'Suno': 'border-pink-500',
     'Dreamina': 'border-yellow-500',
     'KlingAI': 'border-green-500',

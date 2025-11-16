@@ -1,5 +1,4 @@
 
-
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { Sidebar } from './components/Sidebar';
 import { Header } from './components/Header';
@@ -20,7 +19,7 @@ import { GitHubSync } from './components/GitHubSync';
 import { ThreeScene } from './components/ThreeScene';
 import { ControlHub } from './components/ControlHub';
 import { PlaceholderPage } from './components/PlaceholderPage';
-import type { Product, GeneratedContent, VideoIdea, RenderJob, ScheduledPost } from './types';
+import type { Product, GeneratedContent, VideoIdea, RenderJob, ScheduledPost, AIModel } from './types';
 import { Page } from './types';
 import { generateCaptionsAndHashtags, generateReviewScript, generateSeoDescription, generateVideoTitles, generateSpeech, startVideoGeneration } from './services/geminiService';
 
@@ -83,7 +82,7 @@ const App: React.FC = () => {
         ]);
     }, []);
 
-    const startFullAutoPipeline = useCallback(async (product: Product) => {
+    const startFullAutoPipeline = useCallback(async (product: Product, model: AIModel) => {
         addProduct(product);
 
         const [script, titles, seoDescription, captions, audioData] = await Promise.all([
@@ -100,7 +99,7 @@ const App: React.FC = () => {
         setCurrentPage(Page.CONTENT_GENERATOR);
 
         const productWithContent = { ...product, content: fullContent };
-        const videoOperation = await startVideoGeneration(productWithContent);
+        const videoOperation = await startVideoGeneration(productWithContent, model);
         
         if (videoOperation) {
             addRenderJob({
@@ -108,7 +107,7 @@ const App: React.FC = () => {
                 status: 'Queued',
                 progress: 0,
                 createdAt: new Date().toISOString(),
-                models: ['VEO 3.1', 'gemini-2.5-flash-preview-tts'],
+                models: [model, 'gemini-2.5-flash-preview-tts'],
                 videoOperation,
                 audioData
             });
@@ -141,8 +140,8 @@ const App: React.FC = () => {
                           generatedContent={generatedContent}
                           onContentUpdate={updateGeneratedContent}
                         />;
-            // Fix: Property 'PUBLISHER' does not exist on type 'typeof Page'. Changed to 'AI_SOCIAL_POSTING' as it relates to publishing content.
-            case Page.AI_SOCIAL_POSTING:
+            // Align with Sidebar navigation which uses Page.PUBLISHER.
+            case Page.PUBLISHER:
                 return <Publisher 
                     productsWithContent={productsWithContent} 
                     onAddRenderJob={addRenderJob} 

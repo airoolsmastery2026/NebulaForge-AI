@@ -1,19 +1,21 @@
 import React, { useState } from 'react';
-import type { Product } from '../types';
+import type { Product, AIModel } from '../types';
 import { Button } from './common/Button';
 import { Card, CardHeader, CardTitle, CardDescription } from './common/Card';
 import { Bot, Link } from './LucideIcons';
 import { useI18n } from '../hooks/useI18n';
 import { scrapeProductInfo } from '../services/geminiService';
 import { Spinner } from './common/Spinner';
+import { QualitySelector } from './common/QualitySelector';
 
 interface ProductScoutProps {
-    onStartPipeline: (product: Product) => void;
+    onStartPipeline: (product: Product, model: AIModel) => void;
 }
 
 export const ProductScout: React.FC<ProductScoutProps> = ({ onStartPipeline }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [url, setUrl] = useState('');
+    const [selectedModel, setSelectedModel] = useState<AIModel>('VEO 3.1 (Fast)');
     const [error, setError] = useState<string | null>(null);
     const { t } = useI18n();
 
@@ -24,7 +26,7 @@ export const ProductScout: React.FC<ProductScoutProps> = ({ onStartPipeline }) =
         try {
             const product = await scrapeProductInfo(url);
             if (product) {
-                onStartPipeline(product);
+                onStartPipeline(product, selectedModel);
                 setUrl(''); // Clear input on success
             } else {
                 setError(t('productScout.scrapeError'));
@@ -61,7 +63,13 @@ export const ProductScout: React.FC<ProductScoutProps> = ({ onStartPipeline }) =
                             />
                         </div>
                     </div>
+
+                    <div className="flex justify-center">
+                        <QualitySelector selectedModel={selectedModel} onChange={setSelectedModel} />
+                    </div>
+
                     {error && <p className="text-center text-sm text-red-400">{error}</p>}
+                    
                     <div className="flex justify-center pt-2">
                         <Button
                             onClick={handleScout}

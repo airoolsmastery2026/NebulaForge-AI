@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import type { ProductWithContent, RenderJob, ScheduledPost } from '../types';
+import type { ProductWithContent, RenderJob, ScheduledPost, AIModel } from '../types';
 import { Card, CardHeader, CardTitle, CardDescription } from './common/Card';
 import { Button } from './common/Button';
 import { useI18n } from '../hooks/useI18n';
 import { startVideoGeneration, generateSpeech } from '../services/geminiService';
 import { PostSchedulerModal } from './PostSchedulerModal';
 import { Calendar } from './LucideIcons';
+import { QualitySelector } from './common/QualitySelector';
 
 interface PublisherProps {
     productsWithContent: ProductWithContent[];
@@ -18,6 +19,7 @@ export const Publisher: React.FC<PublisherProps> = ({ productsWithContent, onAdd
     const [creatingVideo, setCreatingVideo] = useState<string | null>(null);
     const [isSchedulerOpen, setIsSchedulerOpen] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState<ProductWithContent | null>(null);
+    const [selectedModel, setSelectedModel] = useState<AIModel>('VEO 3.1 (Fast)');
     const { t } = useI18n();
 
     const handleCreateVideo = async (product: ProductWithContent) => {
@@ -25,7 +27,7 @@ export const Publisher: React.FC<PublisherProps> = ({ productsWithContent, onAdd
         try {
             const [audioData, videoOperation] = await Promise.all([
                 generateSpeech(product.content.script || 'No script available.'),
-                startVideoGeneration(product)
+                startVideoGeneration(product, selectedModel)
             ]);
 
             if (!videoOperation) {
@@ -37,7 +39,7 @@ export const Publisher: React.FC<PublisherProps> = ({ productsWithContent, onAdd
                 status: 'Queued',
                 progress: 0,
                 createdAt: new Date().toISOString(),
-                models: ['VEO 3.1', 'gemini-2.5-flash-preview-tts'],
+                models: [selectedModel, 'gemini-2.5-flash-preview-tts'],
                 videoOperation,
                 audioData,
             });
@@ -74,6 +76,9 @@ export const Publisher: React.FC<PublisherProps> = ({ productsWithContent, onAdd
                     <CardTitle>{t('publisher.title')}</CardTitle>
                     <CardDescription>{t('publisher.description')}</CardDescription>
                 </CardHeader>
+                <div className="p-4 border-b border-gray-800 flex justify-end">
+                    <QualitySelector selectedModel={selectedModel} onChange={setSelectedModel} />
+                </div>
                 <div className="divide-y divide-gray-800 list-item-highlight">
                     {readyToPublish.length > 0 ? readyToPublish.map(product => {
                         const scheduledPost = scheduledPosts.find(p => p.productId === product.id);
