@@ -10,6 +10,9 @@ interface SystemLogProps {
 }
 
 const getRelativeTime = (date: Date, locale: string) => {
+    if (!date || isNaN(date.getTime())) {
+        return 'some time ago'; // Fallback for invalid dates
+    }
     const now = new Date();
     const seconds = Math.round((now.getTime() - date.getTime()) / 1000);
     const rtf = new Intl.RelativeTimeFormat(locale, { numeric: 'auto' });
