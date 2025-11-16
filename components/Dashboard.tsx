@@ -1,10 +1,4 @@
 
-
-
-
-
-
-
 import React from 'react';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import type { VideoIdea, RenderJob } from '../types';
@@ -45,11 +39,14 @@ const StatCard: React.FC<{title: string, value: string, change: string}> = ({tit
 export const Dashboard: React.FC<DashboardProps> = ({ videoIdeas, renderJobs, setCurrentPage }) => {
     const { t } = useI18n();
 
+    // The 'name' property was causing an issue with the StatCard component's props.
+    // It has been renamed to 'title' to align with the expected props.
+    // Additionally, a unique 'id' has been added for a stable 'key' prop during mapping.
     const stats = [
-        { name: t('dashboard.totalViews'), value: '7.1M', change: '+15.2%' },
-        { name: t('dashboard.totalEarnings'), value: '$18,920', change: '+21.7%' },
-        { name: t('dashboard.videosCreated'), value: '112', change: `+${(renderJobs.filter(j => j.status === 'Completed').length)} this week` },
-        { name: t('dashboard.conversionRate'), value: '14.1%', change: '-0.5%' },
+        { id: 'views', title: t('dashboard.totalViews'), value: '7.1M', change: '+15.2%' },
+        { id: 'earnings', title: t('dashboard.totalEarnings'), value: '$18,920', change: '+21.7%' },
+        { id: 'videos', title: t('dashboard.videosCreated'), value: '112', change: `+${(renderJobs.filter(j => j.status === 'Completed').length)} this week` },
+        { id: 'conversion', title: t('dashboard.conversionRate'), value: '14.1%', change: '-0.5%' },
     ];
 
     return (
@@ -69,7 +66,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ videoIdeas, renderJobs, se
                  {/* Main Column */}
                 <div className="lg:col-span-2 space-y-6">
                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {stats.map(stat => <StatCard key={stat.name} {...stat}/>)}
+                        {stats.map(({ id, ...statProps }) => <StatCard key={id} {...statProps}/>)}
                     </div>
                     <Card className="h-full">
                         <CardHeader>
