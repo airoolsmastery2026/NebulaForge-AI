@@ -1,3 +1,4 @@
+
 export enum Page {
     // Group 1: Main Navigation
     DASHBOARD = 'Dashboard', // Trang chủ
@@ -89,7 +90,7 @@ export interface PlatformPerformance {
     shares: number;
 }
 
-export type RenderStatus = 'Queued' | 'Rendering' | 'Completed' | 'Failed';
+export type RenderStatus = 'Queued' | 'Rendering' | 'Completed' | 'Composing' | 'Ready' | 'Failed';
 export type AIModel = 'Sora 2' | 'VEO 3.1 (Fast)' | 'VEO 3.1 (HQ)' | 'Suno' | 'Dreamina' | 'KlingAI' | 'ElevenLabs Voice AI' | 'gemini-2.5-flash-preview-tts' | 'Gemini SFX Generator';
 
 export type VideoEffect = 'glitch' | 'vintage' | 'neon';
@@ -179,4 +180,10 @@ export interface AffiliateStat {
   conversions: number;
   error?: string;
   connected: boolean;
+}
+
+export interface AppNotification {
+    id: number;
+    message: string;
+    type: 'info' | 'success' | 'warning' | 'error';
 }

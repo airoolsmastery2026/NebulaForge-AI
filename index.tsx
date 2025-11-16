@@ -3,6 +3,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 import { I18nProvider } from './contexts/I18nContext';
+import { AppProvider } from './contexts/AppContext';
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
@@ -13,7 +14,9 @@ const root = ReactDOM.createRoot(rootElement);
 root.render(
   <React.StrictMode>
     <I18nProvider>
-      <App />
+      <AppProvider>
+        <App />
+      </AppProvider>
     </I18nProvider>
   </React.StrictMode>
 );

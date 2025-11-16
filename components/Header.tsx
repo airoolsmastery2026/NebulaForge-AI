@@ -1,12 +1,12 @@
 
-
-
 import React, { useState, useEffect } from 'react';
 import { MenuIcon } from './Icons';
 import { useI18n } from '../hooks/useI18n';
 import { LanguageSwitcher } from './common/LanguageSwitcher';
 import { HeaderClock } from './common/HeaderClock';
 import { isGeminiApiActive } from '../services/geminiService';
+import { useAppContext } from '../contexts/AppContext';
+import { Users } from './LucideIcons';
 
 interface HeaderProps {
     toggleSidebar: () => void;
@@ -14,17 +14,20 @@ interface HeaderProps {
 
 const SystemStatusIndicator: React.FC = () => {
     const { t } = useI18n();
-    const [isActive, setIsActive] = useState(false);
+    const [isActive, setIsActive] = useState(isGeminiApiActive);
 
     useEffect(() => {
-        const checkApiStatus = () => {
+        // Listen for storage changes to react to API key updates from the Connections page
+        const handleStorageChange = () => {
             setIsActive(isGeminiApiActive());
         };
+        window.addEventListener('storage', handleStorageChange);
         
-        checkApiStatus();
-        const intervalId = setInterval(checkApiStatus, 2000); // Check frequently to be responsive
+        // Also check periodically
+        const intervalId = setInterval(() => setIsActive(isGeminiApiActive()), 2000);
         
         return () => {
+            window.removeEventListener('storage', handleStorageChange);
             clearInterval(intervalId);
         };
     }, []);
@@ -44,6 +47,23 @@ const SystemStatusIndicator: React.FC = () => {
     );
 };
 
+const UserProfile: React.FC = () => {
+    const { isAuthenticated, login, logout } = useAppContext();
+
+    if (!isAuthenticated) {
+        return <button onClick={login} className="text-sm font-semibold text-gray-300 hover:text-white">Login</button>;
+    }
+
+    return (
+        <div className="flex items-center space-x-2">
+            <Users className="w-6 h-6 p-1 bg-gray-700 rounded-full" />
+            <div className="hidden md:block">
+                <p className="text-sm font-semibold">Demo User</p>
+                <button onClick={logout} className="text-xs text-gray-400 hover:text-red-400">Logout</button>
+            </div>
+        </div>
+    );
+};
 
 export const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
     const { t } = useI18n();
@@ -64,12 +84,14 @@ export const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
                 </div>
             </div>
             
-            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 hidden lg:block">
                 <HeaderClock />
             </div>
 
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-4">
                 <LanguageSwitcher />
+                <div className="h-8 w-px bg-gray-700" />
+                <UserProfile />
             </div>
         </header>
     );

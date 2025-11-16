@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import type { Product, AIModel } from '../types';
 import { Button } from './common/Button';
@@ -7,6 +8,7 @@ import { useI18n } from '../hooks/useI18n';
 import { scrapeProductInfo } from '../services/geminiService';
 import { Spinner } from './common/Spinner';
 import { QualitySelector } from './common/QualitySelector';
+import { useAppContext } from '../contexts/AppContext';
 
 interface ProductScoutProps {
     onStartPipeline: (product: Product, model: AIModel) => void;
@@ -16,23 +18,22 @@ export const ProductScout: React.FC<ProductScoutProps> = ({ onStartPipeline }) =
     const [isLoading, setIsLoading] = useState(false);
     const [url, setUrl] = useState('');
     const [selectedModel, setSelectedModel] = useState<AIModel>('VEO 3.1 (Fast)');
-    const [error, setError] = useState<string | null>(null);
     const { t } = useI18n();
+    const { addNotification } = useAppContext();
 
     const handleScout = async () => {
         if (!url.trim()) return;
         setIsLoading(true);
-        setError(null);
         try {
             const product = await scrapeProductInfo(url);
             if (product) {
                 onStartPipeline(product, selectedModel);
                 setUrl(''); // Clear input on success
             } else {
-                setError(t('productScout.scrapeError'));
+                addNotification({ type: 'error', message: t('productScout.scrapeError') });
             }
         } catch (e) {
-            setError(t('productScout.scrapeError'));
+            addNotification({ type: 'error', message: t('productScout.scrapeError') });
             console.error(e);
         } finally {
             setIsLoading(false);
@@ -67,8 +68,6 @@ export const ProductScout: React.FC<ProductScoutProps> = ({ onStartPipeline }) =
                     <div className="flex justify-center">
                         <QualitySelector selectedModel={selectedModel} onChange={setSelectedModel} />
                     </div>
-
-                    {error && <p className="text-center text-sm text-red-400">{error}</p>}
                     
                     <div className="flex justify-center pt-2">
                         <Button

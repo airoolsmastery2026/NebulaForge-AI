@@ -1,6 +1,4 @@
 
-
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription } from './common/Card';
 import { Button } from './common/Button';
@@ -18,10 +16,10 @@ import {
 import { useI18n } from '../hooks/useI18n';
 import { PlatformLogo } from './PlatformLogo';
 import { FacebookTokenManager } from './FacebookTokenManager';
-// Fix: Import `Page` as a value, not just a type, because it is used in an `onClick` handler.
 import type { Connection, ConnectionStatus } from '../types';
 import { Page } from '../types';
 import { checkPlatformStatus } from '../services/platformStatusService';
+import { getConnections, saveConnections as saveConnectionsApi } from '../services/apiService';
 
 
 interface ConnectionField {
@@ -105,9 +103,6 @@ const platformCategories = [
         platforms: ['crypto_com', 'binance', 'bybit', 'shopee', 'lazada', 'tiki', 'momo', 'vnpay']
     }
 ];
-
-const STORAGE_KEY = 'universal-connections';
-
 
 const StatusIndicator: React.FC<{status: ConnectionStatus}> = ({ status }) => {
     const baseClass = 'w-3 h-3 rounded-full';
@@ -280,26 +275,19 @@ export const Connections: React.FC<ConnectionsProps> = ({ setCurrentPage }) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
-        try {
-            const stored = localStorage.getItem(STORAGE_KEY);
-            if (stored) {
-                setConnections(JSON.parse(stored));
-            }
-        } catch (e) { console.error("Failed to load connections:", e); }
+        setConnections(getConnections());
     }, []);
     
-    const saveConnections = (newConnections: Record<string, Connection>) => {
-        setConnections(newConnections);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(newConnections));
-    };
-
     const handleSave = (connData: Connection) => {
-        saveConnections({ ...connections, [connData.id]: connData });
+        const newConnections = { ...connections, [connData.id]: connData };
+        saveConnectionsApi(newConnections);
+        setConnections(newConnections);
     };
     
     const handleDisconnect = (id: string) => {
         const {[id]: _, ...rest} = connections;
-        saveConnections(rest);
+        saveConnectionsApi(rest);
+        setConnections(rest);
         setActivePlatformId(null);
     };
 
@@ -324,7 +312,8 @@ export const Connections: React.FC<ConnectionsProps> = ({ setCurrentPage }) => {
             try {
                 if (typeof e.target?.result === 'string') {
                     const restoredConns = JSON.parse(e.target.result);
-                    saveConnections(restoredConns);
+                    saveConnectionsApi(restoredConns);
+                    setConnections(restoredConns);
                 }
             } catch (err) { console.error("Failed to restore connections:", err); }
         };

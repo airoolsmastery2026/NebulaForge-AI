@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription } from './common/Card';
 import { Button } from './common/Button';
@@ -15,7 +16,9 @@ interface RenderQueueProps {
 const statusColors: Record<RenderJob['status'], string> = {
     Queued: 'bg-slate-500/20 text-slate-300',
     Rendering: 'bg-blue-500/20 text-blue-300',
-    Completed: 'bg-green-500/20 text-green-300',
+    Completed: 'bg-teal-500/20 text-teal-300',
+    Composing: 'bg-purple-500/20 text-purple-300',
+    Ready: 'bg-green-500/20 text-green-300',
     Failed: 'bg-red-500/20 text-red-300',
 };
 
@@ -86,46 +89,41 @@ export const RenderQueue: React.FC<RenderQueueProps> = ({ jobs, setJobs }) => {
     
     useEffect(() => {
         const poll = () => {
-            setJobs(currentJobs => {
-                const jobsToPoll = currentJobs.filter(job =>
-                    (job.status === 'Queued' || job.status === 'Rendering') &&
-                    job.videoOperation && !job.videoOperation.done
-                );
-
-                if (jobsToPoll.length > 0) {
-                    jobsToPoll.forEach(async (job) => {
-                        const updatedOperation = await checkVideoGenerationStatus(job.videoOperation);
-                        setJobs(prevJobs => prevJobs.map(j => {
-                            if (j.id === job.id) {
-                                if (updatedOperation.done) {
-                                    if (updatedOperation.error) {
-                                        console.error(`Job ${j.id} failed:`, updatedOperation.error);
-                                        return { ...j, status: 'Failed', progress: 100, videoOperation: updatedOperation };
-                                    }
-                                    const videoUri = updatedOperation.response?.generatedVideos?.[0]?.video?.uri;
-                                    return { ...j, status: 'Completed', progress: 100, videoOperation: updatedOperation, videoUrl: videoUri };
+            jobs.forEach(async (job) => {
+                 // Poll for rendering status
+                if ((job.status === 'Queued' || job.status === 'Rendering') && job.videoOperation && !job.videoOperation.done) {
+                    const updatedOperation = await checkVideoGenerationStatus(job.videoOperation);
+                    setJobs(prevJobs => prevJobs.map(j => {
+                        if (j.id === job.id) {
+                            if (updatedOperation.done) {
+                                if (updatedOperation.error) {
+                                    console.error(`Job ${j.id} failed:`, updatedOperation.error);
+                                    return { ...j, status: 'Failed', progress: 100, videoOperation: updatedOperation };
                                 }
-                                const progress = j.progress < 95 ? j.progress + Math.floor(Math.random() * 5) : 95;
-                                return { ...j, status: 'Rendering', progress, videoOperation: updatedOperation };
+                                const videoUri = updatedOperation.response?.generatedVideos?.[0]?.video?.uri;
+                                // Move to 'Completed', then it will be picked up by the composing logic below
+                                return { ...j, status: 'Completed', progress: 100, videoOperation: updatedOperation, videoUrl: videoUri };
                             }
-                            return j;
-                        }));
-                    });
+                            const progress = j.progress < 95 ? j.progress + Math.floor(Math.random() * 5) : 95;
+                            return { ...j, status: 'Rendering', progress, videoOperation: updatedOperation };
+                        }
+                        return j;
+                    }));
                 }
-                
-                // Handle mock jobs or queued jobs without starting polling yet
-                return currentJobs.map(job => {
-                    if (job.status === 'Queued' && !job.videoOperation?.done) {
-                        return { ...job, status: 'Rendering', progress: job.progress || 5 };
-                    }
-                    return job;
-                });
+
+                // Simulate composition step after completion (Step 4)
+                if (job.status === 'Completed') {
+                     setJobs(prev => prev.map(j => j.id === job.id ? {...j, status: 'Composing'} : j));
+                     setTimeout(() => {
+                        setJobs(prev => prev.map(j => j.id === job.id ? {...j, status: 'Ready'} : j));
+                     }, 3000); // Simulate 3 second composition
+                }
             });
         };
     
         const intervalId = setInterval(poll, 5000); // Poll every 5 seconds
         return () => clearInterval(intervalId);
-    }, [setJobs]);
+    }, [jobs, setJobs]);
     
     const handleDownload = async (job: RenderJob) => {
         // Download video
@@ -201,7 +199,7 @@ export const RenderQueue: React.FC<RenderQueueProps> = ({ jobs, setJobs }) => {
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400">{new Date(job.createdAt).toLocaleString()}</td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                    <Button size="sm" variant="ghost" disabled={job.status !== 'Completed'} onClick={() => handleDownload(job)}>
+                                    <Button size="sm" variant="ghost" disabled={job.status !== 'Ready'} onClick={() => handleDownload(job)}>
                                         <Download className="h-4 w-4 mr-2" />
                                         {t('renderQueue.download')}
                                     </Button>

@@ -1,19 +1,18 @@
+
 import { GoogleGenAI, Type, Modality } from "@google/genai";
 import type { Product, Trend, AIModel } from '../types';
+import { getConnections } from './apiService';
 
 const getApiKey = (): string | null => {
-    // 1. Prioritize user-provided key from localStorage.
+    // 1. Prioritize user-provided key from the connections service.
     try {
-        const stored = localStorage.getItem('universal-connections');
-        if (stored) {
-            const connections = JSON.parse(stored);
-            const geminiApiKey = connections?.gemini?.credentials?.API_KEY;
-            if (geminiApiKey && geminiApiKey.trim() !== '') {
-                return geminiApiKey;
-            }
+        const connections = getConnections();
+        const geminiApiKey = connections?.gemini?.credentials?.API_KEY;
+        if (geminiApiKey && geminiApiKey.trim() !== '') {
+            return geminiApiKey;
         }
     } catch (e) {
-        console.error("Could not read API key from localStorage", e);
+        console.error("Could not read API key from connections", e);
     }
     
     // 2. Fallback to the environment variable.

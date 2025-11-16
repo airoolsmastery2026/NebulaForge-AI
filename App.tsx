@@ -1,38 +1,66 @@
 
-
-import React, { useState, useCallback, useMemo, useEffect } from 'react';
-import { Sidebar } from './components/Sidebar';
-import { Header } from './components/Header';
-import { ProductScout } from './components/ProductScout';
-import { ContentGenerator } from './components/ContentGenerator';
-import { Publisher } from './components/Publisher';
-import { Analytics } from './components/Analytics';
-import { Dashboard } from './components/Dashboard';
-import { Automation } from './components/Automation';
-import { Connections } from './components/Connections';
-import { PromptTemplates } from './components/PromptTemplates';
-import { Footer } from './components/common/Footer';
-import { RenderQueue } from './components/RenderQueue';
-import { AppGuide } from './components/AppGuide';
-import { ApiDocs } from './components/ApiDocs';
-import { AIVideoStudio } from './components/AIVideoStudio';
-import { GitHubSync } from './components/GitHubSync';
-import { ThreeScene } from './components/ThreeScene';
-import { ControlHub } from './components/ControlHub';
-import { PlaceholderPage } from './components/PlaceholderPage';
-import type { Product, GeneratedContent, VideoIdea, RenderJob, ScheduledPost, AIModel, Connection } from './types';
+import React, { useState, useCallback, useMemo, useEffect, Suspense, lazy } from 'react';
+import type { Product, GeneratedContent, VideoIdea, RenderJob, ScheduledPost, AIModel } from './types';
 import { Page } from './types';
 import { generateCaptionsAndHashtags, generateReviewScript, generateSeoDescription, generateVideoTitles, generateSpeech, startVideoGeneration } from './services/geminiService';
+import { getAppData, saveAppData } from './services/apiService';
+import { useAppContext } from './contexts/AppContext';
+import { ErrorBoundary } from './components/common/ErrorBoundary';
+import { PageLoader } from './components/common/PageLoader';
+import { Notifications } from './components/common/Notifications';
 
-const App: React.FC = () => {
+// Lazy load components for code splitting and better performance (Step 8)
+const Sidebar = lazy(() => import('./components/Sidebar').then(m => ({ default: m.Sidebar })));
+const Header = lazy(() => import('./components/Header').then(m => ({ default: m.Header })));
+const ProductScout = lazy(() => import('./components/ProductScout').then(m => ({ default: m.ProductScout })));
+const ContentGenerator = lazy(() => import('./components/ContentGenerator').then(m => ({ default: m.ContentGenerator })));
+const Publisher = lazy(() => import('./components/Publisher').then(m => ({ default: m.Publisher })));
+const Analytics = lazy(() => import('./components/Analytics').then(m => ({ default: m.Analytics })));
+const Dashboard = lazy(() => import('./components/Dashboard').then(m => ({ default: m.Dashboard })));
+const Automation = lazy(() => import('./components/Automation').then(m => ({ default: m.Automation })));
+const Connections = lazy(() => import('./components/Connections').then(m => ({ default: m.Connections })));
+const PromptTemplates = lazy(() => import('./components/PromptTemplates').then(m => ({ default: m.PromptTemplates })));
+const Footer = lazy(() => import('./components/common/Footer').then(m => ({ default: m.Footer })));
+const RenderQueue = lazy(() => import('./components/RenderQueue').then(m => ({ default: m.RenderQueue })));
+const AppGuide = lazy(() => import('./components/AppGuide').then(m => ({ default: m.AppGuide })));
+const ApiDocs = lazy(() => import('./components/ApiDocs').then(m => ({ default: m.ApiDocs })));
+const AIVideoStudio = lazy(() => import('./components/AIVideoStudio').then(m => ({ default: m.AIVideoStudio })));
+const GitHubSync = lazy(() => import('./components/GitHubSync').then(m => ({ default: m.GitHubSync })));
+const ThreeScene = lazy(() => import('./components/ThreeScene').then(m => ({ default: m.ThreeScene })));
+const ControlHub = lazy(() => import('./components/ControlHub').then(m => ({ default: m.ControlHub })));
+const PlaceholderPage = lazy(() => import('./components/PlaceholderPage').then(m => ({ default: m.PlaceholderPage })));
+
+
+const AppContent: React.FC = () => {
+    const { addNotification } = useAppContext();
     const [currentPage, setCurrentPage] = useState<Page>(Page.DASHBOARD);
+    
+    // All major state is now loaded from and persisted to localStorage (Step 1)
     const [products, setProducts] = useState<Product[]>([]);
     const [generatedContent, setGeneratedContent] = useState<Record<string, GeneratedContent>>({});
-    const [isSidebarOpen, setSidebarOpen] = useState(false);
     const [videoIdeas, setVideoIdeas] = useState<VideoIdea[]>([]);
     const [renderJobs, setRenderJobs] = useState<RenderJob[]>([]);
     const [scheduledPosts, setScheduledPosts] = useState<ScheduledPost[]>([]);
+    
+    const [isSidebarOpen, setSidebarOpen] = useState(false);
     const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+
+    // Load initial state from storage
+    useEffect(() => {
+        const data = getAppData();
+        setProducts(data.products || []);
+        setGeneratedContent(data.generatedContent || {});
+        setVideoIdeas(data.videoIdeas || []);
+        setRenderJobs(data.renderJobs || []);
+        setScheduledPosts(data.scheduledPosts || []);
+    }, []);
+
+    // Persist state whenever it changes
+    useEffect(() => {
+        const appData = { products, generatedContent, videoIdeas, renderJobs, scheduledPosts };
+        saveAppData(appData);
+    }, [products, generatedContent, videoIdeas, renderJobs, scheduledPosts]);
+
 
     useEffect(() => {
         const handleMouseMove = (event: MouseEvent) => {
@@ -44,7 +72,6 @@ const App: React.FC = () => {
         window.addEventListener('mousemove', handleMouseMove);
         return () => window.removeEventListener('mousemove', handleMouseMove);
     }, []);
-
 
     const addProduct = useCallback((newProduct: Product) => {
         setProducts(prev => {
@@ -68,17 +95,20 @@ const App: React.FC = () => {
     const addRenderJob = useCallback((newJob: Omit<RenderJob, 'id'>) => {
         setRenderJobs(prev => [{ ...newJob, id: Date.now() }, ...prev]);
         setCurrentPage(Page.RENDER_QUEUE);
-    }, []);
+        addNotification({ type: 'success', message: `Job for "${newJob.productName}" sent to render queue!` });
+    }, [addNotification]);
 
     const addScheduledPost = useCallback((newPost: Omit<ScheduledPost, 'id' | 'status'>) => {
         setScheduledPosts(prev => [
             { ...newPost, id: Date.now(), status: 'Scheduled' },
             ...prev
         ]);
-    }, []);
+        addNotification({ type: 'success', message: `Post for "${newPost.productName}" has been scheduled.` });
+    }, [addNotification]);
 
     const startFullAutoPipeline = useCallback(async (product: Product, model: AIModel) => {
         addProduct(product);
+        addNotification({ type: 'info', message: `Starting auto-pipeline for "${product.name}"...` });
 
         try {
             const [script, titles, seoDescription, captions, audioData] = await Promise.all([
@@ -93,6 +123,7 @@ const App: React.FC = () => {
             updateGeneratedContent(product.id, fullContent);
             
             setCurrentPage(Page.CONTENT_GENERATOR);
+            addNotification({ type: 'success', message: 'Content generation complete. Starting video render...' });
 
             const productWithContent = { ...product, content: fullContent };
             const videoOperation = await startVideoGeneration(productWithContent, model);
@@ -108,13 +139,14 @@ const App: React.FC = () => {
                     audioData
                 });
             } else {
-                console.error("Pipeline failed: Could not start video generation.");
+                throw new Error("Could not start video generation.");
             }
         } catch (error) {
             console.error("Full auto pipeline failed:", error);
-            // Optionally: provide user feedback about the failure
+            const message = error instanceof Error ? error.message : 'An unknown error occurred.';
+            addNotification({ type: 'error', message: `Pipeline failed: ${message}` });
         }
-    }, [addProduct, updateGeneratedContent, addRenderJob]);
+    }, [addProduct, updateGeneratedContent, addRenderJob, addNotification]);
     
     const productsWithContent = useMemo(() => {
         return products.map(p => ({
@@ -139,7 +171,6 @@ const App: React.FC = () => {
                           generatedContent={generatedContent}
                           onContentUpdate={updateGeneratedContent}
                         />;
-            // Align with Sidebar navigation which uses Page.PUBLISHER.
             case Page.PUBLISHER:
                 return <Publisher 
                     productsWithContent={productsWithContent} 
@@ -161,8 +192,6 @@ const App: React.FC = () => {
                 return <ApiDocs />;
             case Page.APP_GUIDE:
                 return <AppGuide />;
-
-            // Social Hubs
             case Page.FACEBOOK_HUB: return <ControlHub platform="Facebook" />;
             case Page.TIKTOK_HUB: return <ControlHub platform="TikTok" />;
             case Page.YOUTUBE_HUB: return <ControlHub platform="YouTube" />;
@@ -170,19 +199,14 @@ const App: React.FC = () => {
             case Page.TELEGRAM_HUB: return <ControlHub platform="Telegram" />;
             case Page.INSTAGRAM_HUB: return <ControlHub platform="Instagram" />;
             case Page.X_HUB: return <ControlHub platform="X (Twitter)" />;
-
-            // E-commerce Hubs
             case Page.SHOPEE_HUB: return <ControlHub platform="Shopee" isEcommerce />;
             case Page.LAZADA_HUB: return <ControlHub platform="Lazada" isEcommerce />;
             case Page.TIKI_HUB: return <ControlHub platform="Tiki" isEcommerce />;
             case Page.AMAZON_HUB: return <ControlHub platform="Amazon FBA" isEcommerce />;
-
-            // Placeholder Pages
             case Page.AI_SYSTEM_OVERVIEW: return <PlaceholderPage title="AI System Overview" />;
             case Page.CONTROL_CENTER: return <PlaceholderPage title="Control Center" />;
             case Page.AI_REVIEW_MARKETPLACE: return <PlaceholderPage title="AI Review Marketplace" />;
             case Page.AI_VIDEO_SELLING_AUTOMATION: return <PlaceholderPage title="AI Video Selling Automation" />;
-            
             default:
                 return <Dashboard videoIdeas={videoIdeas} renderJobs={renderJobs} setCurrentPage={setCurrentPage} />;
         }
@@ -190,19 +214,33 @@ const App: React.FC = () => {
 
     return (
         <div className="flex h-screen bg-transparent text-gray-100 font-digital">
-            <ThreeScene mouseX={mousePosition.x} mouseY={mousePosition.y} />
-            <Sidebar currentPage={currentPage} setCurrentPage={setCurrentPage} isOpen={isSidebarOpen} setOpen={setSidebarOpen} />
+            <Notifications />
+            <Suspense fallback={<div className="w-64 bg-gray-900/50" />}>
+                <ThreeScene mouseX={mousePosition.x} mouseY={mousePosition.y} />
+                <Sidebar currentPage={currentPage} setCurrentPage={setCurrentPage} isOpen={isSidebarOpen} setOpen={setSidebarOpen} />
+            </Suspense>
             <div className="flex-1 flex flex-col overflow-hidden">
-                <Header 
-                    toggleSidebar={() => setSidebarOpen(!isSidebarOpen)} 
-                />
+                <Suspense fallback={<header className="h-16 flex-shrink-0" />}>
+                    <Header toggleSidebar={() => setSidebarOpen(!isSidebarOpen)} />
+                </Suspense>
                 <main className="flex-1 overflow-x-hidden overflow-y-auto bg-transparent p-4 sm:p-6 lg:p-8">
-                    {renderPage()}
+                    <Suspense fallback={<PageLoader />}>
+                        {renderPage()}
+                    </Suspense>
                 </main>
-                <Footer />
+                <Suspense fallback={null}>
+                    <Footer />
+                </Suspense>
             </div>
         </div>
     );
 };
+
+const App: React.FC = () => (
+    <ErrorBoundary>
+        <AppContent />
+    </ErrorBoundary>
+);
+
 
 export default App;
