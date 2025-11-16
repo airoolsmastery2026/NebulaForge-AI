@@ -1,9 +1,9 @@
 
 
-import React from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Page } from '../types';
 import { AnalyticsIcon, DashboardIcon, EditIcon, PublishIcon, SearchIcon, CloseIcon, SparklesIcon, ConnectIcon, TemplateIcon } from './Icons';
-import { Video, BookOpen, KeyRound, Film, Github, Bot, ShoppingCart, Users, Code, Settings, MessageSquare, Briefcase } from './LucideIcons';
+import { Video, BookOpen, KeyRound, Film, Github, Bot, ShoppingCart, Users, Code, Settings, MessageSquare, Briefcase, ChevronDown } from './LucideIcons';
 import { useI18n } from '../hooks/useI18n';
 
 const Logo = () => {
@@ -99,31 +99,71 @@ const NavLink: React.FC<{
     );
 }
 
-const SidebarContent: React.FC<{ currentPage: Page, onNavigate: (page: Page) => void }> = ({ currentPage, onNavigate }) => {
+const NavGroup: React.FC<{
+    group: { name: string; items: { name: Page; icon: React.ElementType }[] };
+    currentPage: Page;
+    onNavigate: (page: Page) => void;
+}> = ({ group, currentPage, onNavigate }) => {
     const { t } = useI18n();
+    const isGroupActive = useMemo(() => 
+        group.items.some(item => item.name === currentPage), 
+        [group.items, currentPage]
+    );
+
+    const [isOpen, setIsOpen] = useState(isGroupActive || group.name === 'sidebar.group1');
+
+    useEffect(() => {
+        if (isGroupActive) {
+            setIsOpen(true);
+        }
+    }, [isGroupActive]);
+    
+    return (
+        <div className="py-1">
+            <button
+                onClick={() => setIsOpen(!isOpen)}
+                className="w-full flex items-center justify-between px-4 py-2 text-xs font-bold text-gray-500 uppercase tracking-wider font-sans hover:text-gray-300 transition-colors rounded-md"
+                aria-expanded={isOpen}
+            >
+                <span>{t(group.name)}</span>
+                <ChevronDown 
+                    className={`h-4 w-4 transform transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} 
+                    aria-hidden="true"
+                />
+            </button>
+            <div 
+                className={`transition-[max-height] duration-500 ease-in-out overflow-hidden ${isOpen ? 'max-h-[500px]' : 'max-h-0'}`}
+            >
+                <div className="space-y-1 pt-1 px-2">
+                    {group.items.map((item) => (
+                        <NavLink
+                            key={item.name}
+                            page={item.name}
+                            icon={item.icon}
+                            currentPage={currentPage}
+                            onClick={() => onNavigate(item.name)}
+                        />
+                    ))}
+                </div>
+            </div>
+        </div>
+    );
+};
+
+const SidebarContent: React.FC<{ currentPage: Page, onNavigate: (page: Page) => void }> = ({ currentPage, onNavigate }) => {
     return (
         <div className="flex flex-col h-full">
             <div className="flex items-center justify-center px-4 h-16 border-b border-cyan-400/10">
                 <Logo />
             </div>
-            <nav className="flex-1 px-3 py-4 space-y-2 overflow-y-auto">
+            <nav className="flex-1 px-2 py-4 space-y-1 overflow-y-auto">
                 {navigationGroups.map((group) => (
-                    <div key={group.name}>
-                        <h3 className="px-4 pt-3 pb-2 text-xs font-bold text-gray-500 uppercase tracking-wider font-sans">
-                            {t(group.name)}
-                        </h3>
-                        <div className="space-y-1">
-                            {group.items.map((item) => (
-                                <NavLink
-                                    key={item.name}
-                                    page={item.name}
-                                    icon={item.icon}
-                                    currentPage={currentPage}
-                                    onClick={() => onNavigate(item.name)}
-                                />
-                            ))}
-                        </div>
-                    </div>
+                   <NavGroup 
+                        key={group.name}
+                        group={group}
+                        currentPage={currentPage}
+                        onNavigate={onNavigate}
+                    />
                 ))}
             </nav>
         </div>
