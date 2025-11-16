@@ -1,5 +1,4 @@
-
-import React, { useRef, useEffect, useMemo } from 'react';
+import React, { useRef, useEffect } from 'react';
 import * as THREE from 'three';
 
 interface ThreeSceneProps {
@@ -57,42 +56,45 @@ export const ThreeScene: React.FC<ThreeSceneProps> = ({ mouseX, mouseY }) => {
 
         // Planets
         const planets: THREE.Mesh[] = [];
+        const geometries: THREE.BufferGeometry[] = [];
+        const materials: THREE.Material[] = [];
+
+        // Helper to track resources for cleanup
+        const createMesh = (geometry: THREE.BufferGeometry, material: THREE.Material) => {
+            geometries.push(geometry);
+            materials.push(material);
+            return new THREE.Mesh(geometry, material);
+        };
 
         // Sun
-        const sunGeo = new THREE.SphereGeometry(80, 32, 32);
-        const sunMat = new THREE.MeshBasicMaterial({ color: 0xffdd88, wireframe: true });
-        const sun = new THREE.Mesh(sunGeo, sunMat);
+        const sun = createMesh(new THREE.SphereGeometry(80, 32, 32), new THREE.MeshBasicMaterial({ color: 0xffdd88, wireframe: true }));
         scene.add(sun);
         planets.push(sun);
 
         // Planet 1 (Earth-like)
-        const planet1Geo = new THREE.SphereGeometry(20, 32, 32);
-        const planet1Mat = new THREE.MeshStandardMaterial({ color: 0x6699ff, roughness: 0.8 });
-        const planet1 = new THREE.Mesh(planet1Geo, planet1Mat);
+        const planet1 = createMesh(new THREE.SphereGeometry(20, 32, 32), new THREE.MeshStandardMaterial({ color: 0x6699ff, roughness: 0.8 }));
         planet1.position.x = 200;
         scene.add(planet1);
         planets.push(planet1);
         
         // Planet 2 (Mars-like)
-        const planet2Geo = new THREE.SphereGeometry(15, 32, 32);
-        const planet2Mat = new THREE.MeshStandardMaterial({ color: 0xff5733, roughness: 0.9 });
-        const planet2 = new THREE.Mesh(planet2Geo, planet2Mat);
+        const planet2 = createMesh(new THREE.SphereGeometry(15, 32, 32), new THREE.MeshStandardMaterial({ color: 0xff5733, roughness: 0.9 }));
         planet2.position.x = -350;
         scene.add(planet2);
         planets.push(planet2);
         
         // Planet 3 (Jupiter-like)
-        const planet3Geo = new THREE.SphereGeometry(50, 32, 32);
-        const planet3Mat = new THREE.MeshStandardMaterial({ color: 0xddc5a3, roughness: 0.7 });
-        const planet3 = new THREE.Mesh(planet3Geo, planet3Mat);
+        const planet3 = createMesh(new THREE.SphereGeometry(50, 32, 32), new THREE.MeshStandardMaterial({ color: 0xddc5a3, roughness: 0.7 }));
         planet3.position.z = -500;
         planet3.position.x = 400;
         scene.add(planet3);
         planets.push(planet3);
 
         const clock = new THREE.Clock();
+        let animationFrameId: number;
 
         const animate = () => {
+            animationFrameId = requestAnimationFrame(animate);
             const elapsedTime = clock.getElapsedTime();
             
             planet1.position.x = Math.cos(elapsedTime * 0.5) * 200;
@@ -115,7 +117,6 @@ export const ThreeScene: React.FC<ThreeSceneProps> = ({ mouseX, mouseY }) => {
             camera.lookAt(scene.position);
 
             renderer.render(scene, camera);
-            requestAnimationFrame(animate);
         };
         animate();
 
@@ -127,9 +128,25 @@ export const ThreeScene: React.FC<ThreeSceneProps> = ({ mouseX, mouseY }) => {
         window.addEventListener('resize', handleResize);
 
         return () => {
+            cancelAnimationFrame(animationFrameId);
             window.removeEventListener('resize', handleResize);
-            if(currentMount) {
+
+            // Safely remove the canvas from the DOM
+            if (currentMount && renderer.domElement.parentNode === currentMount) {
                 currentMount.removeChild(renderer.domElement);
+            }
+            
+            // Dispose of Three.js resources to prevent memory leaks
+            renderer.dispose();
+            
+            geometries.forEach(geometry => geometry.dispose());
+            materials.forEach(material => material.dispose());
+            starGeometry.dispose();
+            starMaterial.dispose();
+            
+            // Remove all objects from the scene
+            while(scene.children.length > 0){ 
+                scene.remove(scene.children[0]); 
             }
         };
     }, []);
