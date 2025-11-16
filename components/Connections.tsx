@@ -1,5 +1,6 @@
 
 
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription } from './common/Card';
 import { Button } from './common/Button';
@@ -39,7 +40,7 @@ interface Platform {
 }
 
 const platforms: Record<string, Platform> = {
-    gemini: { id: "gemini", nameKey: "connections.gemini", icon: <PlatformLogo platformId="gemini" />, fields: [], docsUrl: 'https://ai.google.dev/gemini-api/docs/api-key' },
+    gemini: { id: "gemini", nameKey: "connections.gemini", icon: <PlatformLogo platformId="gemini" />, fields: [{name: 'API_KEY', type: 'password', helpTextKey: 'connections.help.API_KEY'}], docsUrl: 'https://ai.google.dev/gemini-api/docs/api-key' },
     youtube: { id: "youtube", nameKey: "connections.youtube", icon: <PlatformLogo platformId="youtube" />, fields: [{name: 'CLIENT_ID', type: 'text', helpTextKey: 'connections.help.CLIENT_ID'}, {name: 'CLIENT_SECRET', type: 'password', helpTextKey: 'connections.help.CLIENT_SECRET'}], docsUrl: 'https://console.cloud.google.com/apis/credentials' },
     tiktok: { id: "tiktok", nameKey: "connections.tiktok", icon: <PlatformLogo platformId="tiktok" />, fields: [{name: 'CLIENT_KEY', type: 'text', helpTextKey: 'connections.help.CLIENT_KEY'}, {name: 'CLIENT_SECRET', type: 'password', helpTextKey: 'connections.help.CLIENT_SECRET'}], docsUrl: 'https://developers.tiktok.com/documents/get-started' },
     instagram: { id: "instagram", nameKey: "connections.instagram", icon: <PlatformLogo platformId="instagram" />, fields: [{name: 'ACCESS_TOKEN', type: 'password', helpTextKey: 'connections.help.ACCESS_TOKEN'}], docsUrl: 'https://developers.facebook.com/docs/instagram-basic-display-api/getting-started' },
@@ -277,25 +278,15 @@ export const Connections: React.FC<ConnectionsProps> = ({ setCurrentPage }) => {
     const [activePlatformId, setActivePlatformId] = useState<string | null>(null);
     const [isFbTokenManagerOpen, setIsFbTokenManagerOpen] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const [isCoreAiActive, setIsCoreAiActive] = useState(false);
 
     useEffect(() => {
-        setIsCoreAiActive((window as any).GEMINI_API_ACTIVE || false);
-
         try {
             const stored = localStorage.getItem(STORAGE_KEY);
             if (stored) {
-                const parsed = JSON.parse(stored);
-                // On load, if core AI is active but not in connections, add it.
-                if (isCoreAiActive && !parsed.gemini) {
-                    parsed.gemini = { id: 'gemini', status: 'connected', credentials: {} };
-                }
-                setConnections(parsed);
-            } else if (isCoreAiActive) {
-                setConnections({ 'gemini': { id: 'gemini', status: 'connected', credentials: {} } as Connection});
+                setConnections(JSON.parse(stored));
             }
         } catch (e) { console.error("Failed to load connections:", e); }
-    }, [isCoreAiActive]);
+    }, []);
     
     const saveConnections = (newConnections: Record<string, Connection>) => {
         setConnections(newConnections);
@@ -341,7 +332,6 @@ export const Connections: React.FC<ConnectionsProps> = ({ setCurrentPage }) => {
     };
     
     const activePlatform = activePlatformId ? platforms[activePlatformId] : null;
-    const otherCategories = platformCategories.filter(cat => cat.nameKey !== 'connections.category_ai');
 
     return (
         <>
@@ -361,27 +351,8 @@ export const Connections: React.FC<ConnectionsProps> = ({ setCurrentPage }) => {
                     </CardHeader>
                 </Card>
 
-                {/* Core AI Engine Section */}
-                <Card className={`border-2 ${isCoreAiActive ? 'border-green-500/30' : 'border-red-500/30'}`}>
-                    <div className="p-4 flex flex-col sm:flex-row items-center justify-between">
-                        <div className="flex items-center space-x-4">
-                            <PlatformLogo platformId="gemini" className="w-12 h-12" />
-                            <div>
-                                <h3 className="text-lg font-bold text-bright">{t('connections.geminiCoreTitle')}</h3>
-                                <p className="text-sm text-gray-400 max-w-md">{t('connections.geminiCoreDescription')}</p>
-                            </div>
-                        </div>
-                        <div className="mt-4 sm:mt-0">
-                            <div className={`flex items-center space-x-2 px-3 py-1.5 rounded-full ${isCoreAiActive ? 'bg-green-500/20 text-green-300' : 'bg-red-500/20 text-red-300'}`}>
-                                <div className={`w-3 h-3 rounded-full ${isCoreAiActive ? 'bg-green-500' : 'bg-red-500'}`}></div>
-                                <span className="font-semibold text-sm">{isCoreAiActive ? t('header.statusActive') : t('header.statusInactive')}</span>
-                            </div>
-                        </div>
-                    </div>
-                </Card>
-
                 <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
-                    {otherCategories.map(category => (
+                    {platformCategories.map(category => (
                         <Card key={category.nameKey}>
                             <CardHeader>
                                 <CardTitle>{t(category.nameKey)}</CardTitle>

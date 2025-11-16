@@ -1,10 +1,12 @@
 
 
+
 import React, { useState, useEffect } from 'react';
 import { MenuIcon } from './Icons';
 import { useI18n } from '../hooks/useI18n';
 import { LanguageSwitcher } from './common/LanguageSwitcher';
 import { HeaderClock } from './common/HeaderClock';
+import { isGeminiApiActive } from '../services/geminiService';
 
 interface HeaderProps {
     toggleSidebar: () => void;
@@ -15,14 +17,12 @@ const SystemStatusIndicator: React.FC = () => {
     const [isActive, setIsActive] = useState(false);
 
     useEffect(() => {
-        // This global flag is set in geminiService.ts based on the presence of process.env.API_KEY
-        // It's a simple way to check for build-time environment variable presence on the client.
         const checkApiStatus = () => {
-            setIsActive((window as any).GEMINI_API_ACTIVE || false);
+            setIsActive(isGeminiApiActive());
         };
         
         checkApiStatus();
-        const intervalId = setInterval(checkApiStatus, 5000); // Periodically check for safety
+        const intervalId = setInterval(checkApiStatus, 2000); // Check frequently to be responsive
         
         return () => {
             clearInterval(intervalId);

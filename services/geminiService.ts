@@ -1,14 +1,42 @@
 import { GoogleGenAI, Type, Modality } from "@google/genai";
 import type { Product, Trend, AIModel } from '../types';
 
-// Set a global flag based on the presence of the API key at build time.
-// This allows other components to reactively check if the core AI is active.
-(window as any).GEMINI_API_ACTIVE = !!process.env.API_KEY;
+const getApiKey = (): string | null => {
+    // 1. Prioritize user-provided key from localStorage.
+    try {
+        const stored = localStorage.getItem('universal-connections');
+        if (stored) {
+            const connections = JSON.parse(stored);
+            const geminiApiKey = connections?.gemini?.credentials?.API_KEY;
+            if (geminiApiKey && geminiApiKey.trim() !== '') {
+                return geminiApiKey;
+            }
+        }
+    } catch (e) {
+        console.error("Could not read API key from localStorage", e);
+    }
+    
+    // 2. Fallback to the environment variable.
+    const envApiKey = process.env.API_KEY;
+    if (envApiKey) {
+        return envApiKey;
+    }
+    
+    return null;
+};
+
+// This function can be called by components to reactively check AI status.
+export const isGeminiApiActive = (): boolean => {
+    return !!getApiKey();
+};
+
+// Update the global flag on initial load for any components that might still use it.
+(window as any).GEMINI_API_ACTIVE = isGeminiApiActive();
 
 const createAiClient = () => {
-    const apiKey = process.env.API_KEY;
+    const apiKey = getApiKey();
     if (!apiKey) {
-        console.warn("Gemini API key not found in process.env.API_KEY. AI features will be disabled.");
+        console.warn("Gemini API key not found. Please configure it on the Connections page or set process.env.API_KEY.");
         return null;
     }
     return new GoogleGenAI({ apiKey });
@@ -507,7 +535,7 @@ export const checkVideoGenerationStatus = async (operation: any): Promise<any> =
 };
 
 export const getVideoResult = async (uri: string): Promise<Blob | null> => {
-    const apiKey = process.env.API_KEY;
+    const apiKey = getApiKey(); // Use the dynamic getApiKey function
     if (!apiKey) {
         console.warn("API key not found, cannot download video.");
         return null;
