@@ -18,7 +18,7 @@ const createAiClient = () => {
 const generateContent = async (prompt: string): Promise<string> => {
     const ai = createAiClient();
     if (!ai) {
-       throw new Error("Gemini API key is not configured. AI features are disabled.");
+       return `This is a mocked response because the API key is not configured. Prompt: "${prompt.substring(0, 100)}..."`;
     }
     try {
         const response = await ai.models.generateContent({
