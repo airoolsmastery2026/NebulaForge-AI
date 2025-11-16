@@ -1,18 +1,19 @@
 
 import React, { useEffect } from 'react';
 import { useAppContext } from '../../contexts/AppContext';
-import { X, CheckCircle, Info, AlertTriangle, AlertCircle } from 'lucide-react';
+import { X } from '../LucideIcons';
+import { CheckCircle, AlertTriangle, AlertCircle } from 'lucide-react';
 import type { AppNotification } from '../../types';
 
 const notificationConfig = {
-    info: { icon: Info, barColor: 'bg-blue-500' },
-    success: { icon: CheckCircle, barColor: 'bg-green-500' },
-    warning: { icon: AlertTriangle, barColor: 'bg-yellow-500' },
-    error: { icon: AlertCircle, barColor: 'bg-red-500' },
+    info: { icon: AlertCircle, barColor: 'bg-blue-500', iconColor: 'text-blue-400' },
+    success: { icon: CheckCircle, barColor: 'bg-green-500', iconColor: 'text-green-400' },
+    warning: { icon: AlertTriangle, barColor: 'bg-yellow-500', iconColor: 'text-yellow-400' },
+    error: { icon: AlertCircle, barColor: 'bg-red-500', iconColor: 'text-red-400' },
 };
 
 const Notification: React.FC<{ notification: AppNotification, onRemove: (id: number) => void }> = ({ notification, onRemove }) => {
-    const { icon: Icon, barColor } = notificationConfig[notification.type];
+    const { icon: Icon, barColor, iconColor } = notificationConfig[notification.type];
     const [isVisible, setIsVisible] = React.useState(false);
 
     useEffect(() => {
@@ -31,7 +32,7 @@ const Notification: React.FC<{ notification: AppNotification, onRemove: (id: num
         >
             <div className={`absolute left-0 top-0 bottom-0 w-1.5 ${barColor}`} />
             <div className="flex-shrink-0 ml-2">
-                <Icon className={`h-6 w-6 ${barColor.replace('bg-', 'text-')}`} aria-hidden="true" />
+                <Icon className={`h-6 w-6 ${iconColor}`} aria-hidden="true" />
             </div>
             <div className="ml-3 w-0 flex-1">
                 <p className="text-sm font-medium text-gray-100">{notification.message}</p>

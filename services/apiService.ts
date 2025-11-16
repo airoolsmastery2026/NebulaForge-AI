@@ -23,7 +23,7 @@ const set = <T>(key: string, value: T): void => {
     try {
         localStorage.setItem(key, JSON.stringify(value));
         // Dispatch a storage event to notify other tabs/components
-        window.dispatchEvent(new Event('storage'));
+        window.dispatchEvent(new StorageEvent('storage', { key }));
     } catch (error) {
         console.error(`Error writing to localStorage key “${key}”:`, error);
     }

@@ -217,6 +217,8 @@ export const translations = {
         Queued: "Queued",
         Rendering: "Rendering",
         Completed: "Completed",
+        Composing: "Composing",
+        Ready: "Ready",
         Failed: "Failed",
     },
 
@@ -841,6 +843,8 @@ export const translations = {
         Queued: "Đang chờ",
         Rendering: "Đang kết xuất",
         Completed: "Hoàn thành",
+        Composing: "Đang ghép",
+        Ready: "Sẵn sàng",
         Failed: "Thất bại",
     },
 

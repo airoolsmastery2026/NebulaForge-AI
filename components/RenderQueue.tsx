@@ -201,7 +201,7 @@ export const RenderQueue: React.FC<RenderQueueProps> = ({ jobs, setJobs }) => {
                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                     <Button size="sm" variant="ghost" disabled={job.status !== 'Ready'} onClick={() => handleDownload(job)}>
                                         <Download className="h-4 w-4 mr-2" />
-                                        {t('renderQueue.download')}
+                                        Download Package
                                     </Button>
                                 </td>
                             </tr>

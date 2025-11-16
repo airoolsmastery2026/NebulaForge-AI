@@ -29,9 +29,6 @@ export const isGeminiApiActive = (): boolean => {
     return !!getApiKey();
 };
 
-// Update the global flag on initial load for any components that might still use it.
-(window as any).GEMINI_API_ACTIVE = isGeminiApiActive();
-
 const createAiClient = () => {
     const apiKey = getApiKey();
     if (!apiKey) {
