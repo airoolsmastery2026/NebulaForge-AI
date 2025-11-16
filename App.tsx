@@ -1,4 +1,5 @@
 
+
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { Sidebar } from './components/Sidebar';
 import { Header } from './components/Header';
@@ -23,23 +24,15 @@ import type { Product, GeneratedContent, VideoIdea, RenderJob, ScheduledPost, AI
 import { Page } from './types';
 import { generateCaptionsAndHashtags, generateReviewScript, generateSeoDescription, generateVideoTitles, generateSpeech, startVideoGeneration } from './services/geminiService';
 
-const mockIdeas: VideoIdea[] = [
-  { id: 1, title: "Top 10 Tech Gadgets of 2023", category: "Tech", status: "Generated" },
-  { id: 2, title: "Fitness Equipment Buyers Guide", category: "Health", status: "In Production" },
-  { id: 3, title: "Home Office Setup Tips", category: "Lifestyle", status: "Published" },
-];
-
 const App: React.FC = () => {
     const [currentPage, setCurrentPage] = useState<Page>(Page.DASHBOARD);
     const [products, setProducts] = useState<Product[]>([]);
     const [generatedContent, setGeneratedContent] = useState<Record<string, GeneratedContent>>({});
     const [isSidebarOpen, setSidebarOpen] = useState(false);
-    const [videoIdeas, setVideoIdeas] = useState<VideoIdea[]>(mockIdeas);
+    const [videoIdeas, setVideoIdeas] = useState<VideoIdea[]>([]);
     const [renderJobs, setRenderJobs] = useState<RenderJob[]>([]);
     const [scheduledPosts, setScheduledPosts] = useState<ScheduledPost[]>([]);
     const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-    const [demoStarted, setDemoStarted] = useState(false);
-
 
     useEffect(() => {
         const handleMouseMove = (event: MouseEvent) => {
@@ -87,86 +80,42 @@ const App: React.FC = () => {
     const startFullAutoPipeline = useCallback(async (product: Product, model: AIModel) => {
         addProduct(product);
 
-        const [script, titles, seoDescription, captions, audioData] = await Promise.all([
-            generateReviewScript(product),
-            generateVideoTitles(product.name),
-            generateSeoDescription(product.name),
-            generateCaptionsAndHashtags(product.name),
-            generateSpeech(`Hook: Grab their attention in 3 seconds! Main point: ${product.description}. Call to action: Check the link in the bio!`)
-        ]);
-        
-        const fullContent: GeneratedContent = { script, titles, seoDescription, captions };
-        updateGeneratedContent(product.id, fullContent);
-        
-        setCurrentPage(Page.CONTENT_GENERATOR);
+        try {
+            const [script, titles, seoDescription, captions, audioData] = await Promise.all([
+                generateReviewScript(product),
+                generateVideoTitles(product.name),
+                generateSeoDescription(product.name),
+                generateCaptionsAndHashtags(product.name),
+                generateSpeech(`Hook: Grab their attention in 3 seconds! Main point: ${product.description}. Call to action: Check the link in the bio!`)
+            ]);
+            
+            const fullContent: GeneratedContent = { script, titles, seoDescription, captions };
+            updateGeneratedContent(product.id, fullContent);
+            
+            setCurrentPage(Page.CONTENT_GENERATOR);
 
-        const productWithContent = { ...product, content: fullContent };
-        const videoOperation = await startVideoGeneration(productWithContent, model);
-        
-        if (videoOperation) {
-            addRenderJob({
-                productName: product.name,
-                status: 'Queued',
-                progress: 0,
-                createdAt: new Date().toISOString(),
-                models: [model, 'gemini-2.5-flash-preview-tts'],
-                videoOperation,
-                audioData
-            });
-        } else {
-            console.error("Pipeline failed: Could not start video generation.");
+            const productWithContent = { ...product, content: fullContent };
+            const videoOperation = await startVideoGeneration(productWithContent, model);
+            
+            if (videoOperation) {
+                addRenderJob({
+                    productName: product.name,
+                    status: 'Queued',
+                    progress: 0,
+                    createdAt: new Date().toISOString(),
+                    models: [model, 'gemini-2.5-flash-preview-tts'],
+                    videoOperation,
+                    audioData
+                });
+            } else {
+                console.error("Pipeline failed: Could not start video generation.");
+            }
+        } catch (error) {
+            console.error("Full auto pipeline failed:", error);
+            // Optionally: provide user feedback about the failure
         }
     }, [addProduct, updateGeneratedContent, addRenderJob]);
     
-    const startDemo = useCallback(() => {
-        if (demoStarted) return;
-        
-        const demoProducts: Product[] = [
-            { id: 'demo-veo-suite', name: 'VEO 3.1 Suite', description: 'Advanced AI video generation toolkit.', features: 'Text-to-video, Image-to-video, Video editing', affiliateLink: 'https://demo.link/veo', commission: 30, rating: 4.8, conversions: 2500 },
-            { id: 'demo-kling-ai', name: 'Kling AI Animator', description: 'Create stunning animations from simple prompts.', features: 'Character animation, Scene generation, Style transfer', affiliateLink: 'https://demo.link/kling', commission: 25, rating: 4.6, conversions: 1800 },
-        ];
-        setProducts(demoProducts);
-
-        const demoContent: Record<string, GeneratedContent> = {
-            'demo-veo-suite': {
-                script: "Is this the future of video? VEO 3.1 Suite is an AI that creates stunning videos from just text. Imagine typing a sentence and watching it come to life. It's perfect for marketers and creators. Check it out!",
-                titles: ["VEO 3.1 Will Blow Your Mind!", "The AI Video Tool You Need", "Create Videos in 5 Seconds"],
-                seoDescription: "A review of the VEO 3.1 Suite for AI video generation.",
-                captions: { caption: "This AI is insane!", hashtags: ["#AI", "#VideoEditing", "#Tech"] }
-            }
-        };
-        setGeneratedContent(demoContent);
-
-        const demoJobs: RenderJob[] = [
-            { id: 9001, productName: 'Kling AI Animator', status: 'Rendering', progress: 75, createdAt: new Date(Date.now() - 5 * 60000).toISOString(), models: ['KlingAI', 'ElevenLabs Voice AI'], videoOperation: { name: 'demo-op-1' } },
-            { id: 9002, productName: 'Suno Music Tracks', status: 'Completed', progress: 100, createdAt: new Date(Date.now() - 30 * 60000).toISOString(), models: ['Suno'], videoOperation: { name: 'demo-op-2', done: true }, videoUrl: 'mock-url' }
-        ];
-        setRenderJobs(demoJobs);
-
-        const demoPosts: ScheduledPost[] = [
-            { id: 8001, productId: 'demo-kling-ai', productName: 'Kling AI Animator', platforms: ['youtube', 'tiktok'], content: 'Check out Kling AI!', scheduledAt: new Date(Date.now() + 2 * 24 * 3600000).toISOString(), status: 'Scheduled' }
-        ];
-        setScheduledPosts(demoPosts);
-        
-        try {
-            const demoConnections: Record<string, Connection> = {
-                'youtube': { id: 'youtube', username: 'Demo YouTube User', status: 'connected', autoMode: true, credentials: { CLIENT_ID: 'demo-id' } },
-                'tiktok': { id: 'tiktok', username: 'Demo TikTok User', status: 'connected', autoMode: true, credentials: { CLIENT_KEY: 'demo-key' } },
-                'clickbank': { id: 'clickbank', username: 'Demo ClickBank User', status: 'connected', autoMode: true, credentials: { API_KEY: 'demo-key' } },
-                'shareasale': { id: 'shareasale', username: 'Demo ShareASale User', status: 'refreshing', autoMode: true, credentials: { MERCHANT_ID: 'demo-id' } },
-            };
-            const existing = JSON.parse(localStorage.getItem('universal-connections') || '{}');
-            const updated = { ...existing, ...demoConnections };
-            localStorage.setItem('universal-connections', JSON.stringify(updated));
-            setCurrentPage(Page.DASHBOARD);
-        } catch (e) {
-            console.error("Failed to set demo connections", e);
-        }
-
-        setDemoStarted(true);
-    }, [demoStarted]);
-
-
     const productsWithContent = useMemo(() => {
         return products.map(p => ({
             ...p,
@@ -246,8 +195,6 @@ const App: React.FC = () => {
             <div className="flex-1 flex flex-col overflow-hidden">
                 <Header 
                     toggleSidebar={() => setSidebarOpen(!isSidebarOpen)} 
-                    startDemo={startDemo} 
-                    demoStarted={demoStarted} 
                 />
                 <main className="flex-1 overflow-x-hidden overflow-y-auto bg-transparent p-4 sm:p-6 lg:p-8">
                     {renderPage()}

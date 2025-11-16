@@ -1,16 +1,13 @@
 
+
 import React, { useState, useEffect } from 'react';
 import { MenuIcon } from './Icons';
 import { useI18n } from '../hooks/useI18n';
 import { LanguageSwitcher } from './common/LanguageSwitcher';
 import { HeaderClock } from './common/HeaderClock';
-import { Button } from './common/Button';
-import { Bot } from './LucideIcons';
 
 interface HeaderProps {
     toggleSidebar: () => void;
-    startDemo: () => void;
-    demoStarted: boolean;
 }
 
 const SystemStatusIndicator: React.FC = () => {
@@ -48,7 +45,7 @@ const SystemStatusIndicator: React.FC = () => {
 };
 
 
-export const Header: React.FC<HeaderProps> = ({ toggleSidebar, startDemo, demoStarted }) => {
+export const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
     const { t } = useI18n();
     return (
         <header className="relative z-10 flex-shrink-0 flex h-16 bg-gray-900/60 backdrop-blur-md border-b border-gray-200/10 items-center justify-between px-4 sm:px-6 lg:px-8">
@@ -72,9 +69,6 @@ export const Header: React.FC<HeaderProps> = ({ toggleSidebar, startDemo, demoSt
             </div>
 
             <div className="flex items-center space-x-2">
-                <Button onClick={startDemo} disabled={demoStarted} variant="secondary" size="sm" icon={<Bot className="h-4 w-4" />}>
-                    {demoStarted ? t('header.demoActive') : t('header.startDemo')}
-                </Button>
                 <LanguageSwitcher />
             </div>
         </header>

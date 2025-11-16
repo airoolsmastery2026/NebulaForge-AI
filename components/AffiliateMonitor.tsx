@@ -32,8 +32,8 @@ export const AffiliateMonitor: React.FC = () => {
         const connections: Record<string, Connection> = JSON.parse(localStorage.getItem('universal-connections') || '{}');
 
         for (const p of platformsToCheck) {
-            // Simulate link check to avoid CORS issues in a real frontend
-            const isLinkOk = Math.random() > 0.1; // 90% chance of success
+            // Assume link is OK if connection is configured in this simulation.
+            const isLinkOk = true; 
             let status = isLinkOk ? t('automation.statusActive') : t('automation.statusError');
             
             const connectionData = connections[p.id];

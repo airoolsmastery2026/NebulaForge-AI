@@ -14,29 +14,23 @@ const affiliatePlatforms = [
     { id: "clickbank", name: "ClickBank" }
 ];
 
-const mockFetchAffiliateData = async (): Promise<AffiliateStat[]> => {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
+const prepareAffiliateData = async (): Promise<AffiliateStat[]> => {
+    // Simulate API call delay
+    await new Promise(resolve => setTimeout(resolve, 500));
 
     const connections: Record<string, Connection> = JSON.parse(localStorage.getItem('universal-connections') || '{}');
     
     const data: AffiliateStat[] = affiliatePlatforms.map(platform => {
         const isConnected = !!connections[platform.id];
-        if (isConnected) {
-            return {
-                name: platform.name,
-                revenue: Math.floor(Math.random() * 5000) + 200,
-                clicks: Math.floor(Math.random() * 10000) + 1000,
-                conversions: Math.floor(Math.random() * 500) + 50,
-                connected: true,
-            };
-        }
+        // In a real app, you would fetch actual data here if connected.
+        // For this version, we show 0 if not connected or if data isn't implemented.
         return {
             name: platform.name,
             revenue: 0,
             clicks: 0,
             conversions: 0,
-            connected: false,
+            connected: isConnected,
+            error: isConnected ? "Real data fetching is not implemented." : undefined,
         };
     });
 
@@ -51,7 +45,7 @@ export const AffiliateDashboard: React.FC = () => {
 
     const fetchData = useCallback(async () => {
         setIsLoading(true);
-        const data = await mockFetchAffiliateData();
+        const data = await prepareAffiliateData();
         setStats(data);
         setLastUpdated(new Date());
         setIsLoading(false);
@@ -59,7 +53,7 @@ export const AffiliateDashboard: React.FC = () => {
 
     useEffect(() => {
         fetchData(); // onStartup
-        const interval = setInterval(fetchData, 5 * 60 * 1000); // Auto-refresh every 5 mins (instead of 6 hours for demo)
+        const interval = setInterval(fetchData, 5 * 60 * 1000); // Auto-refresh every 5 mins
         return () => clearInterval(interval);
     }, [fetchData]);
 

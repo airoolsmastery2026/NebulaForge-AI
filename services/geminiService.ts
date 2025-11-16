@@ -8,7 +8,7 @@ import type { Product, Trend, AIModel } from '../types';
 const createAiClient = () => {
     const apiKey = process.env.API_KEY;
     if (!apiKey) {
-        console.warn("Gemini API key not found in process.env.API_KEY. AI features will be mocked.");
+        console.warn("Gemini API key not found in process.env.API_KEY. AI features will be disabled.");
         return null;
     }
     return new GoogleGenAI({ apiKey });
@@ -18,8 +18,7 @@ const createAiClient = () => {
 const generateContent = async (prompt: string): Promise<string> => {
     const ai = createAiClient();
     if (!ai) {
-       await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
-       return `This is a mocked response because the API key is not configured. Prompt: "${prompt.substring(0, 100)}..."`;
+       throw new Error("Gemini API key is not configured. AI features are disabled.");
     }
     try {
         const response = await ai.models.generateContent({
@@ -29,7 +28,7 @@ const generateContent = async (prompt: string): Promise<string> => {
         return response.text;
     } catch (error) {
         console.error("Error generating content with Gemini API:", error);
-        return "Error: Could not generate content. Please check your API key and network connection.";
+        throw new Error("Failed to generate content from Gemini API. Check console for details.");
     }
 };
 
@@ -62,17 +61,7 @@ The ID should be a camelCase version of the product name.
 
     const ai = createAiClient();
     if (!ai) {
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        return { 
-            id: 'mockScrapedProduct', 
-            name: `Mock Product from URL`, 
-            description: 'A great mock tool scraped from the provided URL.', 
-            features: 'Feature A, Feature B, Feature C', 
-            affiliateLink: url, 
-            commission: 30, 
-            rating: 4.7, 
-            conversions: 1800 
-        };
+        return null;
     }
 
     try {
@@ -120,11 +109,7 @@ Ensure the response is a valid JSON array matching the provided schema.
 
     const ai = createAiClient();
     if (!ai) {
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        return [
-            { id: 'mockProduct1', name: `Mock AI Tool for ${topic}`, description: 'A great mock tool.', features: 'Feature A, Feature B', affiliateLink: 'https://mock.link/1', commission: 50, rating: 4.5, conversions: 1500 },
-            { id: 'mockProduct2', name: `Mock Digital Course for ${topic}`, description: 'Learn all about mock things.', features: 'Module 1, Module 2', affiliateLink: 'https://mock.link/2', commission: 40, rating: 4.8, conversions: 2200 },
-        ];
+        return [];
     }
 
     try {
@@ -166,11 +151,7 @@ Ensure the response is a valid JSON array of objects, where each object has "top
 
     const ai = createAiClient();
     if (!ai) {
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        return [
-            { topic: 'Mock Trend: AI Video Tools', description: 'This is a mocked trend description because the API key is not configured.' },
-            { topic: 'Mock Trend: Sustainable Tech', description: 'Another mocked trend for eco-friendly gadgets.' },
-        ];
+        return [];
     }
 
     try {
@@ -243,19 +224,7 @@ Focus on creating strong, curiosity-driven hooks. Use tactics like:
 
     const ai = createAiClient();
     if (!ai) {
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        return [
-            `Is ${productName} Worth It?`,
-            `${productName} Review 2024`,
-            `The TRUTH about ${productName}`,
-            `I tried ${productName} for 7 days...`,
-            `MOCK: ${productName} Secret Feature!`,
-            `This AI Changed My Workflow`,
-            `Don't Buy ${productName} Without Watching`,
-            `${productName}: Scam or Genius?`,
-            `My Brutally Honest ${productName} Review`,
-            `The Future is ${productName}, Here's Why.`,
-        ];
+        return [];
     }
 
     try {
@@ -322,9 +291,7 @@ Hashtags: [Your generated hashtags here, separated by spaces]
 export const generateSpeech = async (script: string): Promise<string> => {
     const ai = createAiClient();
     if (!ai) {
-       await new Promise(resolve => setTimeout(resolve, 1500));
-       // This is a base64 encoded silent WAV file to avoid errors when mocking.
-       return "UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABgAAABkYXRhAAAAAA==";
+       return "";
     }
     try {
         const response = await ai.models.generateContent({
@@ -353,9 +320,7 @@ export const generateSpeech = async (script: string): Promise<string> => {
 export const generateMusic = async (prompt: string): Promise<string> => {
     const ai = createAiClient();
     if (!ai) {
-       await new Promise(resolve => setTimeout(resolve, 2000));
-       // This is a base64 encoded silent WAV file.
-       return "UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABgAAABkYXRhAAAAAA==";
+       return "";
     }
     // In a real scenario, you'd call a music generation model like Suno.
     // For now, we reuse the TTS model as a placeholder for API interaction.
@@ -386,9 +351,7 @@ export const generateMusic = async (prompt: string): Promise<string> => {
 export const generateSfx = async (prompt: string): Promise<string> => {
     const ai = createAiClient();
     if (!ai) {
-       await new Promise(resolve => setTimeout(resolve, 1000));
-       // Silent WAV file
-       return "UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABgAAABkYXRhAAAAAA==";
+       return "";
     }
     try {
         const response = await ai.models.generateContent({
@@ -418,9 +381,7 @@ export const generateSfx = async (prompt: string): Promise<string> => {
 export const generateImageForScene = async (prompt: string): Promise<string> => {
     const ai = createAiClient();
     if (!ai) {
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        // This is a base64 encoded placeholder image to avoid errors when mocking.
-        return "iVBORw0KGgoAAAANSUhEUgAAAMgAAABkCAIAAABeC2PWAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAHCSURBVHhe7dFBDQAgEMCw7V/5C1+g4RARBAYs2R4aDw8QIQLGgAgQASNABIwAEbAIEAEjQASMACNgESACRoAIGAEjQASMACNgESACRoAIGAEjQASMACNgESACRoAIGAEjQASMACNgESACRoAIGAEjQASMACNgESACRoAIGAEjQASMACNgESACRoAIGAEjQASMACNgESACRoAIGAEjQASMACNgESACRoAIGAEjQASMACNgESACRoAIGAEjQASMACNgESACRoAIGAEjQASMACNgESACRoAIGAEjQASMACNgESACRoAIGAEjQASMACNgESACRoAIGAEjQASMACNgESACRoAIGAEjQASMACNgESACRoAIGAEjQASMACNgESACRoAIGAEjQASMACNgESACRoAIGAEjQASMACNgESACRoAIGAEjQASMACNgESACRoAIGAEjQASMACNgESACRoAIGAEjQASMACNgESACRoAIGAEjQASMACNgESACRoAIGAEjQASMACNgESACRoAIGAEjQASMACNgESACRoAIGAEjQASMACNgESACRoAIGAEjQASMACNgESACRoAIGAEjQASMACNgESACRoAIGAEjQASMACNgESACRoAIGAEjQASNgEDOB/212GKF4uWAAAAAASUVORK5CYII=";
+        return "";
     }
     try {
         const response = await ai.models.generateContent({
@@ -457,8 +418,7 @@ export const startVideoGeneration = async (product: Product, model: AIModel = 'V
     await ensureVeoApiKey();
     const ai = createAiClient();
     if (!ai) {
-        await new Promise(resolve => setTimeout(resolve, 500));
-        return { name: `mock-op-${Date.now()}`, done: false };
+        return null;
     }
     
     const prompt = `Create a dynamic, 30-second vertical video ad (9:16 aspect ratio) for the product "${product.name}". 
@@ -494,8 +454,7 @@ export const startSceneVideoGeneration = async (prompt: string, model: AIModel =
     await ensureVeoApiKey();
     const ai = createAiClient();
     if (!ai) {
-        await new Promise(resolve => setTimeout(resolve, 500));
-        return { name: `mock-op-${Date.now()}`, done: false };
+        return null;
     }
     
     const fullPrompt = `Create a short, 5-second video clip for a vertical video (9:16 aspect ratio) that visually represents the following text: "${prompt}". Style: cinematic, engaging, high-quality.`;
@@ -530,8 +489,8 @@ export const checkVideoGenerationStatus = async (operation: any): Promise<any> =
     await ensureVeoApiKey();
     const ai = createAiClient();
 
-    if (!ai) { // Mocking for environments without API key
-        return { ...operation, done: Math.random() > 0.5, response: { generatedVideos: [{ video: { uri: 'mock-video-url' }}]}};
+    if (!ai) {
+        return { ...operation, done: true, error: { message: "API key not configured." }};
     }
 
     try {
