@@ -1,19 +1,31 @@
 // ---
 // 
-// **CRITICAL SECURITY WARNING**
-// 
-// This function handles the Facebook token exchange on the client-side.
-// This is **NOT SECURE** for a production environment because it exposes
-// the `appSecret`. In a real-world application, this logic **MUST** be
-// moved to a secure backend server (e.g., a Node.js endpoint or a serverless function).
-// The frontend should only send the short-lived token to your backend,
-// and the backend would then securely make the call to the Facebook Graph API
-// with the `appSecret` and return the long-lived token to the client.
+//                      ****************************************************
+//                      *                                                  *
+//                      *          CRITICAL SECURITY WARNING               *
+//                      *                                                  *
+//                      ****************************************************
 //
-// This implementation is for demonstration purposes within the constraints of this
-// frontend-only project.
+// THIS FILE CONTAINS A MAJOR SECURITY VULNERABILITY AND IS FOR DEMONSTRATION PURPOSES ONLY.
+//
+// The function `exchangeShortLivedToken` below handles the Facebook token exchange on the CLIENT-SIDE.
+// This is **EXTREMELY INSECURE** for a production environment because it requires and exposes
+// the `appSecret` directly in the frontend code.
+//
+// In a real-world application, this logic **MUST** be moved to a secure backend server (e.g., a
+// Node.js endpoint, a Python Flask API, or a serverless function). The correct and secure flow is:
+//
+// 1.  The frontend obtains a short-lived token after the user logs in.
+// 2.  The frontend sends ONLY this short-lived token to your secure backend endpoint.
+// 3.  The backend server securely stores the `appSecret` (e.g., as an environment variable) and
+//     makes the call to the Facebook Graph API to exchange the token.
+// 4.  The backend returns the newly obtained long-lived token to the frontend to be used for
+//     subsequent API calls.
+//
+// DO NOT USE THIS CLIENT-SIDE IMPLEMENTATION IN PRODUCTION.
 //
 // ---
+
 
 interface ExchangeTokenParams {
     appId: string;
@@ -33,10 +45,10 @@ export const exchangeShortLivedToken = async (params: ExchangeTokenParams): Prom
     const url = new URL('https://graph.facebook.com/v19.0/oauth/access_token');
     url.searchParams.append('grant_type', 'fb_exchange_token');
     url.searchParams.append('client_id', appId);
-    url.searchParams.append('client_secret', appSecret);
+    url.searchParams.append('client_secret', appSecret); // <-- DANGER: EXPOSING SECRET ON CLIENT
     url.searchParams.append('fb_exchange_token', shortLivedToken);
 
-    console.log("Attempting to exchange Facebook token. NOTE: This is an insecure client-side call.");
+    console.warn("CRITICAL SECURITY RISK: Exchanging Facebook token on the client-side. The appSecret is exposed. This must be moved to a backend server in a real application.");
 
     const response = await fetch(url.toString(), {
         method: 'GET',

@@ -43,7 +43,6 @@ const AppContent: React.FC = () => {
     const [scheduledPosts, setScheduledPosts] = useState<ScheduledPost[]>([]);
     
     const [isSidebarOpen, setSidebarOpen] = useState(false);
-    const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
     // Load initial state from storage
     useEffect(() => {
@@ -60,18 +59,6 @@ const AppContent: React.FC = () => {
         const appData = { products, generatedContent, videoIdeas, renderJobs, scheduledPosts };
         saveAppData(appData);
     }, [products, generatedContent, videoIdeas, renderJobs, scheduledPosts]);
-
-
-    useEffect(() => {
-        const handleMouseMove = (event: MouseEvent) => {
-            const { clientX, clientY } = event;
-            const x = (clientX / window.innerWidth) * 2 - 1;
-            const y = -(clientY / window.innerHeight) * 2 + 1;
-            setMousePosition({ x, y });
-        };
-        window.addEventListener('mousemove', handleMouseMove);
-        return () => window.removeEventListener('mousemove', handleMouseMove);
-    }, []);
 
     const addProduct = useCallback((newProduct: Product) => {
         setProducts(prev => {
@@ -216,7 +203,7 @@ const AppContent: React.FC = () => {
         <div className="flex h-screen bg-transparent text-gray-100 font-digital">
             <Notifications />
             <Suspense fallback={<div className="w-64 bg-gray-900/50" />}>
-                <ThreeScene mouseX={mousePosition.x} mouseY={mousePosition.y} />
+                <ThreeScene />
                 <Sidebar currentPage={currentPage} setCurrentPage={setCurrentPage} isOpen={isSidebarOpen} setOpen={setSidebarOpen} />
             </Suspense>
             <div className="flex-1 flex flex-col overflow-hidden">

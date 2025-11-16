@@ -58,30 +58,23 @@ const generateContent = async (prompt: string): Promise<string> => {
 
 export const scrapeProductInfo = async (url: string): Promise<Product | null> => {
     const prompt = `
-Act as an expert web scraper and affiliate marketing analyst. Given the product URL "${url}", extract its key information.
-If the URL is from a known e-commerce site (like Amazon, Shopee, Tiki, Lazada, ClickBank), extract the data. If not, state that it's an unsupported URL.
+Act as an expert web scraper and affiliate marketing analyst. Use Google Search to analyze the content at the product URL: "${url}".
+Based on the search results, extract the product's key information.
 
-Provide the product name, a compelling description for a YouTube video, a list of 3-4 key features (as a string), and use the original URL as the affiliate link.
-Also, estimate the commission percentage, a user rating out of 5, and an estimated number of conversions based on the product's likely popularity.
+Your primary goal is to provide a single, valid JSON object as the output. Do NOT include any other text, explanations, or markdown formatting like \`\`\`json. The entire response must be ONLY the JSON object.
 
-Ensure the response is a single valid JSON object matching the provided schema. Do not wrap it in an array or markdown.
-The ID should be a camelCase version of the product name.
+The JSON object must contain:
+- "id": A unique ID for the product (e.g., camelCase version of the product name).
+- "name": The product's full name.
+- "description": A compelling description (around 30-40 words) suitable for a short-form video.
+- "features": A single string listing 3-4 key features, separated by commas.
+- "affiliateLink": Use the original URL: "${url}".
+- "commission": An estimated commission percentage (as a number).
+- "rating": An estimated user rating out of 5 (as a number).
+- "conversions": An estimated number of conversions based on popularity (as an integer).
+
+If you cannot find reliable information about the product from the search results, return a JSON object with an "error" key, like this: { "error": "Could not find product information for the given URL." }
 `;
-    
-    const schema = {
-        type: Type.OBJECT,
-        properties: {
-            id: { type: Type.STRING, description: "A unique ID for the product, can be the product name in camelCase." },
-            name: { type: Type.STRING },
-            description: { type: Type.STRING },
-            features: { type: Type.STRING },
-            affiliateLink: { type: Type.STRING },
-            commission: { type: Type.NUMBER },
-            rating: { type: Type.NUMBER },
-            conversions: { type: Type.INTEGER },
-        },
-        required: ["id", "name", "description", "features", "affiliateLink", "commission", "rating", "conversions"]
-    };
 
     const ai = createAiClient();
     if (!ai) {
@@ -93,12 +86,40 @@ The ID should be a camelCase version of the product name.
             model: "gemini-2.5-flash",
             contents: prompt,
             config: {
-                responseMimeType: "application/json",
-                responseSchema: schema,
+                tools: [{ googleSearch: {} }],
             },
         });
-        const jsonText = response.text.trim();
-        return JSON.parse(jsonText);
+        
+        let jsonText = response.text.trim();
+        
+        // The model might still wrap the JSON in markdown, so we need to clean it.
+        if (jsonText.startsWith('```json')) {
+            jsonText = jsonText.substring(7);
+            if (jsonText.endsWith('```')) {
+                jsonText = jsonText.slice(0, -3);
+            }
+        } else if (jsonText.startsWith('```')) {
+            jsonText = jsonText.substring(3);
+             if (jsonText.endsWith('```')) {
+                jsonText = jsonText.slice(0, -3);
+            }
+        }
+        
+        const parsedData = JSON.parse(jsonText);
+
+        if (parsedData.error) {
+             console.error("Gemini could not find product info:", parsedData.error);
+             return null;
+        }
+
+        // Basic validation to ensure the object looks like a Product
+        if (parsedData.id && parsedData.name && parsedData.description) {
+            return parsedData as Product;
+        } else {
+            console.error("Parsed JSON from Gemini is missing required product fields:", parsedData);
+            return null;
+        }
+
     } catch (error) {
         console.error("Error scraping product info with Gemini API:", error);
         return null;

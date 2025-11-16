@@ -34,7 +34,6 @@ const navigationGroups = [
         items: [
             { name: Page.PRODUCT_SCOUT, icon: SearchIcon },
             { name: Page.CONTENT_GENERATOR, icon: EditIcon },
-            // Fix: Add the Publisher page to the navigation so it's accessible.
             { name: Page.PUBLISHER, icon: PublishIcon },
             { name: Page.AI_VIDEO_STUDIO, icon: Film },
             { name: Page.RENDER_QUEUE, icon: Video },

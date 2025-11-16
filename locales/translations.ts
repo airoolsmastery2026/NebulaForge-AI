@@ -419,7 +419,6 @@ export const translations = {
         templates: "Templates",
         editTitle: "Edit Template",
         createTitle: "Create New Template",
-        // Fix: Renamed 'description' to 'pageDescription' to avoid duplicate key error.
         pageDescription: "Define the structure for your AI-generated content.",
         nameLabel: "Template Name",
         typeLabel: "Template Type",
@@ -1045,7 +1044,6 @@ export const translations = {
         templates: "Các mẫu",
         editTitle: "Chỉnh sửa Mẫu",
         createTitle: "Tạo Mẫu mới",
-        // Fix: Renamed 'description' to 'pageDescription' to avoid duplicate key error.
         pageDescription: "Xác định cấu trúc cho nội dung do AI tạo ra của bạn.",
         nameLabel: "Tên Mẫu",
         typeLabel: "Loại Mẫu",

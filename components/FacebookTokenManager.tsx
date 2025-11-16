@@ -169,7 +169,6 @@ export const FacebookTokenManager: React.FC = () => {
 
                         {error && <p className="text-sm text-red-400">{t('fbTokenManager.errorPrefix')}: {error}</p>}
 
-                        {/* Fix: Refactor button logic to correctly handle loading states and fix TypeScript error. */}
                         <div className="flex items-center space-x-2">
                            {status === 'refreshing' ? (
                                <Button isLoading={true} icon={<RefreshCw className="h-4 w-4" />}>

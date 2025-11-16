@@ -1,4 +1,5 @@
 
+
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription } from './common/Card';
 import { Button } from './common/Button';
@@ -86,7 +87,26 @@ export const AIVideoStudio: React.FC<AIVideoStudioProps> = ({ productsWithConten
         [productsWithContent]
     );
 
+    // --- Memory Leak Fix: Cleanup Blob URLs ---
+    useEffect(() => {
+        // This effect's cleanup function will run when the component unmounts.
+        return () => {
+            scenes.forEach(scene => {
+                if (scene.videoUrl && scene.videoUrl.startsWith('blob:')) {
+                    URL.revokeObjectURL(scene.videoUrl);
+                }
+            });
+        };
+    }, [scenes]);
+
     const handleProductSelect = (productId: string) => {
+        // Revoke old blob URLs before setting new scenes to prevent memory leaks
+        scenes.forEach(scene => {
+            if (scene.videoUrl && scene.videoUrl.startsWith('blob:')) {
+                URL.revokeObjectURL(scene.videoUrl);
+            }
+        });
+        
         setSelectedProductId(productId);
         const product = productsWithContent.find(p => p.id === productId);
         if (product?.content.script) {
@@ -140,7 +160,16 @@ export const AIVideoStudio: React.FC<AIVideoStudioProps> = ({ productsWithConten
                             const videoBlob = await getVideoResult(videoUri);
                             if (videoBlob) {
                                 const blobUrl = URL.createObjectURL(videoBlob);
-                                setScenes(prev => prev.map(s => s.id === scene.id ? { ...s, generationStatus: 'completed', videoUrl: blobUrl, videoOperation: updatedOperation } : s));
+                                setScenes(prev => prev.map(s => {
+                                    if (s.id === scene.id) {
+                                        // Revoke old URL if it exists before setting new one
+                                        if (s.videoUrl && s.videoUrl.startsWith('blob:')) {
+                                            URL.revokeObjectURL(s.videoUrl);
+                                        }
+                                        return { ...s, generationStatus: 'completed', videoUrl: blobUrl, videoOperation: updatedOperation };
+                                    }
+                                    return s;
+                                }));
                             } else {
                                 setScenes(prev => prev.map(s => s.id === scene.id ? { ...s, generationStatus: 'failed' } : s));
                             }

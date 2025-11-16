@@ -10,7 +10,6 @@ export enum Page {
     // Group 2: AI Modules
     PRODUCT_SCOUT = 'Product Scout',
     CONTENT_GENERATOR = 'Content Generator', // AI Script Generator
-    // Fix: Add PUBLISHER to the Page enum to resolve reference error in App.tsx
     PUBLISHER = 'Publisher',
     AI_VIDEO_STUDIO = 'AI Video Studio',
     RENDER_QUEUE = 'Render Queue',

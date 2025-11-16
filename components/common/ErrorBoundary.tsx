@@ -23,8 +23,11 @@ export class ErrorBoundary extends React.Component<Props, State> {
   }
 
   public render() {
-    // Fix: Destructure props and state from `this` to ensure correct type inference.
-    if (this.state.hasError) {
+    // FIX: Destructure props and state to resolve potential TypeScript issue with 'this' context.
+    const { hasError, error } = this.state;
+    const { children } = this.props;
+
+    if (hasError) {
       return (
         <div className="flex items-center justify-center h-screen bg-gray-900 text-gray-100">
             <div className="text-center p-8 border border-red-500/30 rounded-lg bg-red-500/10 max-w-md">
@@ -35,7 +38,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
                 <details className="mt-4 text-left text-xs text-gray-400 bg-gray-800/50 p-2 rounded">
                     <summary className="cursor-pointer">Error Details</summary>
                     <pre className="mt-2 whitespace-pre-wrap">
-                        <code>{this.state.error?.message}</code>
+                        <code>{error?.message}</code>
                     </pre>
                 </details>
             </div>
@@ -43,6 +46,6 @@ export class ErrorBoundary extends React.Component<Props, State> {
       );
     }
 
-    return this.props.children;
+    return children;
   }
 }

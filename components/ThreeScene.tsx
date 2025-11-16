@@ -1,22 +1,24 @@
 import React, { useRef, useEffect } from 'react';
 import * as THREE from 'three';
 
-interface ThreeSceneProps {
-    mouseX: number;
-    mouseY: number;
-}
+interface ThreeSceneProps {}
 
-export const ThreeScene: React.FC<ThreeSceneProps> = ({ mouseX, mouseY }) => {
+export const ThreeScene: React.FC<ThreeSceneProps> = () => {
     const mountRef = useRef<HTMLDivElement>(null);
-    const mousePosRef = useRef({ x: mouseX, y: mouseY });
+    const mousePosRef = useRef({ x: 0, y: 0 });
 
     useEffect(() => {
-        mousePosRef.current = { x: mouseX, y: mouseY };
-    }, [mouseX, mouseY]);
-
-    useEffect(() => {
-        if (!mountRef.current) return;
         const currentMount = mountRef.current;
+        if (!currentMount) return;
+
+        // --- Mouse Listener ---
+        const handleMouseMove = (event: MouseEvent) => {
+            const { clientX, clientY } = event;
+            const x = (clientX / window.innerWidth) * 2 - 1;
+            const y = -(clientY / window.innerHeight) * 2 + 1;
+            mousePosRef.current = { x, y };
+        };
+        window.addEventListener('mousemove', handleMouseMove);
 
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 3000);
@@ -25,7 +27,8 @@ export const ThreeScene: React.FC<ThreeSceneProps> = ({ mouseX, mouseY }) => {
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-        currentMount.appendChild(renderer.domElement);
+        const canvasElement = renderer.domElement; // Keep a direct reference to the canvas
+        currentMount.appendChild(canvasElement);
         
         // Lighting
         const ambientLight = new THREE.AmbientLight(0xffffff, 0.1);
@@ -35,7 +38,12 @@ export const ThreeScene: React.FC<ThreeSceneProps> = ({ mouseX, mouseY }) => {
         pointLight.position.set(0, 0, 0); // Sun is the light source
         scene.add(pointLight);
 
+        // --- Resource Tracking for Cleanup ---
+        const geometries: THREE.BufferGeometry[] = [];
+        const materials: THREE.Material[] = [];
+
         // Starfield
+        const starGeometry = new THREE.BufferGeometry();
         const starCount = 15000;
         const positions = new Float32Array(starCount * 3);
         for (let i = 0; i < starCount; i++) {
@@ -43,52 +51,37 @@ export const ThreeScene: React.FC<ThreeSceneProps> = ({ mouseX, mouseY }) => {
             positions[i * 3 + 1] = (Math.random() - 0.5) * 3000;
             positions[i * 3 + 2] = (Math.random() - 0.5) * 3000;
         }
-        const starGeometry = new THREE.BufferGeometry();
         starGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        geometries.push(starGeometry);
+        
         const starMaterial = new THREE.PointsMaterial({
             color: 0xaaaaff,
             size: 0.7,
             blending: THREE.AdditiveBlending,
             transparent: true,
         });
+        materials.push(starMaterial);
+        
         const stars = new THREE.Points(starGeometry, starMaterial);
         scene.add(stars);
 
         // Planets
-        const planets: THREE.Mesh[] = [];
-        const geometries: THREE.BufferGeometry[] = [];
-        const materials: THREE.Material[] = [];
-
-        // Helper to track resources for cleanup
         const createMesh = (geometry: THREE.BufferGeometry, material: THREE.Material) => {
             geometries.push(geometry);
             materials.push(material);
-            return new THREE.Mesh(geometry, material);
+            const mesh = new THREE.Mesh(geometry, material);
+            scene.add(mesh);
+            return mesh;
         };
 
-        // Sun
         const sun = createMesh(new THREE.SphereGeometry(80, 32, 32), new THREE.MeshBasicMaterial({ color: 0xffdd88, wireframe: true }));
-        scene.add(sun);
-        planets.push(sun);
-
-        // Planet 1 (Earth-like)
         const planet1 = createMesh(new THREE.SphereGeometry(20, 32, 32), new THREE.MeshStandardMaterial({ color: 0x6699ff, roughness: 0.8 }));
         planet1.position.x = 200;
-        scene.add(planet1);
-        planets.push(planet1);
-        
-        // Planet 2 (Mars-like)
         const planet2 = createMesh(new THREE.SphereGeometry(15, 32, 32), new THREE.MeshStandardMaterial({ color: 0xff5733, roughness: 0.9 }));
         planet2.position.x = -350;
-        scene.add(planet2);
-        planets.push(planet2);
-        
-        // Planet 3 (Jupiter-like)
         const planet3 = createMesh(new THREE.SphereGeometry(50, 32, 32), new THREE.MeshStandardMaterial({ color: 0xddc5a3, roughness: 0.7 }));
         planet3.position.z = -500;
         planet3.position.x = 400;
-        scene.add(planet3);
-        planets.push(planet3);
 
         const clock = new THREE.Clock();
         let animationFrameId: number;
@@ -128,26 +121,21 @@ export const ThreeScene: React.FC<ThreeSceneProps> = ({ mouseX, mouseY }) => {
         window.addEventListener('resize', handleResize);
 
         return () => {
+            // Stop the animation loop and remove listeners
             cancelAnimationFrame(animationFrameId);
             window.removeEventListener('resize', handleResize);
+            window.removeEventListener('mousemove', handleMouseMove);
 
-            // Safely remove the canvas from the DOM
-            if (currentMount && renderer.domElement.parentNode === currentMount) {
-                currentMount.removeChild(renderer.domElement);
+            // Safely remove the canvas from the DOM. This check prevents the "node is not a child" error.
+            if (canvasElement.parentElement === currentMount) {
+                currentMount.removeChild(canvasElement);
             }
             
-            // Dispose of Three.js resources to prevent memory leaks
+            // Dispose of the renderer and all tracked resources to prevent memory leaks
             renderer.dispose();
-            
-            geometries.forEach(geometry => geometry.dispose());
-            materials.forEach(material => material.dispose());
-            starGeometry.dispose();
-            starMaterial.dispose();
-            
-            // Remove all objects from the scene
-            while(scene.children.length > 0){ 
-                scene.remove(scene.children[0]); 
-            }
+            geometries.forEach(g => g.dispose());
+            materials.forEach(m => m.dispose());
+            scene.clear();
         };
     }, []);
 

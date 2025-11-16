@@ -1,4 +1,5 @@
 
+
 import React, { useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription } from './common/Card';
 import { Button } from './common/Button';
@@ -6,6 +7,7 @@ import { Download } from './LucideIcons';
 import type { RenderJob } from '../types';
 import { useI18n } from '../hooks/useI18n';
 import { checkVideoGenerationStatus, getVideoResult } from '../services/geminiService';
+import { GEMINI_TTS_SAMPLE_RATE } from '../constants';
 
 
 interface RenderQueueProps {
@@ -47,7 +49,7 @@ const decode = (base64: string): ArrayBuffer => {
 // Function to create a WAV blob from raw PCM data (in base64)
 const createWavBlob = (base64Pcm: string): Blob => {
     const audioData = decode(base64Pcm);
-    const sampleRate = 24000; // Gemini TTS sample rate
+    const sampleRate = GEMINI_TTS_SAMPLE_RATE;
     const numChannels = 1;
     const bitsPerSample = 16;
     const byteRate = sampleRate * numChannels * (bitsPerSample / 8);
