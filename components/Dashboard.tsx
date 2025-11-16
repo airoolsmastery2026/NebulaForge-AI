@@ -1,5 +1,6 @@
 
-import React from 'react';
+
+import React, { useMemo } from 'react';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import type { VideoIdea, RenderJob } from '../types';
 import { Page } from '../types';
@@ -39,15 +40,15 @@ const StatCard: React.FC<{title: string, value: string, change: string}> = ({tit
 export const Dashboard: React.FC<DashboardProps> = ({ videoIdeas, renderJobs, setCurrentPage }) => {
     const { t } = useI18n();
 
-    // The 'name' property was causing an issue with the StatCard component's props.
-    // It has been renamed to 'title' to align with the expected props.
-    // Additionally, a unique 'id' has been added for a stable 'key' prop during mapping.
-    const stats = [
+    // By wrapping the `stats` array creation in `useMemo`, we ensure it's only recalculated
+    // when its dependencies (`t` function or `renderJobs`) change. This improves performance
+    // and can prevent subtle race conditions during the initial render.
+    const stats = useMemo(() => [
         { id: 'views', title: t('dashboard.totalViews'), value: '7.1M', change: '+15.2%' },
         { id: 'earnings', title: t('dashboard.totalEarnings'), value: '$18,920', change: '+21.7%' },
         { id: 'videos', title: t('dashboard.videosCreated'), value: '112', change: `+${(renderJobs.filter(j => j.status === 'Completed').length)} this week` },
         { id: 'conversion', title: t('dashboard.conversionRate'), value: '14.1%', change: '-0.5%' },
-    ];
+    ], [t, renderJobs]);
 
     return (
         <div className="space-y-6">
