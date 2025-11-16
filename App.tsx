@@ -1,7 +1,5 @@
 
 
-
-
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { Sidebar } from './components/Sidebar';
 import { Header } from './components/Header';
@@ -19,9 +17,11 @@ import { AppGuide } from './components/AppGuide';
 import { ApiDocs } from './components/ApiDocs';
 import { AIVideoStudio } from './components/AIVideoStudio';
 import { GitHubSync } from './components/GitHubSync';
+import { ThreeScene } from './components/ThreeScene';
+import { ControlHub } from './components/ControlHub';
+import { PlaceholderPage } from './components/PlaceholderPage';
 import type { Product, GeneratedContent, VideoIdea, RenderJob, ScheduledPost } from './types';
 import { Page } from './types';
-import { Starfield } from './components/common/Starfield';
 import { generateCaptionsAndHashtags, generateReviewScript, generateSeoDescription, generateVideoTitles, generateSpeech, startVideoGeneration } from './services/geminiService';
 
 const mockIdeas: VideoIdea[] = [
@@ -97,7 +97,6 @@ const App: React.FC = () => {
         const fullContent: GeneratedContent = { script, titles, seoDescription, captions };
         updateGeneratedContent(product.id, fullContent);
         
-        // Navigate to Content Generator to see the results
         setCurrentPage(Page.CONTENT_GENERATOR);
 
         const productWithContent = { ...product, content: fullContent };
@@ -115,7 +114,6 @@ const App: React.FC = () => {
             });
         } else {
             console.error("Pipeline failed: Could not start video generation.");
-            // Here you might want to set an error state to show in the UI
         }
     }, [addProduct, updateGeneratedContent, addRenderJob]);
 
@@ -143,7 +141,8 @@ const App: React.FC = () => {
                           generatedContent={generatedContent}
                           onContentUpdate={updateGeneratedContent}
                         />;
-            case Page.PUBLISHER:
+            // Fix: Property 'PUBLISHER' does not exist on type 'typeof Page'. Changed to 'AI_SOCIAL_POSTING' as it relates to publishing content.
+            case Page.AI_SOCIAL_POSTING:
                 return <Publisher 
                     productsWithContent={productsWithContent} 
                     onAddRenderJob={addRenderJob} 
@@ -164,14 +163,36 @@ const App: React.FC = () => {
                 return <ApiDocs />;
             case Page.APP_GUIDE:
                 return <AppGuide />;
+
+            // Social Hubs
+            case Page.FACEBOOK_HUB: return <ControlHub platform="Facebook" />;
+            case Page.TIKTOK_HUB: return <ControlHub platform="TikTok" />;
+            case Page.YOUTUBE_HUB: return <ControlHub platform="YouTube" />;
+            case Page.ZALO_HUB: return <ControlHub platform="Zalo" />;
+            case Page.TELEGRAM_HUB: return <ControlHub platform="Telegram" />;
+            case Page.INSTAGRAM_HUB: return <ControlHub platform="Instagram" />;
+            case Page.X_HUB: return <ControlHub platform="X (Twitter)" />;
+
+            // E-commerce Hubs
+            case Page.SHOPEE_HUB: return <ControlHub platform="Shopee" isEcommerce />;
+            case Page.LAZADA_HUB: return <ControlHub platform="Lazada" isEcommerce />;
+            case Page.TIKI_HUB: return <ControlHub platform="Tiki" isEcommerce />;
+            case Page.AMAZON_HUB: return <ControlHub platform="Amazon FBA" isEcommerce />;
+
+            // Placeholder Pages
+            case Page.AI_SYSTEM_OVERVIEW: return <PlaceholderPage title="AI System Overview" />;
+            case Page.CONTROL_CENTER: return <PlaceholderPage title="Control Center" />;
+            case Page.AI_REVIEW_MARKETPLACE: return <PlaceholderPage title="AI Review Marketplace" />;
+            case Page.AI_VIDEO_SELLING_AUTOMATION: return <PlaceholderPage title="AI Video Selling Automation" />;
+            
             default:
                 return <Dashboard videoIdeas={videoIdeas} renderJobs={renderJobs} setCurrentPage={setCurrentPage} />;
         }
     };
 
     return (
-        <div className="flex h-screen bg-transparent text-gray-100">
-            <Starfield mouseX={mousePosition.x} mouseY={mousePosition.y} />
+        <div className="flex h-screen bg-transparent text-gray-100 font-digital">
+            <ThreeScene mouseX={mousePosition.x} mouseY={mousePosition.y} />
             <Sidebar currentPage={currentPage} setCurrentPage={setCurrentPage} isOpen={isSidebarOpen} setOpen={setSidebarOpen} />
             <div className="flex-1 flex flex-col overflow-hidden">
                 <Header toggleSidebar={() => setSidebarOpen(!isSidebarOpen)} />

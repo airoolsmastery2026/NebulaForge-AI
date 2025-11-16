@@ -1,40 +1,74 @@
 
 
-
 import React from 'react';
 import { Page } from '../types';
 import { AnalyticsIcon, DashboardIcon, EditIcon, PublishIcon, SearchIcon, CloseIcon, SparklesIcon, ConnectIcon, TemplateIcon } from './Icons';
-import { Video, BookOpen, KeyRound, Film, Github } from './LucideIcons';
+import { Video, BookOpen, KeyRound, Film, Github, Bot, ShoppingCart, Users, Code, Settings, MessageSquare, Briefcase } from './LucideIcons';
 import { useI18n } from '../hooks/useI18n';
 
 const Logo = () => {
     const { t } = useI18n();
     return (
-        <div className="flex items-center space-x-3">
-            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-labelledby="logo-title">
-               <title id="logo-title">AI System Logo</title>
-               <path d="M7 8l-4 4 4 4M17 8l4 4-4 4M14 4l-4 16" className="text-primary-400" />
+        <div className="flex items-center space-x-3 font-digital">
+             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-cyan-400">
+                <path d="M5 3L3 5l2 2 4 4-2 2-2 2 2 2 2-2 2-2 4 4 2 2 2-2-12-12-2-2z"/>
+                <path d="m19 21-2-2"/>
+                <path d="m21 19-2-2"/>
             </svg>
-            <span className="text-xl font-bold text-gray-100 tracking-wide">{t('appName')}</span>
+            <span className="text-xl font-bold text-gray-100 tracking-wider">{t('appName')}</span>
         </div>
     );
 };
 
-
-const navigation = [
-    { name: Page.DASHBOARD, icon: DashboardIcon },
-    { name: Page.AUTOMATION, icon: SparklesIcon },
-    { name: Page.PRODUCT_SCOUT, icon: SearchIcon },
-    { name: Page.CONTENT_GENERATOR, icon: EditIcon },
-    { name: Page.AI_VIDEO_STUDIO, icon: Film },
-    { name: Page.PUBLISHER, icon: PublishIcon },
-    { name: Page.RENDER_QUEUE, icon: Video },
-    { name: Page.ANALYTICS, icon: AnalyticsIcon },
-    { name: Page.CONNECTIONS, icon: ConnectIcon },
-    { name: Page.PROMPT_TEMPLATES, icon: TemplateIcon },
-    { name: Page.GITHUB_SYNC, icon: Github },
-    { name: Page.API_DOCS, icon: KeyRound },
-    { name: Page.APP_GUIDE, icon: BookOpen },
+const navigationGroups = [
+    {
+        name: 'sidebar.group1',
+        items: [
+            { name: Page.DASHBOARD, icon: DashboardIcon },
+            { name: Page.AUTOMATION, icon: SparklesIcon },
+            { name: Page.APP_GUIDE, icon: BookOpen },
+        ]
+    },
+    {
+        name: 'sidebar.group2',
+        items: [
+            { name: Page.PRODUCT_SCOUT, icon: SearchIcon },
+            { name: Page.CONTENT_GENERATOR, icon: EditIcon },
+            // Fix: Add the Publisher page to the navigation so it's accessible.
+            { name: Page.PUBLISHER, icon: PublishIcon },
+            { name: Page.AI_VIDEO_STUDIO, icon: Film },
+            { name: Page.RENDER_QUEUE, icon: Video },
+            { name: Page.PROMPT_TEMPLATES, icon: TemplateIcon },
+        ]
+    },
+    {
+        name: 'sidebar.group3',
+        items: [
+            { name: Page.FACEBOOK_HUB, icon: Bot },
+            { name: Page.TIKTOK_HUB, icon: Bot },
+            { name: Page.YOUTUBE_HUB, icon: Bot },
+            { name: Page.ZALO_HUB, icon: MessageSquare },
+            { name: Page.TELEGRAM_HUB, icon: MessageSquare },
+            { name: Page.INSTAGRAM_HUB, icon: Bot },
+        ]
+    },
+    {
+        name: 'sidebar.group4',
+        items: [
+            { name: Page.SHOPEE_HUB, icon: ShoppingCart },
+            { name: Page.LAZADA_HUB, icon: ShoppingCart },
+            { name: Page.TIKI_HUB, icon: ShoppingCart },
+            { name: Page.AMAZON_HUB, icon: Briefcase },
+        ]
+    },
+    {
+        name: 'sidebar.group5',
+        items: [
+            { name: Page.CONNECTIONS, icon: ConnectIcon },
+            { name: Page.ANALYTICS, icon: AnalyticsIcon },
+            { name: Page.GITHUB_SYNC, icon: Github },
+        ]
+    }
 ];
 
 const NavLink: React.FC<{
@@ -52,34 +86,44 @@ const NavLink: React.FC<{
                 e.preventDefault();
                 onClick();
             }}
-            className={`relative flex items-center px-4 py-2.5 text-sm font-medium rounded-md transition-colors group
+            className={`relative flex items-center px-4 py-2.5 text-sm font-medium rounded-lg transition-colors group
             ${isActive
-                    ? 'bg-primary-500 text-white'
+                    ? 'bg-cyan-500/20 text-cyan-300'
                     : 'text-gray-300 hover:bg-gray-700/50 hover:text-white'
                 }`}
         >
-            <div className={`absolute left-0 w-1 h-6 rounded-r-sm bg-primary-400 transition-all duration-300 ${isActive ? 'opacity-100' : 'opacity-0 scale-y-0 group-hover:opacity-50 group-hover:scale-y-75'}`}></div>
-            <Icon className="mr-3 h-6 w-6" />
-            {t(page)}
+            <div className={`absolute left-0 w-1 h-full rounded-r-sm bg-cyan-400 transition-all duration-300 ${isActive ? 'opacity-100' : 'opacity-0 scale-y-0 group-hover:opacity-50 group-hover:scale-y-75'}`}></div>
+            <Icon className="mr-3 h-5 w-5" />
+            <span className="font-sans">{t(page)}</span>
         </a>
     );
 }
 
 const SidebarContent: React.FC<{ currentPage: Page, onNavigate: (page: Page) => void }> = ({ currentPage, onNavigate }) => {
+    const { t } = useI18n();
     return (
         <div className="flex flex-col h-full">
-            <div className="flex items-center justify-center px-4 h-16 border-b border-gray-200/10">
+            <div className="flex items-center justify-center px-4 h-16 border-b border-cyan-400/10">
                 <Logo />
             </div>
-            <nav className="flex-1 px-3 py-4 space-y-1.5">
-                {navigation.map((item) => (
-                    <NavLink
-                        key={item.name}
-                        page={item.name}
-                        icon={item.icon}
-                        currentPage={currentPage}
-                        onClick={() => onNavigate(item.name)}
-                    />
+            <nav className="flex-1 px-3 py-4 space-y-2 overflow-y-auto">
+                {navigationGroups.map((group) => (
+                    <div key={group.name}>
+                        <h3 className="px-4 pt-3 pb-2 text-xs font-bold text-gray-500 uppercase tracking-wider font-sans">
+                            {t(group.name)}
+                        </h3>
+                        <div className="space-y-1">
+                            {group.items.map((item) => (
+                                <NavLink
+                                    key={item.name}
+                                    page={item.name}
+                                    icon={item.icon}
+                                    currentPage={currentPage}
+                                    onClick={() => onNavigate(item.name)}
+                                />
+                            ))}
+                        </div>
+                    </div>
                 ))}
             </nav>
         </div>
@@ -102,7 +146,7 @@ export const Sidebar: React.FC<{
             {/* Mobile sidebar with overlay */}
             <div className={`fixed inset-0 z-40 flex md:hidden ${isOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out`}>
                 <div className="fixed inset-0 bg-black/60" onClick={() => setOpen(false)}></div>
-                <div className="relative flex w-full max-w-xs flex-1 flex-col glass-card border-r border-gray-200/10">
+                <div className="relative flex w-full max-w-xs flex-1 flex-col glass-card border-r border-cyan-400/20">
                      <div className="absolute top-0 right-0 -mr-12 pt-2">
                         <button
                             type="button"
@@ -119,7 +163,7 @@ export const Sidebar: React.FC<{
 
             {/* Static sidebar for desktop */}
             <div className="hidden md:flex md:w-64 md:flex-col md:inset-y-0">
-                <div className="flex flex-col flex-grow bg-gray-900/40 backdrop-blur-lg border-r border-gray-200/10">
+                <div className="flex flex-col flex-grow glass-card border-r-0">
                     <SidebarContent currentPage={currentPage} onNavigate={handleNavigate} />
                 </div>
             </div>

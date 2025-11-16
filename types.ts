@@ -1,18 +1,45 @@
 export enum Page {
-    DASHBOARD = 'Dashboard',
-    AUTOMATION = 'Automation',
+    // Group 1: Main Navigation
+    DASHBOARD = 'Dashboard', // Trang chủ
+    AI_SYSTEM_OVERVIEW = 'AI System Overview',
+    CONTROL_CENTER = 'Control Center',
+    AUTOMATION = 'Automation', // Tự động hóa đa nền tảng
+    APP_GUIDE = 'App Guide', // Kho tài liệu / Hướng dẫn
+    
+    // Group 2: AI Modules
     PRODUCT_SCOUT = 'Product Scout',
-    PROMPT_TEMPLATES = 'Prompt Templates',
-    CONTENT_GENERATOR = 'Content Generator',
+    CONTENT_GENERATOR = 'Content Generator', // AI Script Generator
+    // Fix: Add PUBLISHER to the Page enum to resolve reference error in App.tsx
     PUBLISHER = 'Publisher',
     AI_VIDEO_STUDIO = 'AI Video Studio',
     RENDER_QUEUE = 'Render Queue',
-    CONNECTIONS = 'Connections',
+    PROMPT_TEMPLATES = 'Prompt Templates',
+    AI_REVIEW_MARKETPLACE = 'AI Review Marketplace',
+    AI_VIDEO_SELLING_AUTOMATION = 'AI Video Selling Automation',
+    AI_SOCIAL_POSTING = 'AI Social Posting',
+
+    // Group 3: Social Media
+    FACEBOOK_HUB = 'Facebook Control Hub',
+    TIKTOK_HUB = 'TikTok Automation',
+    YOUTUBE_HUB = 'YouTube Studio AI',
+    ZALO_HUB = 'Zalo OA Manager',
+    TELEGRAM_HUB = 'Telegram Automation',
+    INSTAGRAM_HUB = 'Instagram Boost Panel',
+    X_HUB = 'Twitter/X Auto-Agent',
+
+    // Group 4: E-commerce
+    SHOPEE_HUB = 'Shopee Seller AI',
+    LAZADA_HUB = 'Lazada Seller AI',
+    TIKI_HUB = 'Tiki Seller Center',
+    AMAZON_HUB = 'Amazon FBA Panel',
+
+    // Group 5: System Settings
+    CONNECTIONS = 'Connections', // Cài API / OAuth
     ANALYTICS = 'Analytics',
-    API_DOCS = 'API Docs',
-    APP_GUIDE = 'App Guide',
     GITHUB_SYNC = 'GitHub Sync',
+    API_DOCS = 'API Docs',
 }
+
 
 export interface Product {
     id: string;

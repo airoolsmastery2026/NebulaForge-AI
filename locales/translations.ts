@@ -1,4 +1,5 @@
 
+
 export const translations = {
   en: {
     // General
@@ -10,18 +11,47 @@ export const translations = {
     
     // Sidebar Page Names (used as keys)
     Dashboard: "Dashboard",
+    'AI System Overview': "AI System Overview",
+    'Control Center': "Control Center",
     Automation: "Automation",
+    'App Guide': "App Guide",
+
     'Product Scout': "Product Scout",
-    'Prompt Templates': "Prompt Templates",
     'Content Generator': "Content Generator",
     Publisher: "Publisher",
     'AI Video Studio': "AI Video Studio",
     'Render Queue': "Render Queue",
+    'Prompt Templates': "Prompt Templates",
+    'AI Review Marketplace': "AI Review Marketplace",
+    'AI Video Selling Automation': "AI Video Selling Automation",
+    'AI Social Posting': "AI Social Posting",
+
+    'Facebook Control Hub': "Facebook Control Hub",
+    'TikTok Automation': "TikTok Automation",
+    'YouTube Studio AI': "YouTube Studio AI",
+    'Zalo OA Manager': "Zalo OA Manager",
+    'Telegram Automation': "Telegram Automation",
+    'Instagram Boost Panel': "Instagram Boost Panel",
+    'Twitter/X Auto-Agent': "Twitter/X Auto-Agent",
+
+    'Shopee Seller AI': "Shopee Seller AI",
+    'Lazada Seller AI': "Lazada Seller AI",
+    'Tiki Seller Center': "Tiki Seller Center",
+    'Amazon FBA Panel': "Amazon FBA Panel",
+    
     Connections: "Connections",
     Analytics: "Analytics",
-    'API Docs': 'API Docs',
-    'App Guide': 'App Guide',
     'GitHub Sync': 'GitHub Sync',
+    'API Docs': 'API Docs',
+    
+    // Sidebar Groups
+    sidebar: {
+      group1: "Main Navigation",
+      group2: "AI Modules",
+      group3: "Social Media",
+      group4: "E-Commerce",
+      group5: "System Settings",
+    },
 
     // Header Clock
     headerClock: {
@@ -163,6 +193,9 @@ export const translations = {
       generating: "Generating..."
     },
     
+    // Fix: This key was duplicated. One was inside 'aiVideoStudio' and one at the root level.
+    // To resolve, I've consolidated effect-related translations under the 'effects' key.
+    // The key 'effects' inside 'aiVideoStudio' was for a label and is kept as is.
     effects: {
       glitch: "Glitch",
       vintage: "Vintage",
@@ -274,7 +307,7 @@ export const translations = {
         backupTooltip: "Save all your connection settings to a JSON file.",
         restoreTooltip: "Load connection settings from a JSON file.",
         export: "Export JSON",
-        status: "Status",
+        // Fix: Removed duplicate 'status' key that was causing a JSON parsing error.
         actions: "Actions",
         edit: "Edit",
         delete: "Delete",
@@ -365,8 +398,27 @@ export const translations = {
         // Types
         script: "Script",
         titles: "Titles",
-        description_type: "Description",
+        description: "Description",
         captions: "Captions",
+        storyboard: "Storyboard",
+        video_payload: "Video Payload",
+        comment: "Comment",
+        ab_test: "A/B Test",
+        analytics: "Analytics",
+        voiceover: "Voiceover",
+        // Template Names
+        template_names: {
+          '15s_video_script': "15s Sales Video Script",
+          'caption_hashtag': "Caption & Hashtag Generator",
+          'product_description': "Short Product Description",
+          'tts_voiceover': "TTS Voiceover Script",
+          'short_subtitle': "Short Subtitle Generator",
+          'storyboard_generator': "Storyboard Generator",
+          'video_ai_payload': "Video AI Payload",
+          'comment_responder': "Comment Responder",
+          'ab_test_generator': "A/B Test Title Generator",
+          'performance_analyzer': "Performance Analyzer",
+        }
     },
 
     // Facebook Token Manager
@@ -519,6 +571,21 @@ export const translations = {
       logError: "Error syncing {repo}: {error}",
       logAutoSync: "Auto-sync process started.",
       logAutoSyncComplete: "Auto-sync cycle completed."
+    },
+
+     // Control Hub & Placeholder
+    controlHub: {
+        connectButton: "Connect Account (OAuth)",
+        disconnectButton: "Disconnect",
+        dataPanel: "Data Panel",
+        analysisModule: "AI Analysis Module",
+        postingSchedule: "Posting Schedule",
+        statistics: "Dashboard Statistics",
+        autoRun: "Auto-Run",
+        description: "Connect your {platform} account to enable automation, data analysis, and scheduled posting.",
+    },
+    placeholder: {
+        underConstruction: "This page is under construction. Full functionality will be available soon."
     }
   },
   vi: {
@@ -531,18 +598,47 @@ export const translations = {
 
     // Sidebar Page Names
     Dashboard: "Bảng điều khiển",
+    'AI System Overview': "Tổng quan hệ thống AI",
+    'Control Center': "Điều khiển trung tâm",
     Automation: "Tự động hóa",
+    'App Guide': 'Hướng dẫn ứng dụng',
+
     'Product Scout': "Săn sản phẩm",
-    'Prompt Templates': "Mẫu prompt",
     'Content Generator': "Tạo nội dung",
     Publisher: "Xuất bản",
     'AI Video Studio': "Studio Video AI",
     'Render Queue': "Hàng đợi kết xuất",
+    'Prompt Templates': "Mẫu prompt",
+    'AI Review Marketplace': "Chợ Review AI",
+    'AI Video Selling Automation': "Tự động bán hàng video",
+    'AI Social Posting': "Đăng bài xã hội AI",
+
+    'Facebook Control Hub': "Hub điều khiển Facebook",
+    'TikTok Automation': "Tự động hóa TikTok",
+    'YouTube Studio AI': "YouTube Studio AI",
+    'Zalo OA Manager': "Quản lý Zalo OA",
+    'Telegram Automation': "Tự động hóa Telegram",
+    'Instagram Boost Panel': "Bảng tăng tốc Instagram",
+    'Twitter/X Auto-Agent': "Agent tự động Twitter/X",
+
+    'Shopee Seller AI': "AI người bán Shopee",
+    'Lazada Seller AI': "AI người bán Lazada",
+    'Tiki Seller Center': "Trung tâm người bán Tiki",
+    'Amazon FBA Panel': "Bảng điều khiển Amazon FBA",
+    
     Connections: "Kết nối",
     Analytics: "Phân tích",
-    'API Docs': 'Tài liệu API',
-    'App Guide': 'Hướng dẫn',
     'GitHub Sync': 'Đồng bộ GitHub',
+    'API Docs': 'Tài liệu API',
+    
+    // Sidebar Groups
+    sidebar: {
+      group1: "Điều hướng chính",
+      group2: "Các module AI",
+      group3: "Mạng xã hội",
+      group4: "Thương mại điện tử",
+      group5: "Cài đặt hệ thống",
+    },
     
     // Header Clock
     headerClock: {
@@ -795,7 +891,7 @@ export const translations = {
         backupTooltip: "Lưu tất cả cài đặt kết nối của bạn vào một tệp JSON.",
         restoreTooltip: "Tải cài đặt kết nối từ một tệp JSON.",
         export: "Xuất JSON",
-        status: "Trạng thái",
+        // Fix: Removed duplicate 'status' key that was causing a JSON parsing error.
         actions: "Hành động",
         edit: "Sửa",
         delete: "Xóa",
@@ -886,8 +982,27 @@ export const translations = {
         // Types
         script: "Kịch bản",
         titles: "Tiêu đề",
-        description_type: "Mô tả",
+        description: "Mô tả",
         captions: "Phụ đề",
+        storyboard: "Bảng phân cảnh",
+        video_payload: "Payload Video",
+        comment: "Bình luận",
+        ab_test: "Thử nghiệm A/B",
+        analytics: "Phân tích",
+        voiceover: "Lồng tiếng",
+        // Template Names
+        template_names: {
+            '15s_video_script': "Kịch bản Video Bán hàng 15s",
+            'caption_hashtag': "Tạo Caption & Hashtag",
+            'product_description': "Mô tả Sản phẩm Ngắn",
+            'tts_voiceover': "Kịch bản Lồng tiếng TTS",
+            'short_subtitle': "Tạo Phụ đề Ngắn",
+            'storyboard_generator': "Tạo Bảng phân cảnh",
+            'video_ai_payload': "Payload cho Video AI",
+            'comment_responder': "Trả lời Bình luận",
+            'ab_test_generator': "Tạo Tiêu đề A/B Test",
+            'performance_analyzer': "Phân tích Hiệu suất",
+        }
     },
 
     // Facebook Token Manager
@@ -1040,6 +1155,21 @@ export const translations = {
       logError: "Lỗi đồng bộ {repo}: {error}",
       logAutoSync: "Quá trình tự động đồng bộ đã bắt đầu.",
       logAutoSyncComplete: "Chu kỳ tự động đồng bộ đã hoàn tất."
+    },
+
+    // Control Hub & Placeholder
+    controlHub: {
+        connectButton: "Kết nối Tài khoản (OAuth)",
+        disconnectButton: "Ngắt kết nối",
+        dataPanel: "Bảng Dữ liệu",
+        analysisModule: "Module Phân tích AI",
+        postingSchedule: "Lịch Đăng bài",
+        statistics: "Thống kê Dashboard",
+        autoRun: "Chạy Tự động",
+        description: "Kết nối tài khoản {platform} của bạn để bật tự động hóa, phân tích dữ liệu và đăng bài theo lịch.",
+    },
+    placeholder: {
+        underConstruction: "Trang này đang được xây dựng. Chức năng đầy đủ sẽ sớm có sẵn."
     }
   }
 };

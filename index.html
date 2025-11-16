@@ -10,39 +10,65 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body {
-            background-image: url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop');
-            background-size: cover;
-            background-attachment: fixed;
-            background-position: center;
+            background-color: #000;
+            color: #f0f8ff; /* AliceBlue */
+            font-family: 'Orbitron', sans-serif;
         }
         .glass-card {
-            background-color: rgba(26, 32, 44, 0.6);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background-color: rgba(10, 25, 47, 0.4);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(56, 189, 248, 0.15);
+            border-radius: 18px;
+            box-shadow: 0 0 5px rgba(56, 189, 248, 0.1),
+                        0 0 10px rgba(56, 189, 248, 0.1),
+                        0 0 20px rgba(56, 189, 248, 0.1),
+                        0 4px 30px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
         }
+        .glass-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            border-radius: 18px;
+            border: 2px solid transparent;
+            background: linear-gradient(45deg, rgba(56, 189, 248, 0.6), rgba(167, 139, 250, 0.6)) border-box;
+            -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: destination-out;
+            mask-composite: exclude;
+            animation: glow-pulse 5s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes glow-pulse {
+            0% { opacity: 0.7; }
+            50% { opacity: 1; }
+            100% { opacity: 0.7; }
+        }
+
         .table-row-highlight tr:hover, .list-item-highlight > div:hover, .list-item-highlight > li:hover {
-            background-color: rgba(60, 120, 255, 0.1);
+            background-color: rgba(60, 120, 255, 0.15);
             transition: background-color 0.2s ease-in-out;
         }
         .text-highlight {
-            color: #67e8f9; /* equivalent to cyan-300 */
+            color: #67e8f9;
         }
         .text-bright {
-            color: #f9fafb; /* equivalent to gray-50 */
+            color: #f9fafb;
         }
         .dropdown-glass {
-            background-color: rgba(30, 41, 59, 0.7); /* slate-800 with transparency */
+            background-color: rgba(30, 41, 59, 0.8);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(56, 189, 248, 0.2);
         }
         @keyframes spin {
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
         }
         .animate-spin-slow {
-            animation: spin 20s linear infinite;
+            animation: spin 60s linear infinite;
         }
     </style>
     <script>
