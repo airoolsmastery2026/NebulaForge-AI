@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { MenuIcon } from './Icons';
 import { useI18n } from '../hooks/useI18n';
 import { LanguageSwitcher } from './common/LanguageSwitcher';
@@ -6,8 +6,9 @@ import { HeaderClock } from './common/HeaderClock';
 import { isGeminiApiActive } from '../services/geminiService';
 import { useAppContext } from '../contexts/AppContext';
 import { getSupabaseClient } from '../services/supabaseClient';
-import { Users, Github, Cloud, CloudCheck, CloudX } from './LucideIcons';
+import { Users, Github, Cloud, CloudCheck, CloudX, Rocket } from './LucideIcons';
 import { Button } from './common/Button';
+import { getConnections } from '../services/apiService';
 
 interface HeaderProps {
     toggleSidebar: () => void;
@@ -67,6 +68,32 @@ const SystemStatusIndicator: React.FC = () => {
         </div>
     );
 };
+
+const DeployButton: React.FC = () => {
+    const { t } = useI18n();
+    const { isDeploying, deployApp } = useAppContext();
+    
+    // Memoize the check to avoid re-reading from localStorage on every render
+    const isVercelConfigured = useMemo(() => {
+        const connections = getConnections();
+        const hookUrl = connections?.vercel?.credentials?.DEPLOY_HOOK_URL;
+        return !!(hookUrl && hookUrl.startsWith('https://api.vercel.com'));
+    }, []);
+
+    return (
+        <Button 
+            size="sm" 
+            variant="secondary" 
+            onClick={deployApp} 
+            isLoading={isDeploying} 
+            disabled={!isVercelConfigured || isDeploying}
+            icon={<Rocket className="h-4 w-4" />}
+            title={isVercelConfigured ? t('header.deployTooltip') : t('header.deployDisabledTooltip')}
+        >
+            {isDeploying ? t('header.deploying') : t('header.deploy')}
+        </Button>
+    );
+}
 
 const UserProfile: React.FC = () => {
     const { session, login, logout, addNotification } = useAppContext();
@@ -129,6 +156,7 @@ export const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
 
             <div className="flex items-center space-x-4">
                 <SyncStatusIndicator />
+                <DeployButton />
                 <LanguageSwitcher />
                 <div className="h-8 w-px bg-gray-700" />
                 <UserProfile />

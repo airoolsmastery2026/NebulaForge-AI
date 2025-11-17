@@ -1,6 +1,7 @@
 import React, { createContext, useState, useCallback, useContext, useEffect } from 'react';
 import type { AppNotification, User, Session } from '../types';
 import { getSupabaseClient } from '../services/supabaseClient';
+import { triggerVercelDeploy } from '../services/deploymentService';
 
 type SyncStatus = 'idle' | 'syncing' | 'success' | 'error';
 
@@ -14,6 +15,8 @@ interface AppContextType {
     removeNotification: (id: number) => void;
     syncStatus: SyncStatus;
     setSyncStatus: (status: SyncStatus) => void;
+    isDeploying: boolean;
+    deployApp: () => Promise<void>;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -23,6 +26,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const [user, setUser] = useState<User | null>(null);
     const [notifications, setNotifications] = useState<AppNotification[]>([]);
     const [syncStatus, setSyncStatus] = useState<SyncStatus>('idle');
+    const [isDeploying, setIsDeploying] = useState(false);
+    
     // FIX: Explicitly initialize useRef with undefined to satisfy older/stricter type checkers that expect an argument.
     const syncStatusTimeoutRef = React.useRef<number | undefined>(undefined);
 
@@ -44,6 +49,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const removeNotification = useCallback((id: number) => {
         setNotifications(prev => prev.filter(n => n.id !== id));
     }, []);
+
+    const deployApp = useCallback(async () => {
+        setIsDeploying(true);
+        const result = await triggerVercelDeploy();
+        if (result.success) {
+            addNotification({ type: 'success', message: result.message });
+        } else {
+            addNotification({ type: 'error', message: result.message });
+        }
+        setIsDeploying(false);
+    }, [addNotification]);
 
     const setupAuthListener = useCallback(() => {
         const supabase = getSupabaseClient();
@@ -111,7 +127,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }, [addNotification]);
     
     return (
-        <AppContext.Provider value={{ session, user, login, logout, notifications, addNotification, removeNotification, syncStatus, setSyncStatus: handleSetSyncStatus }}>
+        <AppContext.Provider value={{ session, user, login, logout, notifications, addNotification, removeNotification, syncStatus, setSyncStatus: handleSetSyncStatus, isDeploying, deployApp }}>
             {children}
         </AppContext.Provider>
     );

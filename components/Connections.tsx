@@ -40,6 +40,7 @@ const platforms: Record<string, Platform> = {
     gemini: { id: "gemini", nameKey: "connections.gemini", icon: <PlatformLogo platformId="gemini" />, fields: [{name: 'API_KEY', type: 'password', helpTextKey: 'connections.help.API_KEY'}], docsUrl: 'https://ai.google.dev/gemini-api/docs/api-key' },
     supabase: { id: "supabase", nameKey: "connections.supabase", icon: <PlatformLogo platformId="supabase" />, fields: [{name: 'SUPABASE_URL', type: 'text', helpTextKey: 'connections.help.SUPABASE_URL'}, {name: 'SUPABASE_ANON_KEY', type: 'password', helpTextKey: 'connections.help.SUPABASE_ANON_KEY'}], docsUrl: 'https://supabase.com/dashboard/project/_/settings/api' },
     github: { id: "github", nameKey: "connections.github", icon: <PlatformLogo platformId="github" />, fields: [{name: 'PERSONAL_ACCESS_TOKEN', type: 'password', helpTextKey: 'connections.help.GITHUB_PAT'}, {name: 'REPOSITORY', type: 'text', helpTextKey: 'connections.help.GITHUB_REPO'}, {name: 'FILE_PATH', type: 'text', helpTextKey: 'connections.help.GITHUB_FILE_PATH'}], docsUrl: 'https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens' },
+    vercel: { id: "vercel", nameKey: "connections.vercel", icon: <PlatformLogo platformId="vercel" />, fields: [{name: 'DEPLOY_HOOK_URL', type: 'password', helpTextKey: 'connections.help.VERCEL_HOOK'}], docsUrl: 'https://vercel.com/docs/deployments/deploy-hooks' },
     youtube: { id: "youtube", nameKey: "connections.youtube", icon: <PlatformLogo platformId="youtube" />, fields: [{name: 'CLIENT_ID', type: 'text', helpTextKey: 'connections.help.CLIENT_ID'}, {name: 'CLIENT_SECRET', type: 'password', helpTextKey: 'connections.help.CLIENT_SECRET'}, {name: 'REDIRECT_URI', type: 'text', helpTextKey: 'connections.help.REDIRECT_URI'}], docsUrl: 'https://console.cloud.google.com/apis/credentials' },
     tiktok: { id: "tiktok", nameKey: "connections.tiktok", icon: <PlatformLogo platformId="tiktok" />, fields: [{name: 'CLIENT_KEY', type: 'text', helpTextKey: 'connections.help.CLIENT_KEY'}, {name: 'CLIENT_SECRET', type: 'password', helpTextKey: 'connections.help.CLIENT_SECRET'}, {name: 'ACCESS_TOKEN', type: 'password', helpTextKey: 'connections.help.ACCESS_TOKEN'}], docsUrl: 'https://developers.tiktok.com/documents/get-started' },
     instagram: { id: "instagram", nameKey: "connections.instagram", icon: <PlatformLogo platformId="instagram" />, fields: [{name: 'ACCESS_TOKEN', type: 'password', helpTextKey: 'connections.help.ACCESS_TOKEN'}], docsUrl: 'https://developers.facebook.com/docs/instagram-basic-display-api/getting-started' },
@@ -89,6 +90,10 @@ const platformCategories = [
     {
         nameKey: 'connections.category_data_sync',
         platforms: ['github', 'supabase', 'googledrive']
+    },
+    {
+        nameKey: 'connections.category_deployment',
+        platforms: ['vercel']
     },
     {
         nameKey: 'connections.category_social',

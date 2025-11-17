@@ -265,5 +265,10 @@ export const CloudX = (props: React.SVGProps<SVGSVGElement>) => (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/><path d="m10 10-4 4"/><path d="m14 10-4-4"/></svg>
 );
 
+export const Rocket = (props: React.SVGProps<SVGSVGElement>) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.3.09-3.1a2.08 2.08 0 0 1-.1-3.18C8.32 8.41 10.32 8 12 8c1.68 0 3.68.41 4.5 1.22a2.08 2.08 0 0 1-.1 3.18c-.6.8-.6 2.21.1 3.1.79.89 2.09 1 3.1.72 1.01-.28 2.32-.28 3.33 0 1.02.28 2.31.28 3.33 0 .71-.84.7-2.3.09-3.1a2.08 2.08 0 0 1-.1-3.18C20.32 8.41 18.32 8 16.5 8c-1.68 0-3.68.41-4.5 1.22a2.08 2.08 0 0 1-.1 3.18c-.6.8-.6 2.21.1 3.1.79.89 2.09 1 3.1.72 1.01-.28 2.32-.28 3.33 0 1.02.28 2.31.28 3.33 0 .71-.84.7-2.3.09-3.1a2.08 2.08 0 0 1-.1-3.18C16.32 8.41 14.32 8 12.5 8c-1.68 0-3.68.41-4.5 1.22a2.08 2.08 0 0 1-.1 3.18c-.6.8-.6 2.21.1 3.1.79.89 2.09 1 3.1.72 1.01-.28 2.32-.28 3.33 0 1.02.28 2.31.28 3.33 0M4.5 16.5l-3-3a2.08 2.08 0 0 1 0-2.92l3-3a2.08 2.08 0 0 1 2.92 0l3 3a2.08 2.08 0 0 1 0 2.92l-3 3a2.08 2.08 0 0 1-2.92 0z"/><path d="m14 14 6 6"/><path d="M12 8c.7 2.5 1.5 5 2.5 7.5"/><path d="M8.5 10.5c1 2.5 2 5 3 7.5"/><path d="M15 8.5C13.5 11 12 13.5 10.5 16"/></svg>
+);
+
+
 // Alias for Telegram
 export const Telegram = BotMessageSquare;

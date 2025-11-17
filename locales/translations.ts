@@ -71,6 +71,10 @@ export const translations = {
       statusInactive: "Core AI Inactive - API Key Required",
       startDemo: "Start Demo",
       demoActive: "Demo Active",
+      deploy: "Deploy",
+      deploying: "Deploying...",
+      deployTooltip: "Trigger a new deployment on Vercel.",
+      deployDisabledTooltip: "Configure Vercel Deploy Hook in Connections to enable.",
     },
 
     // Dashboard
@@ -333,6 +337,7 @@ export const translations = {
         category_affiliate: "Affiliate Marketing",
         category_crypto_financial: "Crypto & Financial",
         category_data_sync: "Data & Sync",
+        category_deployment: "Deployment & CI/CD",
 
         // Help Texts
         help: {
@@ -369,6 +374,7 @@ export const translations = {
             GITHUB_PAT: "Your Personal Access Token with 'repo' scope. Used for reading and writing app data.",
             GITHUB_REPO: "The full repository name, e.g., your-username/your-data-repo.",
             GITHUB_FILE_PATH: "Path to the data file within the repository, e.g., data.json or config/nebula-data.json.",
+            VERCEL_HOOK: "The unique URL for your Vercel Deploy Hook. Found in Project Settings > Git > Deploy Hooks."
         },
 
         // Platforms
@@ -415,6 +421,7 @@ export const translations = {
         spotify: "Spotify",
         linkedin: "LinkedIn",
         googledrive: "Google Drive",
+        vercel: "Vercel",
     },
     
     // Prompt Templates
@@ -656,6 +663,10 @@ export const translations = {
       statusInactive: "Lõi AI Tắt - Yêu cầu API Key",
       startDemo: "Bắt đầu Demo",
       demoActive: "Demo đang chạy",
+      deploy: "Triển khai",
+      deploying: "Đang triển khai...",
+      deployTooltip: "Kích hoạt một lần triển khai mới trên Vercel.",
+      deployDisabledTooltip: "Cấu hình Vercel Deploy Hook trong Kết nối để bật tính năng này.",
     },
     
     // Dashboard
@@ -917,6 +928,7 @@ export const translations = {
         category_affiliate: "Tiếp thị liên kết",
         category_crypto_financial: "Crypto & Tài chính",
         category_data_sync: "Dữ liệu & Đồng bộ",
+        category_deployment: "Triển khai & CI/CD",
         
         // Help Texts
         help: {
@@ -953,6 +965,7 @@ export const translations = {
             GITHUB_PAT: "Personal Access Token của bạn với quyền 'repo'. Dùng để đọc và ghi dữ liệu ứng dụng.",
             GITHUB_REPO: "Tên đầy đủ của repository, ví dụ: ten-cua-ban/repo-du-lieu-cua-ban.",
             GITHUB_FILE_PATH: "Đường dẫn đến tệp dữ liệu trong repository, ví dụ: data.json hoặc config/nebula-data.json.",
+            VERCEL_HOOK: "URL duy nhất cho Deploy Hook của Vercel. Tìm trong Cài đặt Dự án > Git > Deploy Hooks."
         },
 
         // Platforms
@@ -999,6 +1012,7 @@ export const translations = {
         spotify: "Spotify",
         linkedin: "LinkedIn",
         googledrive: "Google Drive",
+        vercel: "Vercel",
     },
     
     // Prompt Templates

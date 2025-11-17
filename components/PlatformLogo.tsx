@@ -295,6 +295,13 @@ const SupabaseLogo = (props: React.SVGProps<SVGSVGElement>) => (
     </svg>
 );
 
+const VercelLogo = (props: React.SVGProps<SVGSVGElement>) => (
+    <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" {...props}>
+      <title>Vercel Logo</title>
+      <path d="M12 2L2 22h20L12 2z"/>
+    </svg>
+);
+
 
 export const PlatformLogo: React.FC<{ platformId: string; className?: string }> = ({ platformId, className }) => {
     const props = { className: className || defaultProps.className };
@@ -339,6 +346,7 @@ export const PlatformLogo: React.FC<{ platformId: string; className?: string }> 
         case 'host123': return <Host123Logo {...props} />;
         case 'googledrive': return <GoogleDriveLogo {...props} />;
         case 'supabase': return <SupabaseLogo {...props} />;
+        case 'vercel': return <VercelLogo {...props} />;
         default: return null;
     }
 };
