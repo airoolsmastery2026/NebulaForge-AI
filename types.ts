@@ -35,10 +35,7 @@ export enum Page {
     // Group 5: System Settings
     CONNECTIONS = 'Connections', // Cài API / OAuth
     ANALYTICS = 'Analytics',
-    GITHUB_SYNC = 'GitHub Sync',
     API_DOCS = 'API Docs',
-    SUPABASE_GUIDE = 'Supabase Guide',
-    DEBUGGING_GUIDE = 'Debugging Guide',
 }
 
 

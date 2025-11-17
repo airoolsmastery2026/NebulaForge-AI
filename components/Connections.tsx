@@ -39,6 +39,7 @@ interface Platform {
 const platforms: Record<string, Platform> = {
     gemini: { id: "gemini", nameKey: "connections.gemini", icon: <PlatformLogo platformId="gemini" />, fields: [{name: 'API_KEY', type: 'password', helpTextKey: 'connections.help.API_KEY'}], docsUrl: 'https://ai.google.dev/gemini-api/docs/api-key' },
     supabase: { id: "supabase", nameKey: "connections.supabase", icon: <PlatformLogo platformId="supabase" />, fields: [{name: 'SUPABASE_URL', type: 'text', helpTextKey: 'connections.help.SUPABASE_URL'}, {name: 'SUPABASE_ANON_KEY', type: 'password', helpTextKey: 'connections.help.SUPABASE_ANON_KEY'}], docsUrl: 'https://supabase.com/dashboard/project/_/settings/api' },
+    github: { id: "github", nameKey: "connections.github", icon: <PlatformLogo platformId="github" />, fields: [{name: 'PERSONAL_ACCESS_TOKEN', type: 'password', helpTextKey: 'connections.help.GITHUB_PAT'}, {name: 'REPOSITORY', type: 'text', helpTextKey: 'connections.help.GITHUB_REPO'}, {name: 'FILE_PATH', type: 'text', helpTextKey: 'connections.help.GITHUB_FILE_PATH'}], docsUrl: 'https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens' },
     youtube: { id: "youtube", nameKey: "connections.youtube", icon: <PlatformLogo platformId="youtube" />, fields: [{name: 'CLIENT_ID', type: 'text', helpTextKey: 'connections.help.CLIENT_ID'}, {name: 'CLIENT_SECRET', type: 'password', helpTextKey: 'connections.help.CLIENT_SECRET'}, {name: 'REDIRECT_URI', type: 'text', helpTextKey: 'connections.help.REDIRECT_URI'}], docsUrl: 'https://console.cloud.google.com/apis/credentials' },
     tiktok: { id: "tiktok", nameKey: "connections.tiktok", icon: <PlatformLogo platformId="tiktok" />, fields: [{name: 'CLIENT_KEY', type: 'text', helpTextKey: 'connections.help.CLIENT_KEY'}, {name: 'CLIENT_SECRET', type: 'password', helpTextKey: 'connections.help.CLIENT_SECRET'}, {name: 'ACCESS_TOKEN', type: 'password', helpTextKey: 'connections.help.ACCESS_TOKEN'}], docsUrl: 'https://developers.tiktok.com/documents/get-started' },
     instagram: { id: "instagram", nameKey: "connections.instagram", icon: <PlatformLogo platformId="instagram" />, fields: [{name: 'ACCESS_TOKEN', type: 'password', helpTextKey: 'connections.help.ACCESS_TOKEN'}], docsUrl: 'https://developers.facebook.com/docs/instagram-basic-display-api/getting-started' },
@@ -74,7 +75,6 @@ const platforms: Record<string, Platform> = {
     twitter_affiliate: { id: "twitter_affiliate", nameKey: "connections.twitter_affiliate", icon: <PlatformLogo platformId="x_twitter" />, fields: [{name: 'CLIENT_ID', type: 'text', helpTextKey: 'connections.help.CLIENT_ID'}, {name: 'CLIENT_SECRET', type: 'password', helpTextKey: 'connections.help.CLIENT_SECRET'}, {name: 'REDIRECT_URI', type: 'text', helpTextKey: 'connections.help.REDIRECT_URI'}], docsUrl: 'https://ads.twitter.com/affiliate' },
     facebook_token_engine: { id: "facebook_token_engine", nameKey: "connections.facebook_token_engine", icon: <PlatformLogo platformId="facebook_token_engine" />, fields: [], docsUrl: 'https://developers.facebook.com/docs/facebook-login/access-tokens' },
     microsoft: { id: "microsoft", nameKey: "connections.microsoft", icon: <PlatformLogo platformId="microsoft" />, fields: [{name: 'AZURE_CLIENT_ID', type: 'text', helpTextKey: 'connections.help.AZURE_CLIENT_ID'}, {name: 'AZURE_CLIENT_SECRET', type: 'password', helpTextKey: 'connections.help.AZURE_CLIENT_SECRET'}], docsUrl: 'https://portal.azure.com/#view/Microsoft_AAD_RegisteredApps/ApplicationsListBlade' },
-    github: { id: "github", nameKey: "connections.github", icon: <PlatformLogo platformId="github" />, fields: [{name: 'CLIENT_ID', type: 'text', helpTextKey: 'connections.help.CLIENT_ID'}, {name: 'CLIENT_SECRET', type: 'password', helpTextKey: 'connections.help.CLIENT_SECRET'}], docsUrl: 'https://github.com/settings/developers' },
     discord: { id: "discord", nameKey: "connections.discord", icon: <PlatformLogo platformId="discord" />, fields: [{name: 'CLIENT_ID', type: 'text', helpTextKey: 'connections.help.CLIENT_ID'}, {name: 'CLIENT_SECRET', type: 'password', helpTextKey: 'connections.help.CLIENT_SECRET'}], docsUrl: 'https://discord.com/developers/applications' },
     spotify: { id: "spotify", nameKey: "connections.spotify", icon: <PlatformLogo platformId="spotify" />, fields: [{name: 'CLIENT_ID', type: 'text', helpTextKey: 'connections.help.CLIENT_ID'}, {name: 'CLIENT_SECRET', type: 'password', helpTextKey: 'connections.help.CLIENT_SECRET'}], docsUrl: 'https://developer.spotify.com/dashboard' },
     linkedin: { id: "linkedin", nameKey: "connections.linkedin", icon: <PlatformLogo platformId="linkedin" />, fields: [{name: 'CLIENT_ID', type: 'text', helpTextKey: 'connections.help.CLIENT_ID'}, {name: 'CLIENT_SECRET', type: 'password', helpTextKey: 'connections.help.CLIENT_SECRET'}], docsUrl: 'https://www.linkedin.com/developers/apps' },
@@ -87,12 +87,16 @@ const platformCategories = [
         platforms: ['gemini']
     },
     {
+        nameKey: 'connections.category_data_sync',
+        platforms: ['github', 'supabase', 'googledrive']
+    },
+    {
         nameKey: 'connections.category_social',
         platforms: ['facebook_token_engine', 'youtube', 'tiktok', 'instagram', 'x_twitter', 'pinterest', 'telegram', 'zalo', 'facebook_ads', 'tiktok_ads', 'youtube_partner', 'instagram_affiliate', 'twitter_affiliate']
     },
     {
         nameKey: 'connections.category_developer',
-        platforms: ['supabase', 'microsoft', 'github', 'discord', 'spotify', 'linkedin', 'googledrive']
+        platforms: ['microsoft', 'discord', 'spotify', 'linkedin']
     },
     {
         nameKey: 'connections.category_affiliate',

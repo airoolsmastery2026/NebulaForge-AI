@@ -24,19 +24,16 @@ const RenderQueue = lazy(() => import('./components/RenderQueue').then(m => ({ d
 const AppGuide = lazy(() => import('./components/AppGuide').then(m => ({ default: m.AppGuide })));
 const ApiDocs = lazy(() => import('./components/ApiDocs').then(m => ({ default: m.ApiDocs })));
 const AIVideoStudio = lazy(() => import('./components/AIVideoStudio').then(m => ({ default: m.AIVideoStudio })));
-const GitHubSync = lazy(() => import('./components/GitHubSync').then(m => ({ default: m.GitHubSync })));
 const ThreeScene = lazy(() => import('./components/ThreeScene').then(m => ({ default: m.ThreeScene })));
 const ControlHub = lazy(() => import('./components/ControlHub').then(m => ({ default: m.ControlHub })));
 const PlaceholderPage = lazy(() => import('./components/PlaceholderPage').then(m => ({ default: m.PlaceholderPage })));
-const SupabaseGuide = lazy(() => import('./components/SupabaseGuide').then(m => ({ default: m.SupabaseGuide })));
-const DebuggingGuide = lazy(() => import('./components/DebuggingGuide').then(m => ({ default: m.DebuggingGuide })));
 
 
 const AppContent: React.FC = () => {
-    const { addNotification } = useAppContext();
+    const { addNotification, setSyncStatus } = useAppContext();
     const [currentPage, setCurrentPage] = useState<Page>(Page.DASHBOARD);
     
-    // All major state is now loaded from and persisted to localStorage (Step 1)
+    // All major state is now loaded from and persisted
     const [products, setProducts] = useState<Product[]>([]);
     const [generatedContent, setGeneratedContent] = useState<Record<string, GeneratedContent>>({});
     const [videoIdeas, setVideoIdeas] = useState<VideoIdea[]>([]);
@@ -44,22 +41,53 @@ const AppContent: React.FC = () => {
     const [scheduledPosts, setScheduledPosts] = useState<ScheduledPost[]>([]);
     
     const [isSidebarOpen, setSidebarOpen] = useState(false);
+    const [isInitialLoading, setIsInitialLoading] = useState(true);
 
-    // Load initial state from storage
+    // Load initial state from storage (now async)
     useEffect(() => {
-        const data = getAppData();
-        setProducts(data.products || []);
-        setGeneratedContent(data.generatedContent || {});
-        setVideoIdeas(data.videoIdeas || []);
-        setRenderJobs(data.renderJobs || []);
-        setScheduledPosts(data.scheduledPosts || []);
-    }, []);
+        const loadInitialData = async () => {
+            setIsInitialLoading(true);
+            const { data, source } = await getAppData();
+            setProducts(data.products || []);
+            setGeneratedContent(data.generatedContent || {});
+            setVideoIdeas(data.videoIdeas || []);
+            setRenderJobs(data.renderJobs || []);
+            setScheduledPosts(data.scheduledPosts || []);
+            setIsInitialLoading(false);
+            addNotification({ type: 'info', message: `Data loaded from ${source}.` });
+        };
+        loadInitialData();
+    }, [addNotification]);
 
-    // Persist state whenever it changes
+    // Memoize app data to use as a stable dependency for the debounced save effect
+    const appData = useMemo(() => ({
+        products, generatedContent, videoIdeas, renderJobs, scheduledPosts
+    }), [products, generatedContent, videoIdeas, renderJobs, scheduledPosts]);
+
+    // Persist state whenever it changes (with debounce)
     useEffect(() => {
-        const appData = { products, generatedContent, videoIdeas, renderJobs, scheduledPosts };
-        saveAppData(appData);
-    }, [products, generatedContent, videoIdeas, renderJobs, scheduledPosts]);
+        if (isInitialLoading) return; // Don't save while initially loading
+
+        setSyncStatus('syncing');
+        const handler = setTimeout(async () => {
+            try {
+                const { source } = await saveAppData(appData);
+                setSyncStatus('success');
+                 if (source === 'github') {
+                    console.log('Successfully synced data to GitHub.');
+                }
+            } catch (error) {
+                setSyncStatus('error');
+                console.error("Failed to sync app data:", error);
+                const message = error instanceof Error ? error.message : 'An unknown error occurred.';
+                addNotification({ type: 'error', message: `GitHub Sync Failed: ${message}` });
+            }
+        }, 2000); // Debounce for 2 seconds
+
+        return () => {
+            clearTimeout(handler);
+        };
+    }, [appData, isInitialLoading, setSyncStatus, addNotification]);
 
     const addProduct = useCallback((newProduct: Product) => {
         setProducts(prev => {
@@ -144,6 +172,10 @@ const AppContent: React.FC = () => {
     }, [products, generatedContent]);
 
     const renderPage = () => {
+        if (isInitialLoading) {
+            return <PageLoader />;
+        }
+
         switch (currentPage) {
             case Page.DASHBOARD:
                 return <Dashboard videoIdeas={videoIdeas} renderJobs={renderJobs} setCurrentPage={setCurrentPage} />;
@@ -172,16 +204,10 @@ const AppContent: React.FC = () => {
                 return <RenderQueue jobs={renderJobs} setJobs={setRenderJobs} />;
             case Page.CONNECTIONS:
                 return <Connections setCurrentPage={setCurrentPage} />;
-            case Page.GITHUB_SYNC:
-                return <GitHubSync />;
             case Page.ANALYTICS:
                 return <Analytics />;
             case Page.API_DOCS:
                 return <ApiDocs />;
-            case Page.SUPABASE_GUIDE:
-                return <SupabaseGuide />;
-            case Page.DEBUGGING_GUIDE:
-                return <DebuggingGuide />;
             case Page.APP_GUIDE:
                 return <AppGuide />;
             case Page.FACEBOOK_HUB: return <ControlHub platform="Facebook" />;

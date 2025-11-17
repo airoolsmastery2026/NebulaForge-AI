@@ -6,12 +6,32 @@ import { HeaderClock } from './common/HeaderClock';
 import { isGeminiApiActive } from '../services/geminiService';
 import { useAppContext } from '../contexts/AppContext';
 import { getSupabaseClient } from '../services/supabaseClient';
-import { Users, Github } from './LucideIcons';
+import { Users, Github, Cloud, CloudCheck, CloudX } from './LucideIcons';
 import { Button } from './common/Button';
 
 interface HeaderProps {
     toggleSidebar: () => void;
 }
+
+const SyncStatusIndicator: React.FC = () => {
+    const { syncStatus } = useAppContext();
+    const { t } = useI18n();
+
+    const statusMap = {
+        idle: { Icon: CloudCheck, color: 'text-gray-500', title: 'Data saved locally.' },
+        syncing: { Icon: Cloud, color: 'text-blue-400 animate-pulse', title: 'Syncing data with GitHub...' },
+        success: { Icon: CloudCheck, color: 'text-green-400', title: 'Data successfully synced to GitHub.' },
+        error: { Icon: CloudX, color: 'text-red-400', title: 'Failed to sync data with GitHub.' },
+    };
+
+    const { Icon, color, title } = statusMap[syncStatus];
+
+    return (
+        <div title={title}>
+            <Icon className={`w-5 h-5 transition-colors ${color}`} />
+        </div>
+    );
+};
 
 const SystemStatusIndicator: React.FC = () => {
     const { t } = useI18n();
@@ -108,6 +128,7 @@ export const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
             </div>
 
             <div className="flex items-center space-x-4">
+                <SyncStatusIndicator />
                 <LanguageSwitcher />
                 <div className="h-8 w-px bg-gray-700" />
                 <UserProfile />

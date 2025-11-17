@@ -2,6 +2,8 @@ import React, { createContext, useState, useCallback, useContext, useEffect } fr
 import type { AppNotification, User, Session } from '../types';
 import { getSupabaseClient } from '../services/supabaseClient';
 
+type SyncStatus = 'idle' | 'syncing' | 'success' | 'error';
+
 interface AppContextType {
     session: Session | null;
     user: User | null;
@@ -10,6 +12,8 @@ interface AppContextType {
     notifications: AppNotification[];
     addNotification: (notification: Omit<AppNotification, 'id'>) => void;
     removeNotification: (id: number) => void;
+    syncStatus: SyncStatus;
+    setSyncStatus: (status: SyncStatus) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -18,6 +22,19 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const [session, setSession] = useState<Session | null>(null);
     const [user, setUser] = useState<User | null>(null);
     const [notifications, setNotifications] = useState<AppNotification[]>([]);
+    const [syncStatus, setSyncStatus] = useState<SyncStatus>('idle');
+    // FIX: Explicitly initialize useRef with undefined to satisfy older/stricter type checkers that expect an argument.
+    const syncStatusTimeoutRef = React.useRef<number | undefined>(undefined);
+
+    const handleSetSyncStatus = useCallback((status: SyncStatus) => {
+        setSyncStatus(status);
+        clearTimeout(syncStatusTimeoutRef.current);
+        if (status === 'success' || status === 'error') {
+            syncStatusTimeoutRef.current = window.setTimeout(() => {
+                setSyncStatus('idle');
+            }, 3000);
+        }
+    }, []);
 
     const addNotification = useCallback((notification: Omit<AppNotification, 'id'>) => {
         const id = Date.now();
@@ -64,6 +81,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         return () => {
             unsubscribe();
             window.removeEventListener('storage', handleStorageChange);
+            clearTimeout(syncStatusTimeoutRef.current);
         };
     }, [setupAuthListener]);
 
@@ -93,7 +111,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }, [addNotification]);
     
     return (
-        <AppContext.Provider value={{ session, user, login, logout, notifications, addNotification, removeNotification }}>
+        <AppContext.Provider value={{ session, user, login, logout, notifications, addNotification, removeNotification, syncStatus, setSyncStatus: handleSetSyncStatus }}>
             {children}
         </AppContext.Provider>
     );

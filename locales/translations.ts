@@ -39,10 +39,7 @@ export const translations = {
     
     Connections: "Connections",
     Analytics: "Analytics",
-    'GitHub Sync': 'GitHub Sync',
     'API Docs': 'API Docs',
-    'Supabase Guide': 'Supabase Guide',
-    'Debugging Guide': 'Debugging Guide',
     
     // Sidebar Groups
     sidebar: {
@@ -335,6 +332,7 @@ export const translations = {
         category_developer: "Developer Platforms",
         category_affiliate: "Affiliate Marketing",
         category_crypto_financial: "Crypto & Financial",
+        category_data_sync: "Data & Sync",
 
         // Help Texts
         help: {
@@ -357,7 +355,6 @@ export const translations = {
             AFFILIATE_ID: "Your unique affiliate identifier.",
             EMAIL: "The email address associated with your API account.",
             PERSONAL_ACCESS_TOKEN: "Your Personal Access Token (PAT) for API access.",
-            PARTNER_ID: "Your Partner ID for the platform's API.",
             BOT_TOKEN: "The token for your Telegram Bot from BotFather.",
             APP_KEY: "The App Key from your app in the developer console.",
             PARTNER_CODE: "Your Partner Code for the API.",
@@ -369,6 +366,9 @@ export const translations = {
             AZURE_CLIENT_SECRET: "The Client Secret from your Azure App Registration.",
             SUPABASE_URL: "The unique URL for your Supabase project's API. Found in Project Settings > API.",
             SUPABASE_ANON_KEY: "The public anonymous key for your Supabase project. Safe for client-side use. Found in Project Settings > API.",
+            GITHUB_PAT: "Your Personal Access Token with 'repo' scope. Used for reading and writing app data.",
+            GITHUB_REPO: "The full repository name, e.g., your-username/your-data-repo.",
+            GITHUB_FILE_PATH: "Path to the data file within the repository, e.g., data.json or config/nebula-data.json.",
         },
 
         // Platforms
@@ -410,7 +410,7 @@ export const translations = {
         twitter_affiliate: "Twitter Affiliate",
         facebook_token_engine: "Facebook Token Engine",
         microsoft: "Microsoft Azure",
-        github: "GitHub",
+        github: "GitHub Sync",
         discord: "Discord",
         spotify: "Spotify",
         linkedin: "LinkedIn",
@@ -564,52 +564,6 @@ export const translations = {
       analytics_title: "Analytics",
       analytics_content: "Measure your success and optimize your strategy. The Analytics page provides detailed charts and data on your channel's performance, including views over time, affiliate revenue from different products, and a breakdown of engagement metrics across all connected platforms.",
     },
-
-    // GitHub Sync
-    githubSync: {
-      title: "GitHub Sync & Backup",
-      description: "Automatically keep local directories in sync with your GitHub repositories.",
-      configTitle: "Configuration",
-      configDescription: "Set up your GitHub token and local path. This is stored only in your browser.",
-      patLabel: "GitHub Personal Access Token (PAT)",
-      patPlaceholder: "ghp_...",
-      patHelp: "A PAT is required to access private repos and avoid rate limits. Create one with 'repo' scope.",
-      getPat: "Get a PAT",
-      pathLabel: "Local Backup Path",
-      pathPlaceholder: "e.g., /Users/user/Documents/GitHub-Backups",
-      pathHelp: "The root folder on your local machine where repositories will be cloned.",
-      reposTitle: "Tracked Repositories",
-      reposDescription: "Add repositories to keep them synchronized.",
-      addRepoLabel: "Add New Repository",
-      addRepoPlaceholder: "username/repository-name",
-      addRepoButton: "Add",
-      syncAllButton: "Sync All",
-      autoSyncLabel: "Auto-Sync Every 5 Minutes",
-      repo: "Repository",
-      status: "Status",
-      lastSync: "Last Sync",
-      actions: "Actions",
-      sync: "Sync",
-      remove: "Remove",
-      activityTitle: "Activity Log",
-      activityDescription: "Live feed of all synchronization activities.",
-      never: "Never",
-      // Statuses
-      synced: "Synced",
-      pending: "Pending",
-      syncing: "Syncing...",
-      error: "Error",
-      cloning: "Cloning...",
-      // Logs
-      logCloning: "Cloning repository {repo}...",
-      logCloneSuccess: "Successfully cloned {repo}.",
-      logPulling: "Pulling latest changes for {repo}...",
-      logPullSuccess: "Successfully synced {repo}.",
-      logError: "Error syncing {repo}: {error}",
-      logAutoSync: "Auto-sync process started.",
-      logAutoSyncComplete: "Auto-sync cycle completed."
-    },
-
      // Control Hub & Placeholder
     controlHub: {
         connectButton: "Connect Account (OAuth)",
@@ -628,210 +582,7 @@ export const translations = {
       quality: "Quality",
       fast: "Fast",
       hq: "High Quality"
-    },
-    // Supabase Guide
-    supabaseGuide: {
-        title: "Supabase Integration Guide for 'bachken' Backend",
-        description: "A comprehensive guide to connect, secure, and build with Supabase.",
-        
-        prompt1_title: "1. Project Info & Connection Keys",
-        prompt1_desc: "First, let's get your Supabase project credentials. Navigate to your project's API settings to find these values.",
-        prompt1_step1: "Navigate to API Settings",
-        prompt1_step2: "In your Supabase Dashboard, go to `Project Settings` > `API`.",
-        prompt1_step3: "Find your credentials in the `Project API keys` section.",
-        prompt1_table_key: "Key",
-        prompt1_table_purpose: "Purpose & Usage",
-        prompt1_table_security: "Security Level",
-        prompt1_url: "Project URL",
-        prompt1_url_desc: "The unique URL for your project's API endpoint.",
-        prompt1_url_sec: "Public",
-        prompt1_anon: "Public `anon` Key",
-        prompt1_anon_desc: "This key is safe to use in a browser or client-side application. It respects your Row Level Security (RLS) policies.",
-        prompt1_anon_sec: "Public (Frontend)",
-        prompt1_service: "Secret `service_role` Key",
-        prompt1_service_desc: "This key bypasses all RLS policies. It should only be used on a secure backend server ('bachken'). Never expose it on the client-side.",
-        prompt1_service_sec: "SECRET (Backend 'bachken' ONLY)",
-
-        prompt2_title: "2. Backend 'bachken' Connection",
-        prompt2_desc: "Here's how to connect your backend to Supabase using the credentials you just found.",
-        prompt2_nodejs: "Node.js",
-        prompt2_nextjs: "Next.js",
-        prompt2_python: "Python",
-        prompt2_env_file: ".env File",
-        prompt2_client_file: "Supabase Client File",
-        prompt2_usage_example: "Usage Example",
-        prompt2_key_comparison: "Key Usage Comparison",
-        prompt2_table_key_type: "Key Type",
-        prompt2_table_use_case: "When to Use",
-        prompt2_table_example: "Example",
-        prompt2_anon_use: "Frontend or backend where RLS should be enforced.",
-        prompt2_anon_example: "Fetching public data, user-specific data after login.",
-        prompt2_service_use: "Backend 'bachken' ONLY, for administrative tasks or when bypassing RLS is required.",
-        prompt2_service_example: "Server-side data migration, cron jobs, admin panels.",
-
-        prompt3_title: "3. Database & RLS Policies",
-        prompt3_desc: "Row Level Security (RLS) is essential for protecting your data. Here’s how to set it up.",
-        prompt3_enable_rls: "Enable RLS for a Table",
-        prompt3_enable_rls_desc: "Run this SQL command in the Supabase SQL Editor to enable RLS on a table named `items`.",
-        prompt3_policies: "Create Policies",
-        prompt3_policies_desc: "Policies are rules that control data access. Here are some examples for the `items` table.",
-        prompt3_select_policy: "SELECT (Read) Policy",
-        prompt3_select_desc: "Allow any authenticated user to read all items.",
-        prompt3_insert_policy: "INSERT (Create) Policy",
-        prompt3_insert_desc: "Allow an authenticated user to insert items only if the `user_id` column matches their own ID.",
-        prompt3_update_policy: "UPDATE Policy",
-        prompt3_update_desc: "Allow a user to update an item only if they are the owner.",
-        prompt3_delete_policy: "DELETE Policy",
-        prompt3_delete_desc: "Allow a user to delete an item only if they are the owner.",
-        prompt3_jwt: "JWT Verification in Backend",
-        prompt3_jwt_desc: "When a user makes a request from the frontend, they send a JWT. Your backend 'bachken' should validate this token to identify the user before performing any action.",
-
-        prompt4_title: "4. Building the REST API",
-        prompt4_desc: "Let's create a standard CRUD REST API for an `items` table in your 'bachken' backend.",
-        prompt4_token_security: "Token Security Best Practice",
-        prompt4_token_security_desc: "Always pass the user's JWT from the client to the backend in the `Authorization` header as a Bearer token. The backend then uses this token to initialize the Supabase client for that specific request, ensuring RLS policies are applied correctly.",
-        prompt4_testing: "Testing with cURL",
-        prompt4_testing_desc: "Replace `YOUR_API_URL`, `YOUR_JWT`, and `ITEM_ID` with your actual values.",
-
-        prompt5_title: "5. Security & Optimization Checklist",
-        prompt5_desc: "A final checklist to ensure your 'bachken' backend and Supabase integration are secure and performant.",
-        prompt5_table_item: "Check Item",
-        prompt5_table_status: "Status",
-        prompt5_table_action: "Action if Failed",
-        prompt5_api: "API Functionality",
-        prompt5_api_action: "Test all CRUD endpoints with Postman or cURL.",
-        prompt5_token: "No Token Leakage",
-        prompt5_token_action: "Ensure `service_role` key is only in backend environment variables, never in client code.",
-        prompt5_rls: "RLS Enabled",
-        prompt5_rls_action: "Go to `Authentication` > `Policies` in Supabase and verify RLS is enabled on all tables with sensitive data.",
-        prompt5_policy: "Policies are Correct",
-        prompt5_policy_action: "Review each policy. Test access with different user roles.",
-        prompt5_log: "Backend Logging",
-        prompt5_log_action: "Implement a logging library (like Winston for Node.js) to record requests and errors.",
-        prompt5_connection: "Stable Connection",
-        prompt5_connection_action: "Use connection pooling if your backend has high traffic.",
-        prompt5_deploy: "Deployment Process",
-        prompt5_deploy_action: "Use environment variables for Supabase keys in your hosting provider (Vercel, Render, etc.).",
-        prompt5_index: "Database Indexes",
-        prompt5_index_action: "Add indexes to columns that are frequently used in `WHERE` clauses to speed up queries.",
-        prompt5_backup: "Backup & Recovery",
-        prompt5_backup_action: "Enable Point-in-Time Recovery (PITR) in Supabase for paid plans. Schedule regular backups.",
-    },
-    // Debugging Guide
-    debuggingGuide: {
-      title: "Debugging Guide: 'Failed to load the app'",
-      description: "A comprehensive guide to diagnosing and fixing the 'white screen' error in web applications.",
-      
-      stepByStepTitle: "1. Step-by-Step Debugging Process",
-      step1_title: "Step 1: Check Browser DevTools (Console)",
-      step1_desc: "This is your first line of defense. Open DevTools (F12 or Ctrl+Shift+I) and look at the `Console` tab for red error messages.",
-      step1_tip1: "<strong>Hydration Error:</strong> Look for `Warning: An error occurred during hydration...` This means the UI rendered on the server is different from the initial render on the client. Common cause: using `new Date()` or `Math.random()` directly in component render logic. Fix: Move such code into a `useEffect` hook to ensure it only runs on the client.",
-      step1_tip2: "<strong>Null/Undefined Crash:</strong> Look for `TypeError: Cannot read properties of undefined (reading 'map')`. This means you're trying to use data that hasn't loaded yet. Fix: Add conditional rendering (`data && <Component />`) or optional chaining (`data?.property`).",
-      
-      step2_title: "Step 2: Check Browser DevTools (Network)",
-      step2_desc: "Switch to the `Network` tab and reload the page (Ctrl+R). Look for items in red.",
-      step2_tip1: "<strong>JS Bundle Failed (404):</strong> If files like `_next/static/chunks/app/page-....js` are red with a 404 status, your Vercel deployment is likely broken or corrupted. A redeploy is necessary.",
-      step2_tip2: "<strong>API Call Failed (500):</strong> If a request to your API (e.g., `/api/products`) fails with a 500 status, the server-side code crashed. Check the Vercel Function logs for that specific API route.",
-      
-      step3_title: "Step 3: Check Vercel Build Logs",
-      step3_desc: "Go to your project dashboard on Vercel, navigate to the 'Deployments' tab, and click on the latest deployment. Review the 'Building' logs.",
-      step3_tip1: "Look for any lines that start with `Error:`. This could be a TypeScript error, a missing dependency, or a syntax error that only fails during the production build (`npm run build`).",
-      
-      step4_title: "Step 4: Check Vercel Runtime Logs",
-      step4_desc: "In your Vercel project dashboard, go to the 'Functions' tab. If your app uses Server Components, API routes, or middleware, any crashes will be logged here.",
-      step4_tip1: "This is where you'll find errors related to missing environment variables on the server, or code in a Server Component trying to access browser-only APIs like `window`.",
-      
-      quickFixesTitle: "2. Quick Test Commands & Fallback UI",
-      build_command_title: "Run a Production Build Locally",
-      build_command_desc: "This command often reveals errors that are missed in development mode (`npm run dev`).",
-      fallback_ui_title: "Create a Fallback UI",
-      fallback_ui_desc: "To prevent a total white screen crash, wrap your components in an `ErrorBoundary`. This app already includes one in `App.tsx`. It will catch rendering errors and display a friendly message instead of a blank page.",
-      
-      vercelErrorsTitle: "3. Top 20 Common Next.js Vercel Deployment Errors",
-      error: "Error",
-      cause: "Cause",
-      fix: "Fix",
-
-      err1_title: "Missing Environment Variables",
-      err1_cause: "`.env.local` file is not uploaded to Vercel. Variables needed by the server (e.g., database connection string) are missing.",
-      err1_fix: "Go to Vercel Project Settings > Environment Variables. Add all required variables from your `.env.local` file.",
-
-      err2_title: "Missing `NEXT_PUBLIC_` prefix",
-      err2_cause: "Client-side code tries to access an environment variable that doesn't start with `NEXT_PUBLIC_`.",
-      err2_fix: "Prefix the variable name with `NEXT_PUBLIC_` (e.g., `NEXT_PUBLIC_API_URL`) in both your `.env.local` file and Vercel settings.",
-
-      err3_title: "Build Fails on Vercel, Works Locally",
-      err3_cause: "Mismatched Node.js versions, dependency issues (try deleting `node_modules` and `package-lock.json` and reinstalling), or case-sensitivity differences between your OS and Vercel's Linux environment.",
-      err3_fix: "Set the Node.js version in Vercel Project Settings > General. Ensure file import paths match case exactly (e.g., `./Component` vs `./component`).",
-
-      err4_title: "Using Browser-only APIs in Server Components",
-      err4_cause: "Code in a Server Component (default in App Router), `getStaticProps`, or `getServerSideProps` uses `window`, `document`, or other browser APIs.",
-      err4_fix: "Move the component/code using these APIs into a client component by adding `'use client';` at the top of the file, or place the code inside a `useEffect` hook.",
-
-      err5_title: "`next/image` Domain Not Configured",
-      err5_cause: "Using an external URL in `<Image>` without adding the hostname to `next.config.js`.",
-      err5_fix: "Add the image hostname to `images.remotePatterns` in your `next.config.js` file.",
-
-      err6_title: "Serverless Function Timeout",
-      err6_cause: "A data fetching operation or API route takes longer than the allowed execution time (e.g., 10s on Hobby plan).",
-      err6_fix: "Optimize your database query or API call. For long-running tasks, consider background jobs or switching to a Vercel Pro plan to increase the timeout.",
-
-      err7_title: "Incorrect Output Directory",
-      err7_cause: "Vercel's 'Output Directory' setting is not set to `.next` (the default for Next.js).",
-      err7_fix: "In Vercel Project Settings > General, ensure 'Output Directory' is either blank or set to `.next`.",
-
-      err8_title: "Hydration Mismatch Error",
-      err8_cause: "The HTML rendered on the server does not match the initial HTML rendered on the client.",
-      err8_fix: "Avoid using browser-dependent values (like `window.innerWidth` or `new Date()`) during the initial render. Use `useEffect` to set state after the component has mounted.",
-
-      err9_title: "Middleware Crash",
-      err9_cause: "The `middleware.ts` file has an error, blocking all incoming requests.",
-      err9_fix: "Wrap middleware logic in `try...catch` blocks and check Vercel's Edge Function logs for errors.",
-
-      err10_title: "`dynamic()` Import Fails",
-      err10_cause: "A dynamically imported component is not compatible with SSR.",
-      err10_fix: "When using `dynamic()`, specify `ssr: false` if the component relies on browser APIs: `dynamic(() => import('../components/MyMap'), { ssr: false })`.",
-      
-      err11_title: "JS Bundle 404/Corrupted",
-      err11_cause: "A previous deployment failed midway, leaving inconsistent files. A browser or CDN cache might be serving old, invalid files.",
-      err11_fix: "Redeploy the project on Vercel. Clear your browser cache or try in incognito mode.",
-      
-      err12_title: "API Route 500 Error",
-      err12_cause: "An unhandled exception occurred in your server-side API route code.",
-      err12_fix: "Check the Vercel Function logs for the specific API route. Wrap your API logic in a `try...catch` block to return a proper JSON error response instead of crashing.",
-      
-      err13_title: "File Path Case Sensitivity",
-      err13_cause: "Importing a file with the wrong case (e.g., `import C from './component'` when the file is `Component.tsx`). Works on Windows/macOS but fails on Linux (Vercel).",
-      err13_fix: "Ensure the case in your `import` statements exactly matches the file and folder names.",
-      
-      err14_title: "Data Fetching Failure in SSG/SSR",
-      err14_cause: "An API call in `getStaticProps` or `getServerSideProps` fails during the build or request time.",
-      err14_fix: "Ensure your data fetching functions are robust, handle errors gracefully, and that any required API keys are available as environment variables.",
-      
-      err15_title: "Memory Limit Exceeded",
-      err15_cause: "A Serverless Function uses more memory than the allocated limit (e.g., 1GB on Hobby plan), often from processing large files or data sets.",
-      err15_fix: "Optimize your function to be more memory-efficient. Process data in streams or upgrade to a Vercel Pro plan for higher memory limits.",
-      
-      err16_title: "`postinstall` Script Failure",
-      err16_cause: "A command in your `package.json`'s `postinstall` script (like `prisma generate`) fails on Vercel's build environment.",
-      err16_fix: "Check the build logs for errors in the `postinstall` step. Ensure all required dependencies and environment variables for the script are available.",
-      
-      err17_title: "Incorrect `next.config.js`",
-      err17_cause: "A syntax error or invalid configuration in `next.config.js` causes the build to fail.",
-      err17_fix: "Double-check the `next.config.js` file for errors. Run `npm run build` locally to validate it.",
-      
-      err18_title: "Top-level `await` in Non-Async Component",
-      err18_cause: "Using `await` directly in the body of a React component that is not an Async Server Component.",
-      err18_fix: "Move data fetching with `await` into a `useEffect` hook, or convert the component to an Async Server Component if using the App Router.",
-      
-      err19_title: "Static Asset Path Issues",
-      err19_cause: "Referencing files in the `public` directory with an incorrect path (e.g., `../public/img.png` instead of `/img.png`).",
-      err19_fix: "Always reference files in the `public` directory from the root, starting with a `/`.",
-      
-      err20_title: "Font Optimization Failure",
-      err20_cause: "Next.js fails to fetch or process a font from Google Fonts during the build, often due to network issues on the build server.",
-      err20_fix: "Try redeploying. If the issue persists, consider self-hosting the font files within your `public` directory.",
-    },
+    }
   },
   vi: {
     // General
@@ -873,10 +624,7 @@ export const translations = {
     
     Connections: "Kết nối",
     Analytics: "Phân tích",
-    'GitHub Sync': 'Đồng bộ GitHub',
     'API Docs': 'Tài liệu API',
-    'Supabase Guide': 'Hướng dẫn Supabase',
-    'Debugging Guide': 'Hướng dẫn Gỡ lỗi',
     
     // Sidebar Groups
     sidebar: {
@@ -1168,6 +916,7 @@ export const translations = {
         category_developer: "Nền tảng Nhà phát triển",
         category_affiliate: "Tiếp thị liên kết",
         category_crypto_financial: "Crypto & Tài chính",
+        category_data_sync: "Dữ liệu & Đồng bộ",
         
         // Help Texts
         help: {
@@ -1190,7 +939,6 @@ export const translations = {
             AFFILIATE_ID: "Mã định danh liên kết duy nhất của bạn.",
             EMAIL: "Địa chỉ email được liên kết với tài khoản API của bạn.",
             PERSONAL_ACCESS_TOKEN: "Personal Access Token (PAT) của bạn để truy cập API.",
-            PARTNER_ID: "Partner ID của bạn cho API của nền tảng.",
             BOT_TOKEN: "Token cho Bot Telegram của bạn từ BotFather.",
             APP_KEY: "App Key từ ứng dụng của bạn trong bảng điều khiển nhà phát triển.",
             PARTNER_CODE: "Mã Đối tác của bạn cho API.",
@@ -1202,6 +950,9 @@ export const translations = {
             AZURE_CLIENT_SECRET: "Client Secret từ Azure App Registration của bạn.",
             SUPABASE_URL: "URL duy nhất cho API của dự án Supabase. Tìm thấy trong Cài đặt Dự án > API.",
             SUPABASE_ANON_KEY: "Khóa công khai (anon) cho dự án Supabase. An toàn để sử dụng phía client. Tìm thấy trong Cài đặt Dự án > API.",
+            GITHUB_PAT: "Personal Access Token của bạn với quyền 'repo'. Dùng để đọc và ghi dữ liệu ứng dụng.",
+            GITHUB_REPO: "Tên đầy đủ của repository, ví dụ: ten-cua-ban/repo-du-lieu-cua-ban.",
+            GITHUB_FILE_PATH: "Đường dẫn đến tệp dữ liệu trong repository, ví dụ: data.json hoặc config/nebula-data.json.",
         },
 
         // Platforms
@@ -1243,7 +994,7 @@ export const translations = {
         twitter_affiliate: "Twitter Affiliate",
         facebook_token_engine: "Công cụ Token Facebook",
         microsoft: "Microsoft Azure",
-        github: "GitHub",
+        github: "Đồng bộ GitHub",
         discord: "Discord",
         spotify: "Spotify",
         linkedin: "LinkedIn",
@@ -1398,51 +1149,6 @@ export const translations = {
       analytics_content: "Đo lường thành công và tối ưu hóa chiến lược của bạn. Trang Phân tích cung cấp các biểu đồ và dữ liệu chi tiết về hiệu suất của kênh bạn, bao gồm lượt xem theo thời gian, doanh thu liên kết từ các sản phẩm khác nhau và phân tích chi tiết các chỉ số tương tác trên tất cả các nền tảng đã kết nối.",
     },
 
-    // GitHub Sync
-    githubSync: {
-      title: "Đồng bộ & Sao lưu GitHub",
-      description: "Tự động giữ các thư mục cục bộ đồng bộ với kho lưu trữ GitHub của bạn.",
-      configTitle: "Cấu hình",
-      configDescription: "Thiết lập token GitHub và đường dẫn cục bộ. Thông tin này chỉ được lưu trữ trong trình duyệt của bạn.",
-      patLabel: "GitHub Personal Access Token (PAT)",
-      patPlaceholder: "ghp_...",
-      patHelp: "Cần có PAT để truy cập các repo riêng tư và tránh giới hạn tốc độ. Tạo một token với phạm vi 'repo'.",
-      getPat: "Lấy PAT",
-      pathLabel: "Đường dẫn Sao lưu Cục bộ",
-      pathPlaceholder: "ví dụ: /Users/user/Documents/GitHub-Backups",
-      pathHelp: "Thư mục gốc trên máy tính của bạn nơi các kho lưu trữ sẽ được nhân bản.",
-      reposTitle: "Các kho lưu trữ được theo dõi",
-      reposDescription: "Thêm các kho lưu trữ để giữ chúng được đồng bộ hóa.",
-      addRepoLabel: "Thêm Kho lưu trữ mới",
-      addRepoPlaceholder: "tên-người-dùng/tên-kho-lưu-trữ",
-      addRepoButton: "Thêm",
-      syncAllButton: "Đồng bộ tất cả",
-      autoSyncLabel: "Tự động đồng bộ mỗi 5 phút",
-      repo: "Kho lưu trữ",
-      status: "Trạng thái",
-      lastSync: "Lần đồng bộ cuối",
-      actions: "Hành động",
-      sync: "Đồng bộ",
-      remove: "Xóa",
-      activityTitle: "Nhật ký Hoạt động",
-      activityDescription: "Luồng trực tiếp của tất cả các hoạt động đồng bộ hóa.",
-      never: "Chưa bao giờ",
-      // Statuses
-      synced: "Đã đồng bộ",
-      pending: "Đang chờ",
-      syncing: "Đang đồng bộ...",
-      error: "Lỗi",
-      cloning: "Đang nhân bản...",
-      // Logs
-      logCloning: "Đang nhân bản kho lưu trữ {repo}...",
-      logCloneSuccess: "Đã nhân bản thành công {repo}.",
-      logPulling: "Đang kéo các thay đổi mới nhất cho {repo}...",
-      logPullSuccess: "Đã đồng bộ thành công {repo}.",
-      logError: "Lỗi đồng bộ {repo}: {error}",
-      logAutoSync: "Quá trình tự động đồng bộ đã bắt đầu.",
-      logAutoSyncComplete: "Chu kỳ tự động đồng bộ đã hoàn tất."
-    },
-
     // Control Hub & Placeholder
     controlHub: {
         connectButton: "Kết nối Tài khoản (OAuth)",
@@ -1461,209 +1167,6 @@ export const translations = {
       quality: "Chất lượng",
       fast: "Nhanh",
       hq: "Chất lượng cao"
-    },
-    // Supabase Guide
-    supabaseGuide: {
-        title: "Hướng dẫn Tích hợp Supabase cho Backend 'bachken'",
-        description: "Hướng dẫn toàn diện để kết nối, bảo mật và xây dựng với Supabase.",
-        
-        prompt1_title: "1. Thông tin Project & Khóa Kết nối",
-        prompt1_desc: "Đầu tiên, hãy lấy thông tin xác thực dự án Supabase của bạn. Điều hướng đến cài đặt API của dự án để tìm các giá trị này.",
-        prompt1_step1: "Đi đến Cài đặt API",
-        prompt1_step2: "Trong Bảng điều khiển Supabase, vào `Project Settings` > `API`.",
-        prompt1_step3: "Tìm thông tin của bạn trong phần `Project API keys`.",
-        prompt1_table_key: "Khóa",
-        prompt1_table_purpose: "Mục đích & Sử dụng",
-        prompt1_table_security: "Mức độ Bảo mật",
-        prompt1_url: "URL Dự án",
-        prompt1_url_desc: "URL duy nhất cho điểm cuối API của dự án.",
-        prompt1_url_sec: "Công khai",
-        prompt1_anon: "Khóa `anon` Công khai",
-        prompt1_anon_desc: "Khóa này an toàn để sử dụng trong trình duyệt hoặc ứng dụng phía client. Nó tuân thủ các chính sách Row Level Security (RLS) của bạn.",
-        prompt1_anon_sec: "Công khai (Frontend)",
-        prompt1_service: "Khóa `service_role` Bí mật",
-        prompt1_service_desc: "Khóa này bỏ qua tất cả các chính sách RLS. Chỉ nên được sử dụng trên một máy chủ backend an toàn ('bachken'). Không bao giờ để lộ nó ở phía client.",
-        prompt1_service_sec: "BÍ MẬT (CHỈ Backend 'bachken')",
-
-        prompt2_title: "2. Kết nối Backend 'bachken'",
-        prompt2_desc: "Đây là cách kết nối backend của bạn với Supabase bằng thông tin xác thực bạn vừa tìm thấy.",
-        prompt2_nodejs: "Node.js",
-        prompt2_nextjs: "Next.js",
-        prompt2_python: "Python",
-        prompt2_env_file: "Tệp .env",
-        prompt2_client_file: "Tệp Client Supabase",
-        prompt2_usage_example: "Ví dụ Sử dụng",
-        prompt2_key_comparison: "So sánh việc sử dụng Khóa",
-        prompt2_table_key_type: "Loại Khóa",
-        prompt2_table_use_case: "Khi nào sử dụng",
-        prompt2_table_example: "Ví dụ",
-        prompt2_anon_use: "Frontend hoặc backend nơi RLS cần được thực thi.",
-        prompt2_anon_example: "Lấy dữ liệu công khai, dữ liệu dành riêng cho người dùng sau khi đăng nhập.",
-        prompt2_service_use: "CHỈ backend 'bachken', cho các tác vụ quản trị hoặc khi cần bỏ qua RLS.",
-        prompt2_service_example: "Di chuyển dữ liệu phía máy chủ, công việc định kỳ (cron job), bảng quản trị.",
-
-        prompt3_title: "3. Database & Chính sách RLS",
-        prompt3_desc: "Row Level Security (RLS) rất cần thiết để bảo vệ dữ liệu của bạn. Đây là cách thiết lập.",
-        prompt3_enable_rls: "Bật RLS cho một Bảng",
-        prompt3_enable_rls_desc: "Chạy lệnh SQL này trong Trình chỉnh sửa SQL của Supabase để bật RLS trên bảng có tên `items`.",
-        prompt3_policies: "Tạo Chính sách",
-        prompt3_policies_desc: "Chính sách là các quy tắc kiểm soát quyền truy cập dữ liệu. Dưới đây là một số ví dụ cho bảng `items`.",
-        prompt3_select_policy: "Chính sách SELECT (Đọc)",
-        prompt3_select_desc: "Cho phép bất kỳ người dùng đã xác thực nào đọc tất cả các mục.",
-        prompt3_insert_policy: "Chính sách INSERT (Tạo)",
-        prompt3_insert_desc: "Cho phép người dùng đã xác thực chèn các mục chỉ khi cột `user_id` khớp với ID của chính họ.",
-        prompt3_update_policy: "Chính sách UPDATE",
-        prompt3_update_desc: "Cho phép người dùng cập nhật một mục chỉ khi họ là chủ sở hữu.",
-        prompt3_delete_policy: "Chính sách DELETE",
-        prompt3_delete_desc: "Cho phép người dùng xóa một mục chỉ khi họ là chủ sở hữu.",
-        prompt3_jwt: "Xác minh JWT trong Backend",
-        prompt3_jwt_desc: "Khi người dùng thực hiện một yêu cầu từ frontend, họ sẽ gửi một JWT. Backend 'bachken' của bạn nên xác thực token này để nhận dạng người dùng trước khi thực hiện bất kỳ hành động nào.",
-
-        prompt4_title: "4. Xây dựng REST API",
-        prompt4_desc: "Hãy tạo một REST API CRUD tiêu chuẩn cho bảng `items` trong backend 'bachken' của bạn.",
-        prompt4_token_security: "Thực hành Tốt nhất về Bảo mật Token",
-        prompt4_token_security_desc: "Luôn truyền JWT của người dùng từ client đến backend trong tiêu đề `Authorization` dưới dạng Bearer token. Backend sau đó sử dụng token này để khởi tạo client Supabase cho yêu cầu cụ thể đó, đảm bảo các chính sách RLS được áp dụng chính xác.",
-        prompt4_testing: "Kiểm tra bằng cURL",
-        prompt4_testing_desc: "Thay thế `YOUR_API_URL`, `YOUR_JWT`, và `ITEM_ID` bằng các giá trị thực tế của bạn.",
-
-        prompt5_title: "5. Checklist Bảo mật & Tối ưu hóa",
-        prompt5_desc: "Một checklist cuối cùng để đảm bảo backend 'bachken' và tích hợp Supabase của bạn an toàn và hiệu quả.",
-        prompt5_table_item: "Mục kiểm tra",
-        prompt5_table_status: "Trạng thái",
-        prompt5_table_action: "Hành động nếu Thất bại",
-        prompt5_api: "Chức năng API",
-        prompt5_api_action: "Kiểm tra tất cả các điểm cuối CRUD bằng Postman hoặc cURL.",
-        prompt5_token: "Không rò rỉ Token",
-        prompt5_token_action: "Đảm bảo khóa `service_role` chỉ có trong biến môi trường backend, không bao giờ có trong mã client.",
-        prompt5_rls: "RLS đã được Bật",
-        prompt5_rls_action: "Vào `Authentication` > `Policies` trong Supabase và xác minh RLS được bật trên tất cả các bảng có dữ liệu nhạy cảm.",
-        prompt5_policy: "Chính sách Chính xác",
-        prompt5_policy_action: "Xem xét từng chính sách. Kiểm tra quyền truy cập với các vai trò người dùng khác nhau.",
-        prompt5_log: "Ghi nhật ký Backend",
-        prompt5_log_action: "Triển khai một thư viện ghi nhật ký (như Winston cho Node.js) để ghi lại các yêu cầu và lỗi.",
-        prompt5_connection: "Kết nối Ổn định",
-        prompt5_connection_action: "Sử dụng connection pooling nếu backend của bạn có lưu lượng truy cập cao.",
-        prompt5_deploy: "Quy trình Triển khai",
-        prompt5_deploy_action: "Sử dụng biến môi trường cho các khóa Supabase trong nhà cung cấp dịch vụ lưu trữ của bạn (Vercel, Render, v.v.).",
-        prompt5_index: "Chỉ mục Cơ sở dữ liệu",
-        prompt5_index_action: "Thêm chỉ mục vào các cột thường được sử dụng trong mệnh đề `WHERE` để tăng tốc độ truy vấn.",
-        prompt5_backup: "Sao lưu & Khôi phục",
-        prompt5_backup_action: "Bật Point-in-Time Recovery (PITR) trong Supabase cho các gói trả phí. Lên lịch sao lưu thường xuyên.",
-    },
-     // Debugging Guide
-    debuggingGuide: {
-      title: "Hướng dẫn Gỡ lỗi: 'Không thể tải ứng dụng'",
-      description: "Hướng dẫn toàn diện để chẩn đoán và sửa lỗi 'trang trắng' trong ứng dụng web.",
-      
-      stepByStepTitle: "1. Quy trình Gỡ lỗi từng bước",
-      step1_title: "Bước 1: Kiểm tra DevTools của Trình duyệt (Console)",
-      step1_desc: "Đây là tuyến phòng thủ đầu tiên. Mở DevTools (F12 hoặc Ctrl+Shift+I) và xem tab `Console` để tìm các thông báo lỗi màu đỏ.",
-      step1_tip1: "<strong>Lỗi Hydration:</strong> Tìm lỗi `Warning: An error occurred during hydration...` Điều này có nghĩa là UI được render ở server khác với lần render ban đầu ở client. Nguyên nhân phổ biến: sử dụng `new Date()` hoặc `Math.random()` trực tiếp trong logic render của component. Cách sửa: Chuyển code đó vào hook `useEffect` để đảm bảo nó chỉ chạy ở client.",
-      step1_tip2: "<strong>Lỗi Null/Undefined:</strong> Tìm lỗi `TypeError: Cannot read properties of undefined (reading 'map')`. Điều này có nghĩa là bạn đang cố gắng sử dụng dữ liệu chưa được tải. Cách sửa: Thêm render có điều kiện (`data && <Component />`) hoặc optional chaining (`data?.property`).",
-      
-      step2_title: "Bước 2: Kiểm tra DevTools của Trình duyệt (Network)",
-      step2_desc: "Chuyển sang tab `Network` và tải lại trang (Ctrl+R). Tìm các mục có màu đỏ.",
-      step2_tip1: "<strong>Lỗi tải gói JS (404):</strong> Nếu các tệp như `_next/static/chunks/app/page-....js` có màu đỏ với trạng thái 404, việc deploy lên Vercel của bạn có thể đã bị hỏng. Cần phải deploy lại.",
-      step2_tip2: "<strong>Lỗi gọi API (500):</strong> Nếu một yêu cầu đến API của bạn (ví dụ: `/api/products`) thất bại với trạng thái 500, code phía server đã bị sập. Kiểm tra log của Vercel Function cho API route cụ thể đó.",
-      
-      step3_title: "Bước 3: Kiểm tra Build Logs trên Vercel",
-      step3_desc: "Truy cập dashboard dự án của bạn trên Vercel, vào tab 'Deployments', và nhấp vào lần deploy mới nhất. Xem lại logs trong mục 'Building'.",
-      step3_tip1: "Tìm bất kỳ dòng nào bắt đầu bằng `Error:`. Đây có thể là lỗi TypeScript, thiếu dependency, hoặc lỗi cú pháp chỉ xảy ra khi build cho production (`npm run build`).",
-      
-      step4_title: "Bước 4: Kiểm tra Runtime Logs trên Vercel",
-      step4_desc: "Trong dashboard dự án Vercel, vào tab 'Functions'. Nếu ứng dụng của bạn sử dụng Server Components, API routes, hoặc middleware, mọi sự cố sẽ được ghi lại ở đây.",
-      step4_tip1: "Đây là nơi bạn sẽ tìm thấy các lỗi liên quan đến việc thiếu biến môi trường trên server, hoặc code trong Server Component cố gắng truy cập các API chỉ có trên trình duyệt như `window`.",
-      
-      quickFixesTitle: "2. Lệnh Kiểm tra Nhanh & Giao diện Dự phòng",
-      build_command_title: "Chạy Build Production ở Local",
-      build_command_desc: "Lệnh này thường phát hiện các lỗi bị bỏ qua trong chế độ dev (`npm run dev`).",
-      fallback_ui_title: "Tạo Giao diện Dự phòng (Fallback UI)",
-      fallback_ui_desc: "Để tránh ứng dụng bị sập hoàn toàn và hiển thị màn hình trắng, hãy bọc các component của bạn trong một `ErrorBoundary`. Ứng dụng này đã có sẵn một component như vậy trong `App.tsx`. Nó sẽ bắt các lỗi render và hiển thị một thông báo thân thiện thay vì trang trống.",
-
-      vercelErrorsTitle: "3. Top 20 Lỗi Deploy Next.js trên Vercel Phổ biến",
-      error: "Lỗi",
-      cause: "Nguyên nhân",
-      fix: "Cách khắc phục",
-
-      err1_title: "Thiếu biến môi trường",
-      err1_cause: "Tệp `.env.local` không được tải lên Vercel. Các biến cần thiết cho server (ví dụ: chuỗi kết nối database) bị thiếu.",
-      err1_fix: "Vào Vercel Project Settings > Environment Variables. Thêm tất cả các biến cần thiết từ tệp `.env.local` của bạn.",
-
-      err2_title: "Thiếu tiền tố `NEXT_PUBLIC_`",
-      err2_cause: "Code phía client cố gắng truy cập một biến môi trường không bắt đầu bằng `NEXT_PUBLIC_`.",
-      err2_fix: "Thêm tiền tố `NEXT_PUBLIC_` vào tên biến (ví dụ: `NEXT_PUBLIC_API_URL`) trong cả tệp `.env.local` và cài đặt trên Vercel.",
-
-      err3_title: "Build lỗi trên Vercel, chạy tốt ở local",
-      err3_cause: "Không khớp phiên bản Node.js, sự cố dependency (thử xóa `node_modules` và `package-lock.json` rồi cài lại), hoặc khác biệt về phân biệt chữ hoa/thường giữa HĐH của bạn và môi trường Linux của Vercel.",
-      err3_fix: "Đặt phiên bản Node.js trong Vercel Project Settings > General. Đảm bảo đường dẫn import tệp khớp chính xác về chữ hoa/thường (ví dụ: `./Component` so với `./component`).",
-
-      err4_title: "Sử dụng API chỉ có trên trình duyệt trong Server Components",
-      err4_cause: "Code trong Server Component (mặc định trong App Router), `getStaticProps`, hoặc `getServerSideProps` sử dụng `window`, `document` hoặc các API trình duyệt khác.",
-      err4_fix: "Chuyển component/code sử dụng các API này vào một client component bằng cách thêm `'use client';` ở đầu tệp, hoặc đặt code bên trong hook `useEffect`.",
-
-      err5_title: "Chưa cấu hình domain cho `next/image`",
-      err5_cause: "Sử dụng URL bên ngoài trong `<Image>` mà không thêm hostname vào `next.config.js`.",
-      err5_fix: "Thêm hostname của hình ảnh vào `images.remotePatterns` trong tệp `next.config.js` của bạn.",
-
-      err6_title: "Serverless Function hết thời gian chờ",
-      err6_cause: "Một thao tác lấy dữ liệu hoặc API route mất nhiều thời gian hơn thời gian thực thi cho phép (ví dụ: 10 giây trên gói Hobby).",
-      err6_fix: "Tối ưu hóa truy vấn database hoặc lệnh gọi API của bạn. Đối với các tác vụ chạy lâu, hãy xem xét các công việc nền hoặc chuyển sang gói Vercel Pro để tăng thời gian chờ.",
-
-      err7_title: "Sai thư mục Output",
-      err7_cause: "Cài đặt 'Output Directory' của Vercel không được đặt thành `.next` (mặc định cho Next.js).",
-      err7_fix: "Trong Vercel Project Settings > General, đảm bảo 'Output Directory' được để trống hoặc đặt thành `.next`.",
-
-      err8_title: "Lỗi Hydration Mismatch",
-      err8_cause: "HTML được render trên server không khớp với HTML ban đầu được render trên client.",
-      err8_fix: "Tránh sử dụng các giá trị phụ thuộc vào trình duyệt (như `window.innerWidth` hoặc `new Date()`) trong lần render đầu tiên. Sử dụng `useEffect` để đặt state sau khi component đã được mount.",
-
-      err9_title: "Lỗi Middleware",
-      err9_cause: "Tệp `middleware.ts` có lỗi, chặn tất cả các yêu cầu đến.",
-      err9_fix: "Bọc logic middleware trong các khối `try...catch` và kiểm tra logs của Edge Function trên Vercel để tìm lỗi.",
-
-      err10_title: "Lỗi `dynamic()` Import",
-      err10_cause: "Một component được import động không tương thích với SSR.",
-      err10_fix: "Khi sử dụng `dynamic()`, chỉ định `ssr: false` nếu component phụ thuộc vào API trình duyệt: `dynamic(() => import('../components/MyMap'), { ssr: false })`.",
-      
-      err11_title: "JS Bundle 404/Bị hỏng",
-      err11_cause: "Một lần deploy trước đó đã thất bại giữa chừng, để lại các tệp không nhất quán. Cache của trình duyệt hoặc CDN có thể đang phục vụ các tệp cũ, không hợp lệ.",
-      err11_fix: "Deploy lại dự án trên Vercel. Xóa cache trình duyệt hoặc thử ở chế độ ẩn danh.",
-      
-      err12_title: "Lỗi API Route 500",
-      err12_cause: "Một ngoại lệ không được xử lý đã xảy ra trong code API route phía server của bạn.",
-      err12_fix: "Kiểm tra logs của Vercel Function cho API route cụ thể. Bọc logic API của bạn trong một khối `try...catch` để trả về một phản hồi lỗi JSON phù hợp thay vì làm sập.",
-      
-      err13_title: "Phân biệt chữ hoa/thường của đường dẫn tệp",
-      err13_cause: "Import một tệp với chữ hoa/thường sai (ví dụ: `import C from './component'` khi tệp là `Component.tsx`). Hoạt động trên Windows/macOS nhưng thất bại trên Linux (Vercel).",
-      err13_fix: "Đảm bảo chữ hoa/thường trong các câu lệnh `import` của bạn khớp chính xác với tên tệp và thư mục.",
-      
-      err14_title: "Lỗi lấy dữ liệu trong SSG/SSR",
-      err14_cause: "Một lệnh gọi API trong `getStaticProps` hoặc `getServerSideProps` thất bại trong quá trình build hoặc tại thời điểm yêu cầu.",
-      err14_fix: "Đảm bảo các hàm lấy dữ liệu của bạn mạnh mẽ, xử lý lỗi một cách duyên dáng, và mọi khóa API cần thiết đều có sẵn dưới dạng biến môi trường.",
-      
-      err15_title: "Vượt quá giới hạn bộ nhớ",
-      err15_cause: "Một Serverless Function sử dụng nhiều bộ nhớ hơn giới hạn được phân bổ (ví dụ: 1GB trên gói Hobby), thường là do xử lý các tệp hoặc bộ dữ liệu lớn.",
-      err15_fix: "Tối ưu hóa hàm của bạn để tiết kiệm bộ nhớ hơn. Xử lý dữ liệu theo luồng (stream) hoặc nâng cấp lên gói Vercel Pro để có giới hạn bộ nhớ cao hơn.",
-      
-      err16_title: "Lỗi script `postinstall`",
-      err16_cause: "Một lệnh trong script `postinstall` của `package.json` (như `prisma generate`) thất bại trên môi trường build của Vercel.",
-      err16_fix: "Kiểm tra build logs để tìm lỗi trong bước `postinstall`. Đảm bảo tất cả các dependency và biến môi trường cần thiết cho script đều có sẵn.",
-      
-      err17_title: "Sai `next.config.js`",
-      err17_cause: "Lỗi cú pháp hoặc cấu hình không hợp lệ trong `next.config.js` làm cho quá trình build thất bại.",
-      err17_fix: "Kiểm tra lại tệp `next.config.js` để tìm lỗi. Chạy `npm run build` ở local để xác thực nó.",
-      
-      err18_title: "`await` ở cấp cao nhất trong Component không đồng bộ",
-      err18_cause: "Sử dụng `await` trực tiếp trong phần thân của một component React không phải là Async Server Component.",
-      err18_fix: "Chuyển việc lấy dữ liệu bằng `await` vào một hook `useEffect`, hoặc chuyển đổi component thành Async Server Component nếu sử dụng App Router.",
-      
-      err19_title: "Sự cố đường dẫn tài sản tĩnh",
-      err19_cause: "Tham chiếu các tệp trong thư mục `public` với đường dẫn không chính xác (ví dụ: `../public/img.png` thay vì `/img.png`).",
-      err19_fix: "Luôn tham chiếu các tệp trong thư mục `public` từ gốc, bắt đầu bằng dấu `/`.",
-      
-      err20_title: "Lỗi tối ưu hóa Font",
-      err20_cause: "Next.js không thể lấy hoặc xử lý một font từ Google Fonts trong quá trình build, thường do sự cố mạng trên máy chủ build.",
-      err20_fix: "Thử deploy lại. Nếu sự cố vẫn tiếp diễn, hãy xem xét việc tự host các tệp font trong thư mục `public` của bạn.",
-    },
+    }
   }
 };

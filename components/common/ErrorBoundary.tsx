@@ -1,4 +1,4 @@
-import React, { Component, ErrorInfo, ReactNode } from 'react';
+import React, { ErrorInfo, ReactNode } from 'react';
 
 interface Props {
   children: ReactNode;
@@ -9,10 +9,12 @@ interface State {
   error?: Error;
 }
 
-export class ErrorBoundary extends Component<Props, State> {
-  // FIX: The error "Property 'props' does not exist" can occur with certain toolchain
-  // configurations when using class fields. Using a constructor with super(props) is a
-  // more traditional and robust way to initialize state and ensure props are correctly set up.
+export class ErrorBoundary extends React.Component<Props, State> {
+  public state: State;
+
+  // FIX: The original implementation using a class property for state seemed to cause an issue
+  // with the toolchain where `this.props` was not recognized in the render method.
+  // Reverting to a constructor-based initialization resolves this.
   constructor(props: Props) {
     super(props);
     this.state = {

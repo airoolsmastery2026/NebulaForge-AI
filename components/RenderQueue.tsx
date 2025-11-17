@@ -14,7 +14,7 @@ interface RenderQueueProps {
 }
 
 const statusColors: Record<RenderJob['status'], string> = {
-    Queued: 'bg-slate-500/20 text-slate-300',
+    Queued: 'bg-gray-500/20 text-gray-300',
     Rendering: 'bg-blue-500/20 text-blue-300',
     Completed: 'bg-teal-500/20 text-teal-300',
     Composing: 'bg-purple-500/20 text-purple-300',

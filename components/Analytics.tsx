@@ -65,11 +65,11 @@ export const Analytics: React.FC = () => {
                                     </linearGradient>
                                 </defs>
                                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(0, 255, 255, 0.1)" />
-                                <XAxis dataKey="name" stroke="#94a3b8" />
-                                <YAxis stroke="#94a3b8" />
+                                <XAxis dataKey="name" stroke="#9CA3AF" />
+                                <YAxis stroke="#9CA3AF" />
                                 <Tooltip contentStyle={chartTooltipStyle} />
-                                <Legend wrapperStyle={{color: '#e2e8f0'}}/>
-                                <Area type="monotone" dataKey="views" stroke="#00FFFF" strokeWidth={2} fill="url(#colorViews)" activeDot={{ r: 8, fill: '#00FFFF', stroke: '#020617' }} />
+                                <Legend wrapperStyle={{color: '#E5E7EB'}}/>
+                                <Area type="monotone" dataKey="views" stroke="#00FFFF" strokeWidth={2} fill="url(#colorViews)" activeDot={{ r: 8, fill: '#00FFFF', stroke: '#111827' }} />
                             </AreaChart>
                         </ResponsiveContainer>
                     </div>
@@ -84,10 +84,10 @@ export const Analytics: React.FC = () => {
                          <ResponsiveContainer width="100%" height="100%">
                             <BarChart data={revenueData}>
                                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(0, 255, 255, 0.1)" />
-                                <XAxis dataKey="name" stroke="#94a3b8" />
-                                <YAxis stroke="#94a3b8" />
+                                <XAxis dataKey="name" stroke="#9CA3AF" />
+                                <YAxis stroke="#9CA3AF" />
                                 <Tooltip contentStyle={chartTooltipStyle} cursor={{fill: 'rgba(0, 255, 255, 0.05)'}} />
-                                <Legend wrapperStyle={{color: '#e2e8f0'}}/>
+                                <Legend wrapperStyle={{color: '#E5E7EB'}}/>
                                 <Bar dataKey="revenue" fill="#00FFFF" fillOpacity={0.7} />
                             </BarChart>
                         </ResponsiveContainer>
@@ -103,7 +103,7 @@ export const Analytics: React.FC = () => {
                   {mockAnalytics.map((data) => (
                     <div key={data.platform} className="flex items-center justify-between border-b border-primary-500/20 pb-3 last:border-0 last:pb-0 rounded-md p-2">
                       <div className="flex items-center">
-                        <div className="mr-4 flex h-10 w-10 items-center justify-center rounded-full bg-slate-800/50">
+                        <div className="mr-4 flex h-10 w-10 items-center justify-center rounded-full bg-gray-800/50">
                             <PlatformIcon platform={data.platform} />
                         </div>
                         <div>

@@ -18,6 +18,8 @@ export const checkPlatformStatus = async (platformId: string, credentials: Recor
     switch (platformId) {
         case 'gemini':
             return { success: true, message: 'Success: Gemini API key is valid. Ready for generation.' };
+        case 'github':
+            return { success: true, message: 'Success: GitHub PAT is valid. Repository is accessible.' };
         case 'youtube':
             return { success: true, message: 'Success: YouTube API connection is authorized.' };
         case 'googledrive':
