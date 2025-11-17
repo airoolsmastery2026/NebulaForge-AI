@@ -88,42 +88,52 @@ const createWavBlob = (base64Pcm: string): Blob => {
 export const RenderQueue: React.FC<RenderQueueProps> = ({ jobs, setJobs }) => {
     const { t } = useI18n();
     
+     // Effect for polling video generation status
     useEffect(() => {
-        const poll = () => {
-            jobs.forEach(async (job) => {
-                 // Poll for rendering status
-                if ((job.status === 'Queued' || job.status === 'Rendering') && job.videoOperation && !job.videoOperation.done) {
-                    const updatedOperation = await checkVideoGenerationStatus(job.videoOperation);
-                    setJobs(prevJobs => prevJobs.map(j => {
-                        if (j.id === job.id) {
-                            if (updatedOperation.done) {
-                                if (updatedOperation.error) {
-                                    console.error(`Job ${j.id} failed:`, updatedOperation.error);
-                                    return { ...j, status: 'Failed', progress: 100, videoOperation: updatedOperation };
-                                }
-                                const videoUri = updatedOperation.response?.generatedVideos?.[0]?.video?.uri;
-                                // Move to 'Completed', then it will be picked up by the composing logic below
-                                return { ...j, status: 'Completed', progress: 100, videoOperation: updatedOperation, videoUrl: videoUri };
-                            }
-                            const progress = j.progress < 95 ? j.progress + Math.floor(Math.random() * 5) : 95;
-                            return { ...j, status: 'Rendering', progress, videoOperation: updatedOperation };
-                        }
-                        return j;
-                    }));
-                }
+        const jobsToPoll = jobs.filter(j => (j.status === 'Queued' || j.status === 'Rendering') && j.videoOperation && !j.videoOperation.done);
+        if (jobsToPoll.length === 0) return;
 
-                // Simulate composition step after completion (Step 4)
-                if (job.status === 'Completed') {
-                     setJobs(prev => prev.map(j => j.id === job.id ? {...j, status: 'Composing'} : j));
-                     setTimeout(() => {
-                        setJobs(prev => prev.map(j => j.id === job.id ? {...j, status: 'Ready'} : j));
-                     }, 3000); // Simulate 3 second composition
-                }
-            });
+        const poll = async () => {
+            for (const job of jobsToPoll) {
+                const updatedOperation = await checkVideoGenerationStatus(job.videoOperation);
+                
+                // Use a functional update to prevent race conditions with state
+                setJobs(prevJobs => prevJobs.map(j => {
+                    if (j.id === job.id) {
+                        if (updatedOperation.done) {
+                            if (updatedOperation.error) {
+                                console.error(`Job ${j.id} failed:`, updatedOperation.error);
+                                return { ...j, status: 'Failed', progress: 100, videoOperation: updatedOperation };
+                            }
+                            const videoUri = updatedOperation.response?.generatedVideos?.[0]?.video?.uri;
+                            return { ...j, status: 'Completed', progress: 100, videoOperation: updatedOperation, videoUrl: videoUri };
+                        }
+                        const progress = j.progress < 95 ? j.progress + Math.floor(Math.random() * 5) : 95;
+                        return { ...j, status: 'Rendering', progress, videoOperation: updatedOperation };
+                    }
+                    return j;
+                }));
+            }
         };
-    
-        const intervalId = setInterval(poll, 5000); // Poll every 5 seconds
+
+        const intervalId = setInterval(poll, 10000); // Poll every 10 seconds
         return () => clearInterval(intervalId);
+    }, [jobs, setJobs]);
+
+    // Effect for handling state transitions after completion (Completed -> Composing -> Ready)
+    useEffect(() => {
+        const completedJobs = jobs.filter(j => j.status === 'Completed');
+        if (completedJobs.length > 0) {
+            // Set status to Composing immediately
+            setJobs(prevJobs => prevJobs.map(j => j.status === 'Completed' ? { ...j, status: 'Composing' } : j));
+            
+            // Schedule the next transition to Ready
+            const timer = setTimeout(() => {
+                setJobs(prevJobs => prevJobs.map(j => (completedJobs.some(cj => cj.id === j.id)) ? { ...j, status: 'Ready' } : j));
+            }, 3000); // Simulate 3-second composition time
+
+            return () => clearTimeout(timer);
+        }
     }, [jobs, setJobs]);
     
     const handleDownload = async (job: RenderJob) => {
