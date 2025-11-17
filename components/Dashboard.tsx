@@ -1,5 +1,3 @@
-
-
 import React, { useMemo } from 'react';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import type { VideoIdea, RenderJob } from '../types';
@@ -46,7 +44,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ videoIdeas, renderJobs, se
     const stats = useMemo(() => [
         { id: 'views', title: t('dashboard.totalViews'), value: '7.1M', change: '+15.2%' },
         { id: 'earnings', title: t('dashboard.totalEarnings'), value: '$18,920', change: '+21.7%' },
-        { id: 'videos', title: t('dashboard.videosCreated'), value: '112', change: `+${(renderJobs.filter(j => j.status === 'Completed').length)} this week` },
+        { id: 'videos', title: t('dashboard.videosCreated'), value: '112', change: `+${(renderJobs.filter(j => j.status === 'Ready').length)} this week` },
         { id: 'conversion', title: t('dashboard.conversionRate'), value: '14.1%', change: '-0.5%' },
     ], [t, renderJobs]);
 

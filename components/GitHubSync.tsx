@@ -31,7 +31,7 @@ const StatusBadge: React.FC<{ status: RepoStatus }> = ({ status }) => {
     const { t } = useI18n();
     const styles: Record<RepoStatus, string> = {
         synced: 'bg-green-500/20 text-green-300',
-        pending: 'bg-slate-500/20 text-slate-300',
+        pending: 'bg-gray-500/20 text-gray-300',
         syncing: 'bg-blue-500/20 text-blue-300',
         cloning: 'bg-purple-500/20 text-purple-300',
         error: 'bg-red-500/20 text-red-300',

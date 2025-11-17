@@ -27,8 +27,7 @@ export const ThreeScene: React.FC<ThreeSceneProps> = () => {
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-        const canvasElement = renderer.domElement; // Keep a direct reference to the canvas
-        currentMount.appendChild(canvasElement);
+        currentMount.appendChild(renderer.domElement);
         
         // Lighting
         const ambientLight = new THREE.AmbientLight(0xffffff, 0.1);
@@ -121,17 +120,16 @@ export const ThreeScene: React.FC<ThreeSceneProps> = () => {
         window.addEventListener('resize', handleResize);
 
         return () => {
-            // Stop the animation loop and remove listeners
             cancelAnimationFrame(animationFrameId);
             window.removeEventListener('resize', handleResize);
             window.removeEventListener('mousemove', handleMouseMove);
 
-            // Safely remove the canvas from the DOM. This check prevents the "node is not a child" error.
-            if (canvasElement.parentElement === currentMount) {
-                currentMount.removeChild(canvasElement);
+            // More robust cleanup: Check if the canvas is still a child of the mount point
+            // before trying to remove it. This prevents errors during hot-reloads.
+            if (currentMount && currentMount.contains(renderer.domElement)) {
+                currentMount.removeChild(renderer.domElement);
             }
             
-            // Dispose of the renderer and all tracked resources to prevent memory leaks
             renderer.dispose();
             geometries.forEach(g => g.dispose());
             materials.forEach(m => m.dispose());

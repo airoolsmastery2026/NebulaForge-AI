@@ -57,12 +57,12 @@ export const SystemLog: React.FC<SystemLogProps> = ({ renderJobs }) => {
             <div className="p-4 space-y-4 overflow-y-auto flex-grow">
                 {logEvents.slice(0, 5).map(event => (
                     <div key={event.id} className="flex items-start">
-                        <div className="flex-shrink-0 mr-3 mt-1 bg-slate-800/70 p-2 rounded-full ring-1 ring-slate-700">
+                        <div className="flex-shrink-0 mr-3 mt-1 bg-gray-800/70 p-2 rounded-full ring-1 ring-gray-700">
                            {event.icon}
                         </div>
                         <div>
-                            <p className="text-sm text-slate-200">{event.text}</p>
-                            <p className="text-xs text-slate-500">{getRelativeTime(event.time, locale)}</p>
+                            <p className="text-sm text-gray-200">{event.text}</p>
+                            <p className="text-xs text-gray-500">{getRelativeTime(event.time, locale)}</p>
                         </div>
                     </div>
                 ))}

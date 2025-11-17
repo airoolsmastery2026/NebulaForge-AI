@@ -1,8 +1,6 @@
-
 import React, { useEffect } from 'react';
 import { useAppContext } from '../../contexts/AppContext';
-import { X } from '../LucideIcons';
-import { CheckCircle, AlertTriangle, AlertCircle } from 'lucide-react';
+import { X, CheckCircle, AlertTriangle, AlertCircle } from '../LucideIcons';
 import type { AppNotification } from '../../types';
 
 const notificationConfig = {

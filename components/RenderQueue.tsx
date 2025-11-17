@@ -14,7 +14,7 @@ interface RenderQueueProps {
 }
 
 const statusColors: Record<RenderJob['status'], string> = {
-    Queued: 'bg-slate-500/20 text-slate-300',
+    Queued: 'bg-gray-500/20 text-gray-300',
     Rendering: 'bg-blue-500/20 text-blue-300',
     Completed: 'bg-teal-500/20 text-teal-300',
     Composing: 'bg-purple-500/20 text-purple-300',
@@ -106,7 +106,7 @@ export const RenderQueue: React.FC<RenderQueueProps> = ({ jobs, setJobs }) => {
                                 return { ...j, status: 'Failed', progress: 100, videoOperation: updatedOperation };
                             }
                             const videoUri = updatedOperation.response?.generatedVideos?.[0]?.video?.uri;
-                            return { ...j, status: 'Completed', progress: 100, videoOperation: updatedOperation, videoUrl: videoUri };
+                            return { ...j, status: 'Composing', progress: 100, videoOperation: updatedOperation, videoUrl: videoUri };
                         }
                         const progress = j.progress < 95 ? j.progress + Math.floor(Math.random() * 5) : 95;
                         return { ...j, status: 'Rendering', progress, videoOperation: updatedOperation };
@@ -118,16 +118,6 @@ export const RenderQueue: React.FC<RenderQueueProps> = ({ jobs, setJobs }) => {
 
         const intervalId = setInterval(poll, 10000); // Poll every 10 seconds
         return () => clearInterval(intervalId);
-    }, [jobs, setJobs]);
-
-    // Effect for handling state transition: Completed -> Composing
-    useEffect(() => {
-        const completedJobs = jobs.filter(j => j.status === 'Completed');
-        if (completedJobs.length > 0) {
-            setJobs(prevJobs => prevJobs.map(j => 
-                j.status === 'Completed' ? { ...j, status: 'Composing' } : j
-            ));
-        }
     }, [jobs, setJobs]);
 
     // Effect for handling state transition: Composing -> Ready
