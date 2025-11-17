@@ -1,6 +1,5 @@
-
 import { GoogleGenAI, Type, Modality } from "@google/genai";
-import type { Product, Trend, AIModel } from '../types';
+import type { Product, Trend, AIModel, ProductWithContent } from '../types';
 import { getConnections } from './apiService';
 
 const getApiKey = (): string | null => {
@@ -459,7 +458,7 @@ const veoModelMapping: Record<string, string> = {
     'VEO 3.1 (HQ)': 'veo-3.1-generate-preview',
 };
 
-export const startVideoGeneration = async (product: Product, model: AIModel = 'VEO 3.1 (Fast)'): Promise<any> => {
+export const startVideoGeneration = async (product: ProductWithContent, model: AIModel = 'VEO 3.1 (Fast)'): Promise<any> => {
     await ensureVeoApiKey();
     const ai = createAiClient();
     if (!ai) {

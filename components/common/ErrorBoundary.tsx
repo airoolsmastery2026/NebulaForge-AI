@@ -10,9 +10,13 @@ interface State {
 }
 
 export class ErrorBoundary extends React.Component<Props, State> {
-  public state: State = {
-    hasError: false,
-  };
+  // Fix: Initialize state in the constructor to ensure `this.props` is available and to avoid potential issues with class field syntax in some build environments.
+  constructor(props: Props) {
+    super(props);
+    this.state = {
+      hasError: false,
+    };
+  }
 
   public static getDerivedStateFromError(error: Error): State {
     return { hasError: true, error };
@@ -42,7 +46,6 @@ export class ErrorBoundary extends React.Component<Props, State> {
       );
     }
 
-    // FIX: The previous destructuring was causing a tooling-related error. Switched to a direct return of `this.props.children`, which is a standard and robust pattern.
     return this.props.children;
   }
 }

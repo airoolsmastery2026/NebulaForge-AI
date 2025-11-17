@@ -1,6 +1,5 @@
-
 import React, { useState, useCallback, useMemo, useEffect, Suspense, lazy } from 'react';
-import type { Product, GeneratedContent, VideoIdea, RenderJob, ScheduledPost, AIModel } from './types';
+import type { Product, GeneratedContent, VideoIdea, RenderJob, ScheduledPost, AIModel, ProductWithContent } from './types';
 import { Page } from './types';
 import { generateCaptionsAndHashtags, generateReviewScript, generateSeoDescription, generateVideoTitles, generateSpeech, startVideoGeneration } from './services/geminiService';
 import { getAppData, saveAppData } from './services/apiService';
@@ -112,7 +111,7 @@ const AppContent: React.FC = () => {
             setCurrentPage(Page.CONTENT_GENERATOR);
             addNotification({ type: 'success', message: 'Content generation complete. Starting video render...' });
 
-            const productWithContent = { ...product, content: fullContent };
+            const productWithContent: ProductWithContent = { ...product, content: fullContent };
             const videoOperation = await startVideoGeneration(productWithContent, model);
             
             if (videoOperation) {

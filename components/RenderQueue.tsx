@@ -1,5 +1,3 @@
-
-
 import React, { useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription } from './common/Card';
 import { Button } from './common/Button';
@@ -33,6 +31,7 @@ const modelColors: Record<string, string> = {
     'KlingAI': 'border-green-500',
     'ElevenLabs Voice AI': 'border-cyan-500',
     'gemini-2.5-flash-preview-tts': 'border-sky-500',
+    'Gemini SFX Generator': 'border-indigo-400',
 };
 
 // Helper function to decode base64 string to ArrayBuffer
@@ -128,31 +127,43 @@ export const RenderQueue: React.FC<RenderQueueProps> = ({ jobs, setJobs }) => {
     }, [jobs, setJobs]);
     
     const handleDownload = async (job: RenderJob) => {
-        // Download video
-        if (job.videoUrl) {
-            const videoBlob = await getVideoResult(job.videoUrl);
-            if (videoBlob) {
-                const url = URL.createObjectURL(videoBlob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `${job.productName}_video.mp4`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-            }
-        }
-        // Download audio
-        if (job.audioData) {
-            const audioBlob = createWavBlob(job.audioData);
-            const url = URL.createObjectURL(audioBlob);
+        const downloadFile = (blob: Blob, fileName: string) => {
+            const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `${job.productName}_audio.wav`;
+            a.download = fileName;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
+        };
+    
+        // Download main audio if it exists
+        if (job.audioData) {
+            const audioBlob = createWavBlob(job.audioData);
+            downloadFile(audioBlob, `${job.productName}_voiceover.wav`);
+        }
+    
+        // Handle jobs from AI Video Studio
+        if (job.scenes && job.scenes.length > 0) {
+            for (const [index, scene] of job.scenes.entries()) {
+                if (scene.videoOperation?.response) {
+                    const videoUri = scene.videoOperation.response?.generatedVideos?.[0]?.video?.uri;
+                    if (videoUri) {
+                        const videoBlob = await getVideoResult(videoUri);
+                        if (videoBlob) {
+                            downloadFile(videoBlob, `${job.productName}_scene_${index + 1}.mp4`);
+                        }
+                    }
+                }
+            }
+        } 
+        // Handle simple jobs from Publisher
+        else if (job.videoUrl) {
+            const videoBlob = await getVideoResult(job.videoUrl);
+            if (videoBlob) {
+                downloadFile(videoBlob, `${job.productName}_video.mp4`);
+            }
         }
     };
 
