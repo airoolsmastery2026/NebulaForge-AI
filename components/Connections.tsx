@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription } from './common/Card';
 import { Button } from './common/Button';
@@ -359,12 +360,15 @@ export const Connections: React.FC<ConnectionsProps> = ({ setCurrentPage }) => {
         const reader = new FileReader();
         reader.onload = (e) => {
             try {
-                if (typeof e.target?.result === 'string') {
-                    const restoredConns = JSON.parse(e.target.result);
+                const result = e.target?.result;
+                if (typeof result === 'string') {
+                    const restoredConns = JSON.parse(result) as Record<string, Connection>;
                     saveConnectionsApi(restoredConns);
                     setConnections(restoredConns);
                 }
-            } catch (err) { console.error("Failed to restore connections:", err); }
+            } catch (err) { 
+// FIX: The `err` variable is of type `unknown` and cannot be directly passed to functions that may expect a string under strict type checking. Explicitly convert it to a string.
+console.error("Failed to restore connections:", String(err)); }
         };
         reader.readAsText(file);
     };

@@ -91,28 +91,33 @@ export const ThreeScene: React.FC<ThreeSceneProps> = () => {
 
             const animate = () => {
                 animationFrameId = requestAnimationFrame(animate);
-                const elapsedTime = clock.getElapsedTime();
-                
-                planet1.position.x = Math.cos(elapsedTime * 0.5) * 200;
-                planet1.position.z = Math.sin(elapsedTime * 0.5) * 200;
-                planet1.rotation.y += 0.005;
+                try {
+                    const elapsedTime = clock.getElapsedTime();
+                    
+                    planet1.position.x = Math.cos(elapsedTime * 0.5) * 200;
+                    planet1.position.z = Math.sin(elapsedTime * 0.5) * 200;
+                    planet1.rotation.y += 0.005;
 
-                planet2.position.x = Math.cos(elapsedTime * 0.3) * -350;
-                planet2.position.z = Math.sin(elapsedTime * 0.3) * -350;
-                planet2.rotation.y += 0.003;
+                    planet2.position.x = Math.cos(elapsedTime * 0.3) * -350;
+                    planet2.position.z = Math.sin(elapsedTime * 0.3) * -350;
+                    planet2.rotation.y += 0.003;
 
-                planet3.position.x = Math.cos(elapsedTime * 0.1) * 400;
-                planet3.position.z = Math.sin(elapsedTime * 0.1) * -500;
-                planet3.rotation.y += 0.001;
+                    planet3.position.x = Math.cos(elapsedTime * 0.1) * 400;
+                    planet3.position.z = Math.sin(elapsedTime * 0.1) * -500;
+                    planet3.rotation.y += 0.001;
 
-                sun.rotation.y += 0.001;
-                
-                const { x, y } = mousePosRef.current;
-                camera.position.x += (x * 200 - camera.position.x) * 0.05;
-                camera.position.y += (-y * 200 - camera.position.y) * 0.05;
-                camera.lookAt(scene.position);
+                    sun.rotation.y += 0.001;
+                    
+                    const { x, y } = mousePosRef.current;
+                    camera.position.x += (x * 200 - camera.position.x) * 0.05;
+                    camera.position.y += (-y * 200 - camera.position.y) * 0.05;
+                    camera.lookAt(scene.position);
 
-                renderer.render(scene, camera);
+                    renderer.render(scene, camera);
+                } catch (error) {
+                    console.error("Error in Three.js animation loop, stopping animation.", error);
+                    cancelAnimationFrame(animationFrameId);
+                }
             };
             animate();
 

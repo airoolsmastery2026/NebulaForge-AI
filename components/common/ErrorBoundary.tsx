@@ -1,3 +1,4 @@
+
 import React, { ErrorInfo, ReactNode } from 'react';
 
 interface Props {
@@ -10,28 +11,23 @@ interface State {
 }
 
 export class ErrorBoundary extends React.Component<Props, State> {
-  public state: State;
+  // FIX: Initialize state as a class property instead of in the constructor.
+  // This is a more modern syntax and resolves issues where the TypeScript compiler
+  // was failing to recognize `this.state` and `this.props` on the component instance.
+  public state: State = {
+    hasError: false,
+    error: undefined,
+  };
 
-  // FIX: The original implementation using a class property for state seemed to cause an issue
-  // with the toolchain where `this.props` was not recognized in the render method.
-  // Reverting to a constructor-based initialization resolves this.
-  constructor(props: Props) {
-    super(props);
-    this.state = {
-      hasError: false,
-      error: undefined,
-    };
-  }
-
-  static getDerivedStateFromError(error: Error): State {
+  public static getDerivedStateFromError(error: Error): State {
     return { hasError: true, error };
   }
 
-  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+  public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error("Uncaught error:", error, errorInfo);
   }
 
-  render() {
+  public render() {
     if (this.state.hasError) {
       return (
         <div className="flex items-center justify-center h-screen bg-gray-900 text-gray-100">
