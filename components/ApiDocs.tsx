@@ -23,6 +23,14 @@ const platformData = [
         docsUrl: 'https://developers.facebook.com/docs/facebook-login'
     },
     {
+        id: 'supabase',
+        logoId: 'supabase',
+        nameKey: 'apiDocs.platforms.supabase.name',
+        instructionsKey: 'apiDocs.platforms.supabase.instructions',
+        consoleUrl: 'https://supabase.com/dashboard',
+        docsUrl: 'https://supabase.com/docs/guides/auth/social-login/github'
+    },
+    {
         id: 'zalo',
         logoId: 'zalo',
         nameKey: 'apiDocs.platforms.zalo.name',

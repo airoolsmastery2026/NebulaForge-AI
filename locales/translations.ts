@@ -507,6 +507,10 @@ export const translations = {
                 name: 'Facebook / Instagram',
                 instructions: `- Create a new App (type "Consumer").\n- Navigate to "Settings → Basic".\n- App ID is your Client ID, App Secret is your Client Secret.`
             },
+            supabase: {
+                name: 'Supabase Auth',
+                instructions: `- In your Supabase project, go to "Authentication → Providers".\n- Find and expand the "GitHub" provider.\n- **Enable the provider.** This is the crucial step.\n- Get your Client ID and Secret from a GitHub OAuth App and paste them here.`
+            },
             zalo: {
                 name: 'Zalo Developers',
                 instructions: `- Go to "My Applications" → "Create New Application".\n- Find App ID and App Secret in "Application Info".`
@@ -1097,6 +1101,10 @@ export const translations = {
             facebook: {
                 name: 'Facebook / Instagram',
                 instructions: `- Tạo App mới (chọn "Consumer").\n- Vào "Settings → Basic".\n- App ID là Client ID, App Secret là Client Secret của bạn.`
+            },
+            supabase: {
+                name: 'Xác thực Supabase',
+                instructions: `- Trong dự án Supabase, vào "Authentication → Providers".\n- Tìm và mở rộng nhà cung cấp "GitHub".\n- **Bật nhà cung cấp này lên.** Đây là bước quan trọng nhất.\n- Lấy Client ID và Secret từ một ứng dụng GitHub OAuth và dán vào đây.`
             },
             zalo: {
                 name: 'Zalo Developers',
