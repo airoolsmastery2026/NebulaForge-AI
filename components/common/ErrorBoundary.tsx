@@ -10,6 +10,7 @@ interface State {
 }
 
 export class ErrorBoundary extends React.Component<Props, State> {
+  // Reverted to a class property for state initialization for better stability in some toolchains.
   public state: State = {
     hasError: false,
     error: undefined,
