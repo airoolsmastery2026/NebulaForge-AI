@@ -3,14 +3,14 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { Page } from '../types';
 import { AnalyticsIcon, DashboardIcon, EditIcon, PublishIcon, SearchIcon, CloseIcon, SparklesIcon, ConnectIcon, TemplateIcon } from './Icons';
-import { Video, BookOpen, KeyRound, Film, Github, Bot, ShoppingCart, Users, Code, Settings, MessageSquare, Briefcase, ChevronDown } from './LucideIcons';
+import { Video, BookOpen, KeyRound, Film, Github, Bot, ShoppingCart, Users, Code, Settings, MessageSquare, Briefcase, ChevronDown, Database, Bug } from './LucideIcons';
 import { useI18n } from '../hooks/useI18n';
 
 const Logo = () => {
     const { t } = useI18n();
     return (
         <div className="flex items-center space-x-3 font-digital">
-             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-cyan-400">
+             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-cyan-400">
                 <path d="M5 3L3 5l2 2 4 4-2 2-2 2 2 2 2-2 2-2 4 4 2 2 2-2-12-12-2-2z"/>
                 <path d="m19 21-2-2"/>
                 <path d="m21 19-2-2"/>
@@ -66,6 +66,9 @@ const navigationGroups = [
             { name: Page.CONNECTIONS, icon: ConnectIcon },
             { name: Page.ANALYTICS, icon: AnalyticsIcon },
             { name: Page.GITHUB_SYNC, icon: Github },
+            { name: Page.API_DOCS, icon: Code },
+            { name: Page.SUPABASE_GUIDE, icon: Database },
+            { name: Page.DEBUGGING_GUIDE, icon: Bug },
         ]
     }
 ];

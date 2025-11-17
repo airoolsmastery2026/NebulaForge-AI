@@ -37,6 +37,8 @@ export enum Page {
     ANALYTICS = 'Analytics',
     GITHUB_SYNC = 'GitHub Sync',
     API_DOCS = 'API Docs',
+    SUPABASE_GUIDE = 'Supabase Guide',
+    DEBUGGING_GUIDE = 'Debugging Guide',
 }
 
 

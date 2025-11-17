@@ -1,4 +1,4 @@
-import React, { ErrorInfo, ReactNode } from 'react';
+import React, { Component, ErrorInfo, ReactNode } from 'react';
 
 interface Props {
   children: ReactNode;
@@ -9,12 +9,17 @@ interface State {
   error?: Error;
 }
 
-export class ErrorBoundary extends React.Component<Props, State> {
-  // Reverted to a class property for state initialization for better stability in some toolchains.
-  public state: State = {
-    hasError: false,
-    error: undefined,
-  };
+export class ErrorBoundary extends Component<Props, State> {
+  // FIX: The error "Property 'props' does not exist" can occur with certain toolchain
+  // configurations when using class fields. Using a constructor with super(props) is a
+  // more traditional and robust way to initialize state and ensure props are correctly set up.
+  constructor(props: Props) {
+    super(props);
+    this.state = {
+      hasError: false,
+      error: undefined,
+    };
+  }
 
   static getDerivedStateFromError(error: Error): State {
     return { hasError: true, error };

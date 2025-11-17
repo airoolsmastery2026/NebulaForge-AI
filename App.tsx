@@ -28,6 +28,8 @@ const GitHubSync = lazy(() => import('./components/GitHubSync').then(m => ({ def
 const ThreeScene = lazy(() => import('./components/ThreeScene').then(m => ({ default: m.ThreeScene })));
 const ControlHub = lazy(() => import('./components/ControlHub').then(m => ({ default: m.ControlHub })));
 const PlaceholderPage = lazy(() => import('./components/PlaceholderPage').then(m => ({ default: m.PlaceholderPage })));
+const SupabaseGuide = lazy(() => import('./components/SupabaseGuide').then(m => ({ default: m.SupabaseGuide })));
+const DebuggingGuide = lazy(() => import('./components/DebuggingGuide').then(m => ({ default: m.DebuggingGuide })));
 
 
 const AppContent: React.FC = () => {
@@ -176,6 +178,10 @@ const AppContent: React.FC = () => {
                 return <Analytics />;
             case Page.API_DOCS:
                 return <ApiDocs />;
+            case Page.SUPABASE_GUIDE:
+                return <SupabaseGuide />;
+            case Page.DEBUGGING_GUIDE:
+                return <DebuggingGuide />;
             case Page.APP_GUIDE:
                 return <AppGuide />;
             case Page.FACEBOOK_HUB: return <ControlHub platform="Facebook" />;
