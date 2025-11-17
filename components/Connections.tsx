@@ -10,7 +10,8 @@ import {
     X as XIcon,
     Zap,
     HelpCircle,
-    BookOpen
+    BookOpen,
+    Edit
 } from './LucideIcons';
 import { useI18n } from '../hooks/useI18n';
 import { PlatformLogo } from './PlatformLogo';
@@ -131,14 +132,25 @@ const ConnectionModal: React.FC<{
     onClose: () => void;
 }> = ({ platform, connection, onSave, onDisconnect, onClose }) => {
     const { t } = useI18n();
+
+    const isInitiallyConnected = connection?.status === 'connected' || connection?.status === 'refreshing';
+    // Start in edit mode only if it's a new connection, otherwise start in view mode.
+    const [isEditing, setIsEditing] = useState(!isInitiallyConnected);
     const [credentials, setCredentials] = useState<Record<string, string>>({});
     const [statusCheck, setStatusCheck] = useState<{ running: boolean; message: string | null }>({ running: false, message: null });
     const modalRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        setCredentials(connection?.credentials || platform.fields.reduce((acc, f) => ({...acc, [f.name]: ''}), {}));
-        setStatusCheck({ running: false, message: null });
+        // This effect runs when the modal is opened or the platform changes.
+        // It sets up the initial state for the modal.
+        const initialCredentials = connection?.credentials || platform.fields.reduce((acc, f) => ({...acc, [f.name]: ''}), {});
+        setCredentials(initialCredentials);
+
+        const connected = connection?.status === 'connected' || connection?.status === 'refreshing';
+        setIsEditing(!connected); // Reset editing state based on connection status
+        setStatusCheck({ running: false, message: null }); // Reset status check message
     }, [connection, platform]);
+
 
     useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
@@ -152,7 +164,7 @@ const ConnectionModal: React.FC<{
         };
     }, [onClose]);
 
-    const handleSave = () => {
+    const handleSaveOrUpdate = () => {
         const newConnection = {
             id: platform.id,
             username: `${t(platform.nameKey)} User`,
@@ -161,26 +173,36 @@ const ConnectionModal: React.FC<{
             credentials,
         };
         onSave(newConnection);
-        onClose();
+        onClose(); // Close the modal after saving
     };
     
     const handleDisconnectClick = () => {
         onDisconnect(platform.id);
+        onClose();
     };
 
     const handleCheckStatus = async () => {
+        const credsToCheck = connection?.credentials || {};
         setStatusCheck({ running: true, message: null });
-        const result = await checkPlatformStatus(platform.id, credentials);
+        const result = await checkPlatformStatus(platform.id, credsToCheck);
         setStatusCheck({ running: false, message: result.message });
     };
     
-    const isConnected = connection?.status === 'connected' || connection?.status === 'refreshing';
+    const maskValue = (value: string, fieldName: string): string => {
+        if (!value) return 'Not Set';
+        const lowerFieldName = fieldName.toLowerCase();
+        if (lowerFieldName.includes('url') || lowerFieldName.includes('repo') || lowerFieldName.includes('path') || lowerFieldName.includes('id') || lowerFieldName.includes('tag')) {
+            return value;
+        }
+        if (value.length < 8) return '********';
+        return `${value.substring(0, 4)}...${value.slice(-4)}`;
+    };
     
     return (
-        <div ref={modalRef} className="glass-card w-96 rounded-lg shadow-2xl p-4 space-y-3" onClick={e => e.stopPropagation()}>
-             <div className="flex justify-between items-start">
+        <div ref={modalRef} className="glass-card w-full max-w-md rounded-lg shadow-2xl p-4" onClick={e => e.stopPropagation()}>
+             <div className="flex justify-between items-start mb-4">
                 <div>
-                    <h4 className="font-bold text-base text-gray-100">{t(platform.nameKey)}</h4>
+                    <h4 className="font-bold text-lg text-gray-100">{t(platform.nameKey)}</h4>
                     <div className="flex items-center space-x-2 mt-1">
                         <StatusIndicator status={connection?.status || 'disconnected'} />
                         <span className="text-xs text-gray-400">{t(`connections.status_${connection?.status || 'disconnected'}`)}</span>
@@ -196,49 +218,67 @@ const ConnectionModal: React.FC<{
                 </div>
             </div>
             
-            {!isConnected && platform.fields.map(field => (
-                <div key={field.name}>
-                    <div className="flex items-center space-x-2 mb-1">
-                        <label htmlFor={`${platform.id}-${field.name}`} className="text-xs text-gray-400 block font-mono">{field.name}</label>
-                        <div data-tooltip={t(field.helpTextKey) + (field.helpUrl ? `\n\n${t('connections.help.clickForDocs')}` : '')}>
-                           <a href={field.helpUrl || '#'} target="_blank" rel="noopener noreferrer" onClick={e => {if (!field.helpUrl) e.preventDefault()}} aria-label={`Help for ${field.name}`}>
-                                <HelpCircle className="h-4 w-4 text-gray-500 hover:text-cyan-400"/>
-                           </a>
+            {!isEditing && connection ? (
+                // --- VIEW MODE ---
+                <div className="space-y-4">
+                    <div className="space-y-3 pt-2 text-sm">
+                        <p className="text-xs text-gray-400 font-semibold">Saved Credentials:</p>
+                        <div className="space-y-2 rounded-md bg-gray-800/50 p-3 max-h-40 overflow-y-auto">
+                            {Object.entries(connection.credentials).map(([key, value]) => (
+                                <div key={key} className="flex justify-between items-center">
+                                    <span className="font-mono text-gray-400 text-xs">{key}:</span>
+                                    <span className="font-mono text-gray-200 text-xs bg-gray-900 px-2 py-1 rounded truncate max-w-[60%]">{maskValue(value, key)}</span>
+                                </div>
+                            ))}
                         </div>
                     </div>
-                    <input 
-                        id={`${platform.id}-${field.name}`}
-                        type={field.type}
-                        className="w-full bg-gray-800/50 border border-gray-600 rounded-md px-2 py-1.5 text-gray-50 focus:outline-none focus:ring-1 focus:ring-primary-500 text-sm"
-                        value={credentials[field.name] || ''}
-                        onChange={(e) => setCredentials(prev => ({ ...prev, [field.name]: e.target.value }))}
-                    />
+                    <div className="space-y-3 pt-2">
+                        <Button size="sm" variant="secondary" onClick={handleCheckStatus} isLoading={statusCheck.running} className="w-full">
+                            {statusCheck.running ? t('connections.testing') : t('connections.testConnection')}
+                        </Button>
+                        {statusCheck.message && (
+                            <div className={`text-xs p-2 rounded-md ${statusCheck.message.startsWith('Success') ? 'bg-green-500/20 text-green-300' : 'bg-red-500/20 text-red-300'}`}>
+                                {statusCheck.message}
+                            </div>
+                        )}
+                    </div>
+                     <div className="flex justify-between items-center pt-2">
+                         <Button size="sm" variant="secondary" onClick={() => setIsEditing(true)} icon={<Edit className="h-3 w-3" />}>Edit</Button>
+                         <Button size="sm" variant="ghost" className="text-red-400 hover:bg-red-500/10 hover:text-red-400" onClick={handleDisconnectClick} icon={<Trash className="h-3 w-3" />}>{t('connections.disconnect')}</Button>
+                    </div>
                 </div>
-            ))}
-            
-            {isConnected && (
-                <div className="space-y-3 pt-2">
-                    <Button size="sm" variant="secondary" onClick={handleCheckStatus} isLoading={statusCheck.running} className="w-full">
-                        {statusCheck.running ? t('connections.testing') : t('connections.testConnection')}
-                    </Button>
-                    {statusCheck.message && (
-                        <div className={`text-xs p-2 rounded-md ${statusCheck.message.startsWith('Success') ? 'bg-green-500/20 text-green-300' : 'bg-red-500/20 text-red-300'}`}>
-                            {statusCheck.message}
+            ) : (
+                // --- EDIT/CREATE MODE (FORM) ---
+                <div className="space-y-4">
+                    {platform.fields.map(field => (
+                        <div key={field.name}>
+                            <div className="flex items-center space-x-2 mb-1">
+                                <label htmlFor={`${platform.id}-${field.name}`} className="text-xs text-gray-400 block font-mono">{field.name}</label>
+                                <div data-tooltip={t(field.helpTextKey) + (field.helpUrl ? `\n\n${t('connections.help.clickForDocs')}` : '')}>
+                                   <a href={field.helpUrl || '#'} target="_blank" rel="noopener noreferrer" onClick={e => {if (!field.helpUrl) e.preventDefault()}} aria-label={`Help for ${field.name}`}>
+                                        <HelpCircle className="h-4 w-4 text-gray-500 hover:text-cyan-400"/>
+                                   </a>
+                                </div>
+                            </div>
+                            <input 
+                                id={`${platform.id}-${field.name}`}
+                                type={field.type}
+                                className="w-full bg-gray-800/50 border border-gray-600 rounded-md px-2 py-1.5 text-gray-50 focus:outline-none focus:ring-1 focus:ring-primary-500 text-sm"
+                                value={credentials[field.name] || ''}
+                                onChange={(e) => setCredentials(prev => ({ ...prev, [field.name]: e.target.value }))}
+                            />
                         </div>
-                    )}
+                    ))}
+                     <div className="flex justify-end space-x-2 pt-2">
+                        <Button size="sm" variant="ghost" onClick={isInitiallyConnected ? () => setIsEditing(false) : onClose}>
+                            {t('connections.cancel')}
+                        </Button>
+                        <Button size="sm" onClick={handleSaveOrUpdate} icon={<Save className="h-3 w-3"/>}>
+                            {isInitiallyConnected ? "Update Connection" : t('connections.saveAndConnect')}
+                        </Button>
+                    </div>
                 </div>
             )}
-
-            <div className="flex justify-end space-x-2 pt-2">
-                {isConnected ? (
-                     <Button size="sm" variant="secondary" onClick={handleDisconnectClick} icon={<Trash className="h-3 w-3" />}>{t('connections.disconnect')}</Button>
-                ) : (
-                    <>
-                        <Button size="sm" variant="ghost" onClick={onClose}>{t('connections.cancel')}</Button>
-                        <Button size="sm" onClick={handleSave} icon={<Save className="h-3 w-3"/>}>{t('connections.saveAndConnect')}</Button>
-                    </>
-                )}
-            </div>
         </div>
     )
 }
@@ -384,7 +424,7 @@ export const Connections: React.FC<ConnectionsProps> = ({ setCurrentPage }) => {
 
             {activePlatform && (
                 <div 
-                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
                     onClick={() => setActivePlatformId(null)}
                 >
                     <ConnectionModal 

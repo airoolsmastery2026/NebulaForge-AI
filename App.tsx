@@ -255,9 +255,7 @@ const AppContent: React.FC = () => {
 };
 
 const App: React.FC = () => (
-    <ErrorBoundary>
-        <AppContent />
-    </ErrorBoundary>
+    <AppContent />
 );
 
 
