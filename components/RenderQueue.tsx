@@ -88,7 +88,7 @@ const createWavBlob = (base64Pcm: string): Blob => {
 export const RenderQueue: React.FC<RenderQueueProps> = ({ jobs, setJobs }) => {
     const { t } = useI18n();
     
-     // Effect for polling video generation status
+    // Effect for polling video generation status
     useEffect(() => {
         const jobsToPoll = jobs.filter(j => (j.status === 'Queued' || j.status === 'Rendering') && j.videoOperation && !j.videoOperation.done);
         if (jobsToPoll.length === 0) return;
@@ -120,18 +120,25 @@ export const RenderQueue: React.FC<RenderQueueProps> = ({ jobs, setJobs }) => {
         return () => clearInterval(intervalId);
     }, [jobs, setJobs]);
 
-    // Effect for handling state transitions after completion (Completed -> Composing -> Ready)
+    // Effect for handling state transition: Completed -> Composing
     useEffect(() => {
         const completedJobs = jobs.filter(j => j.status === 'Completed');
         if (completedJobs.length > 0) {
-            // Set status to Composing immediately
-            setJobs(prevJobs => prevJobs.map(j => j.status === 'Completed' ? { ...j, status: 'Composing' } : j));
-            
-            // Schedule the next transition to Ready
-            const timer = setTimeout(() => {
-                setJobs(prevJobs => prevJobs.map(j => (completedJobs.some(cj => cj.id === j.id)) ? { ...j, status: 'Ready' } : j));
-            }, 3000); // Simulate 3-second composition time
+            setJobs(prevJobs => prevJobs.map(j => 
+                j.status === 'Completed' ? { ...j, status: 'Composing' } : j
+            ));
+        }
+    }, [jobs, setJobs]);
 
+    // Effect for handling state transition: Composing -> Ready
+    useEffect(() => {
+        const composingJobsExist = jobs.some(j => j.status === 'Composing');
+        if (composingJobsExist) {
+            const timer = setTimeout(() => {
+                setJobs(prevJobs => prevJobs.map(j => 
+                    j.status === 'Composing' ? { ...j, status: 'Ready' } : j
+                ));
+            }, 3000); // Simulate 3-second composition time
             return () => clearTimeout(timer);
         }
     }, [jobs, setJobs]);
